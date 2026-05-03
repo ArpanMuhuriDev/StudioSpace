@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <title>JamPad</title>
+  <link rel="manifest" href="manifest.json" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #161616;
+      --surface2: #1f1f1f;
+      --surface3: #2a2a2a;
+      --accent: #f0c040;
+      --accent-dim: rgba(240,192,64,0.12);
+      --red: #ff5050;
+      --red-dim: rgba(255,80,80,0.1);
+      --green: #4cffb0;
+      --text: #efefef;
+      --muted: #666;
+      --muted2: #444;
+      --border: #272727;
+      --radius: 18px;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-body: 'Syne', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: var(--font-body);
+      min-height: 100dvh; overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::after {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 9999;
+    }
+    .app-header {
+      padding: 18px 20px 0;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100; background: var(--bg);
+    }
+    .logo { font-family: var(--font-display); font-size: 2.6rem; letter-spacing: 4px; line-height: 1; color: var(--accent); }
+    .logo em { color: var(--text); font-style: normal; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .icon-btn {
+      width: 36px; height: 36px; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1rem; color: var(--muted);
+      transition: all 0.2s;
+    }
+    .icon-btn.active { border-color: var(--accent); color: var(--accent); }
+    .icon-btn.spinning { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .status-bar {
+      margin: 10px 20px 0; padding: 8px 14px; border-radius: 10px;
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.8px;
+      text-transform: uppercase; display: flex; align-items: center; gap: 8px;
+    }
+    .status-bar.ok  { background: rgba(76,255,176,0.08); color: var(--green); border: 1px solid rgba(76,255,176,0.2); }
+    .status-bar.warn { background: var(--red-dim); color: var(--red); border: 1px solid rgba(255,80,80,0.2); }
+    .status-bar.info { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(240,192,64,0.2); }
+    .tabs {
+      display: flex; margin: 16px 20px 0;
+      background: var(--surface); border-radius: 14px; padding: 4px; gap: 3px;
+    }
+    .tab {
+      flex: 1; padding: 10px 6px; border: none; background: transparent;
+      color: var(--muted); font-family: var(--font-body); font-size: 0.8rem;
+      font-weight: 700; border-radius: 11px; cursor: pointer; transition: all 0.2s;
+    }
+    .tab.active { background: var(--accent); color: #000; }
+    .page { display: none; padding: 20px; animation: fadeUp 0.25s ease; }
+    .page.active { display: block; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    .section-title { font-family: var(--font-display); font-size: 1.7rem; letter-spacing: 2px; color: var(--text); margin-bottom: 20px; }
+    .section-title span { color: var(--accent); }
+    .field { margin-bottom: 14px; }
+    label { display: block; font-size: 0.68rem; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+    input, select {
+      width: 100%; background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 13px; padding: 13px 15px; color: var(--text);
+      font-family: var(--font-body); font-size: 0.95rem; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none;
+    }
+    input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(240,192,64,0.1); }
+    input::placeholder { color: var(--muted2); }
+    .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .amount-wrap { position: relative; }
+    .amount-wrap input { padding-left: 34px; }
+    .currency-sign { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--accent); font-weight: 700; font-size: 0.95rem; pointer-events: none; }
+    .clash-box {
+      background: var(--red-dim); border: 1px solid rgba(255,80,80,0.3);
+      border-radius: 11px; padding: 10px 14px; font-size: 0.8rem; color: var(--red);
+      margin-bottom: 14px; display: none; align-items: center; gap: 8px;
+    }
+    .clash-box.show { display: flex; }
+    .submit-btn {
+      width: 100%; margin-top: 6px; background: var(--accent); color: #000;
+      border: none; border-radius: 14px; padding: 15px;
+      font-family: var(--font-display); font-size: 1.2rem; letter-spacing: 2.5px;
+      cursor: pointer; transition: transform 0.15s, opacity 0.15s;
+      box-shadow: 0 6px 24px rgba(240,192,64,0.2);
+    }
+    .submit-btn:active { transform: scale(0.97); }
+    .submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-spinner { display: none; }
+    .submit-btn.loading .btn-text { display: none; }
+    .submit-btn.loading .btn-spinner { display: inline; }
+    .summary-bar {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px 16px;
+      display: grid; grid-template-columns: 1fr 1px 1fr 1px 1fr;
+      margin-bottom: 18px;
+    }
+    .summary-item { text-align: center; padding: 2px 8px; }
+    .summary-divider { background: var(--border); }
+    .summary-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 4px; }
+    .summary-value { font-family: var(--font-display); font-size: 1.4rem; color: var(--accent); letter-spacing: 1px; }
+    .date-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .date-nav-btn {
+      width: 36px; height: 36px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-size: 1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .date-nav input[type="date"] { flex: 1; text-align: center; padding: 9px 12px; font-size: 0.85rem; font-weight: 700; border-radius: 10px; }
+    .filter-row { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; margin-bottom: 14px; }
+    .filter-row::-webkit-scrollbar { display: none; }
+    .chip {
+      flex-shrink: 0; padding: 6px 14px; border-radius: 100px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--muted); font-family: var(--font-body); font-size: 0.75rem;
+      font-weight: 600; cursor: pointer; transition: all 0.15s;
+    }
+    .chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+    .booking-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px 14px 14px 18px;
+      margin-bottom: 10px; display: flex; align-items: center; gap: 12px;
+      position: relative; overflow: hidden; animation: fadeUp 0.2s ease;
+    }
+    .booking-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); }
+    .booking-card.past::before { background: var(--muted2); }
+    .booking-card.past { opacity: 0.6; }
+    .card-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .card-info { flex: 1; min-width: 0; }
+    .card-band { font-size: 0.95rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-time { font-size: 0.76rem; color: var(--muted); margin-top: 2px; }
+    .card-date-lbl { font-size: 0.68rem; color: var(--muted2); margin-top: 1px; }
+    .card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+    .card-amount { font-family: var(--font-display); font-size: 1.25rem; color: var(--accent); letter-spacing: 1px; }
+    .card-del { background: transparent; border: none; color: var(--muted2); font-size: 0.85rem; cursor: pointer; padding: 2px; transition: color 0.2s; }
+    .card-del:hover { color: var(--red); }
+    .empty-state { text-align: center; padding: 56px 20px; color: var(--muted); }
+    .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+    .empty-state p { font-size: 0.88rem; line-height: 1.7; }
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(4px); z-index: 500;
+      display: none; align-items: flex-end;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 24px 24px 0 0; padding: 24px 20px 36px; width: 100%;
+      animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .modal-handle { width: 40px; height: 4px; background: var(--muted2); border-radius: 2px; margin: 0 auto 20px; }
+    .modal-title { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: 2px; margin-bottom: 8px; }
+    .modal-title span { color: var(--accent); }
+    .modal-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+    .modal-save-btn {
+      width: 100%; background: var(--accent); color: #000; border: none;
+      border-radius: 13px; padding: 14px; font-family: var(--font-display);
+      font-size: 1.1rem; letter-spacing: 2px; cursor: pointer; margin-top: 6px;
+    }
+    .modal-help { margin-top: 14px; font-size: 0.75rem; color: var(--muted); text-align: center; line-height: 1.5; }
+    .toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); padding: 11px 22px; border-radius: 100px;
+      font-size: 0.82rem; font-weight: 600; z-index: 1000;
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      white-space: nowrap; max-width: 90vw;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: var(--green); color: var(--green); }
+    .toast.error { border-color: var(--red); color: var(--red); }
+  </style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="logo">Jam<em>Pad</em></div>
+  <div class="header-right">
+    <button class="icon-btn" id="syncBtn" onclick="syncNow()">↻</button>
+    <button class="icon-btn" id="configBtn" onclick="openSetup()">⚙</button>
+  </div>
+</header>
+
+<div class="status-bar info" id="statusBar">
+  <span id="statusMsg">Configure Google Sheets to sync across devices</span>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('book')">📋 Book</button>
+  <button class="tab" onclick="switchTab('schedule')">🎸 Schedule</button>
+  <button class="tab" onclick="switchTab('stats')">📊 Stats</button>
+</div>
+
+<!-- BOOK -->
+<div class="page active" id="page-book">
+  <p class="section-title" style="margin-top:18px">New <span>Booking</span></p>
+  <div class="field">
+    <label>Band Name</label>
+    <input type="text" id="bandName" placeholder="e.g. XYZ Rockers" autocomplete="off" />
+  </div>
+  <div class="field">
+    <label>Date</label>
+    <input type="date" id="bookDate" />
+  </div>
+  <div class="time-row">
+    <div class="field"><label>From</label><input type="time" id="fromTime" onchange="checkClash()" /></div>
+    <div class="field"><label>To</label><input type="time" id="toTime" onchange="checkClash()" /></div>
+  </div>
+  <div class="clash-box" id="clashBox"><span>⚠️</span><span id="clashMsg"></span></div>
+  <div class="field">
+    <label>Amount Collected (₹)</label>
+    <div class="amount-wrap">
+      <span class="currency-sign">₹</span>
+      <input type="number" id="amount" placeholder="0" inputmode="numeric" min="0" />
+    </div>
+  </div>
+  <div class="field">
+    <label>Notes (optional)</label>
+    <input type="text" id="notes" placeholder="e.g. needs drum kit" autocomplete="off" />
+  </div>
+  <button class="submit-btn" id="submitBtn" onclick="addBooking()">
+    <span class="btn-text">CONFIRM BOOKING</span>
+    <span class="btn-spinner">SAVING…</span>
+  </button>
+</div>
+
+<!-- SCHEDULE -->
+<div class="page" id="page-schedule">
+  <div class="summary-bar">
+    <div class="summary-item"><div class="summary-label">Bookings</div><div class="summary-value" id="sumCount">0</div></div>
+    <div class="summary-divider"></div>
+    <div class="summary-item"><div class="summary-label">Collected</div><div class="summary-value" id="sumAmount">₹0</div></div>
+    <div class="summary-divider"></div>
+    <div class="summary-item"><div class="summary-label">Hours</div><div class="summary-value" id="sumHours">0h</div></div>
+  </div>
+  <div class="date-nav">
+    <button class="date-nav-btn" onclick="shiftDate(-1)">‹</button>
+    <input type="date" id="scheduleDate" onchange="renderSchedule()" />
+    <button class="date-nav-btn" onclick="shiftDate(1)">›</button>
+  </div>
+  <div class="filter-row">
+    <button class="chip active" onclick="setFilter('day',this)">This Day</button>
+    <button class="chip" onclick="setFilter('all',this)">All</button>
+    <button class="chip" onclick="setFilter('upcoming',this)">Upcoming</button>
+    <button class="chip" onclick="setFilter('past',this)">Past</button>
+  </div>
+  <div id="bookingList"></div>
+</div>
+
+<!-- STATS -->
+<div class="page" id="page-stats">
+  <p class="section-title" style="margin-top:18px">Revenue <span>Stats</span></p>
+  <div id="statsContent"></div>
+</div>
+
+<!-- SETUP MODAL -->
+<div class="modal-overlay" id="setupModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Google <span>Sheets</span></div>
+    <p class="modal-desc">Paste your Apps Script Web App URL. Both phones will read and write through this URL — same data, always in sync.</p>
+    <div class="field">
+      <label>Apps Script Web App URL</label>
+      <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec" />
+    </div>
+    <button class="modal-save-btn" onclick="saveConfig()">SAVE & CONNECT</button>
+    <p class="modal-help">Don't have a URL yet? Open <strong>setup-guide.html</strong> for step-by-step instructions (5 minutes).</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SCRIPT_URL_KEY = 'jampad_script_url';
+const LOCAL_KEY = 'jampad_local';
+const ICONS = ['🎸','🥁','🎹','🎺','🎻','🎷','🎤','🪗'];
+let bookings = [];
+let currentFilter = 'day';
+let isSyncing = false;
+
+// ── INIT ──
+window.addEventListener('DOMContentLoaded', () => {
+  const today = todayStr();
+  document.getElementById('bookDate').value = today;
+  document.getElementById('scheduleDate').value = today;
+  document.getElementById('bookDate').addEventListener('change', checkClash);
+  const url = getScriptUrl();
+  if (url) {
+    document.getElementById('scriptUrl').value = url;
+    document.getElementById('configBtn').classList.add('active');
+    setStatus('info', 'Connecting to Google Sheets…');
+    loadFromSheets();
+  } else {
+    bookings = getLocal();
+    renderSchedule(); renderStats();
+  }
+});
+
+// ── UTILS ──
+const todayStr = () => new Date().toISOString().split('T')[0];
+const timeToMins = t => { const [h,m] = t.split(':').map(Number); return h*60+m; };
+const getScriptUrl = () => localStorage.getItem(SCRIPT_URL_KEY) || '';
+const getLocal = () => JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
+const saveLocal = d => localStorage.setItem(LOCAL_KEY, JSON.stringify(d));
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const t = todayStr();
+  const tom = new Date(); tom.setDate(tom.getDate()+1);
+  const tomStr = tom.toISOString().split('T')[0];
+  if (dateStr === t) return 'Today';
+  if (dateStr === tomStr) return 'Tomorrow';
+  return d.toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short' });
+}
+
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' '+type : '');
+  setTimeout(() => t.className = 'toast', 2800);
+}
+
+function setStatus(type, msg) {
+  const bar = document.getElementById('statusBar');
+  bar.className = 'status-bar ' + type;
+  document.getElementById('statusMsg').textContent = msg;
+}
+
+// ── SETUP MODAL ──
+function openSetup() { document.getElementById('setupModal').classList.add('show'); }
+function closeSetup() { document.getElementById('setupModal').classList.remove('show'); }
+document.getElementById('setupModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('setupModal')) closeSetup();
+});
+function saveConfig() {
+  const url = document.getElementById('scriptUrl').value.trim();
+  if (!url || !url.startsWith('https://script.google.com')) {
+    showToast('Enter a valid Apps Script URL', 'error'); return;
+  }
+  localStorage.setItem(SCRIPT_URL_KEY, url);
+  document.getElementById('configBtn').classList.add('active');
+  closeSetup();
+  setStatus('info', 'Connecting…');
+  showToast('Connecting to Sheets…');
+  loadFromSheets();
+}
+
+// ── GOOGLE SHEETS ──
+async function loadFromSheets() {
+  const url = getScriptUrl();
+  if (!url) { bookings = getLocal(); renderSchedule(); renderStats(); return; }
+  setSpin(true);
+  try {
+    const res = await fetch(url + '?action=getAll');
+    const data = await res.json();
+    if (data.status === 'ok') {
+      bookings = data.bookings || [];
+      saveLocal(bookings);
+      setStatus('ok', '✓ Synced · ' + bookings.length + ' bookings');
+    } else throw new Error(data.message);
+  } catch {
+    bookings = getLocal();
+    setStatus('warn', '⚠ Offline — showing local data');
+  } finally {
+    setSpin(false);
+    renderSchedule(); renderStats();
+  }
+}
+
+async function pushToSheets(booking) {
+  const url = getScriptUrl(); if (!url) return false;
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'add', booking })
+    });
+    const data = await res.json();
+    return data.status === 'ok';
+  } catch { return false; }
+}
+
+async function deleteFromSheets(id) {
+  const url = getScriptUrl(); if (!url) return false;
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'delete', id })
+    });
+    const data = await res.json();
+    return data.status === 'ok';
+  } catch { return false; }
+}
+
+function setSpin(on) {
+  isSyncing = on;
+  document.getElementById('syncBtn').classList.toggle('spinning', on);
+}
+
+async function syncNow() {
+  if (isSyncing) return;
+  setStatus('info', 'Syncing…');
+  await loadFromSheets();
+  if (getScriptUrl()) showToast('Synced!', 'success');
+}
+
+// ── CLASH ──
+function checkClash() {
+  const date = document.getElementById('bookDate').value;
+  const from = document.getElementById('fromTime').value;
+  const to   = document.getElementById('toTime').value;
+  const box  = document.getElementById('clashBox');
+  const msg  = document.getElementById('clashMsg');
+  if (!date || !from || !to) { box.classList.remove('show'); return false; }
+  const nF = timeToMins(from), nT = timeToMins(to);
+  if (nT <= nF) { msg.textContent = '"To" must be after "From".'; box.classList.add('show'); return true; }
+  const clash = bookings.find(b => b.date === date && nF < timeToMins(b.to) && nT > timeToMins(b.from));
+  if (clash) { msg.textContent = `Clashes with ${clash.band} (${clash.from}–${clash.to})`; box.classList.add('show'); return true; }
+  box.classList.remove('show'); return false;
+}
+
+// ── ADD BOOKING ──
+async function addBooking() {
+  const band   = document.getElementById('bandName').value.trim();
+  const date   = document.getElementById('bookDate').value;
+  const from   = document.getElementById('fromTime').value;
+  const to     = document.getElementById('toTime').value;
+  const amount = document.getElementById('amount').value;
+  const notes  = document.getElementById('notes').value.trim();
+  if (!band || !date || !from || !to || !amount) { showToast('Fill all required fields', 'error'); return; }
+  if (checkClash()) { showToast('Fix the slot clash first', 'error'); return; }
+  const btn = document.getElementById('submitBtn');
+  btn.classList.add('loading'); btn.disabled = true;
+  const booking = { id: Date.now().toString(), band, date, from, to, amount: parseFloat(amount), notes, createdAt: new Date().toISOString() };
+  const url = getScriptUrl();
+  if (url) {
+    const ok = await pushToSheets(booking);
+    if (ok) {
+      bookings.push(booking); saveLocal(bookings);
+      showToast('✅ Saved to Google Sheets!', 'success');
+      setStatus('ok', '✓ Synced · ' + bookings.length + ' bookings');
+    } else {
+      booking._pending = true; bookings.push(booking); saveLocal(bookings);
+      showToast('Saved locally (offline)', '');
+      setStatus('warn', '⚠ Offline — tap ↻ to sync');
+    }
+  } else {
+    bookings.push(booking); saveLocal(bookings);
+    showToast('Saved locally');
+  }
+  ['bandName','fromTime','toTime','amount','notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('clashBox').classList.remove('show');
+  btn.classList.remove('loading'); btn.disabled = false;
+  switchTab('schedule');
+}
+
+// ── DELETE ──
+async function deleteBooking(id) {
+  if (!confirm('Remove this booking?')) return;
+  const url = getScriptUrl();
+  if (url) { setSpin(true); await deleteFromSheets(id); setSpin(false); }
+  bookings = bookings.filter(b => b.id !== id);
+  saveLocal(bookings); renderSchedule(); renderStats();
+  showToast('Booking removed');
+}
+
+// ── SCHEDULE ──
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderSchedule();
+}
+function shiftDate(d) {
+  const el = document.getElementById('scheduleDate');
+  const dt = new Date(el.value + 'T00:00:00');
+  dt.setDate(dt.getDate() + d);
+  el.value = dt.toISOString().split('T')[0];
+  renderSchedule();
+}
+function renderSchedule() {
+  const list = document.getElementById('bookingList');
+  const sel  = document.getElementById('scheduleDate').value;
+  const today = todayStr();
+  let filtered = [...bookings];
+  if (currentFilter === 'day')      filtered = filtered.filter(b => b.date === sel);
+  else if (currentFilter === 'upcoming') filtered = filtered.filter(b => b.date >= today);
+  else if (currentFilter === 'past')     filtered = filtered.filter(b => b.date < today);
+  filtered.sort((a,b) => a.date === b.date ? a.from.localeCompare(b.from) : a.date.localeCompare(b.date));
+  const summarySet = currentFilter === 'day' ? filtered : bookings;
+  const totalMins = summarySet.reduce((s,b) => s + (timeToMins(b.to) - timeToMins(b.from)), 0);
+  document.getElementById('sumCount').textContent  = summarySet.length;
+  document.getElementById('sumAmount').textContent = '₹' + summarySet.reduce((s,b) => s+b.amount, 0).toLocaleString('en-IN');
+  document.getElementById('sumHours').textContent  = (totalMins/60).toFixed(1) + 'h';
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">🎸</div><p>No bookings here.<br/>Use the Book tab to add one!</p></div>`;
+    return;
+  }
+  list.innerHTML = filtered.map((b,i) => `
+    <div class="booking-card ${b.date < today ? 'past' : ''}">
+      <div class="card-icon">${ICONS[i % ICONS.length]}</div>
+      <div class="card-info">
+        <div class="card-band">${b.band}${b._pending ? ' 🔄' : ''}</div>
+        <div class="card-time">${b.from} – ${b.to}${b.notes ? ' · ' + b.notes : ''}</div>
+        <div class="card-date-lbl">${formatDate(b.date)}</div>
+      </div>
+      <div class="card-right">
+        <div class="card-amount">₹${b.amount.toLocaleString('en-IN')}</div>
+        <button class="card-del" onclick="deleteBooking('${b.id}')">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+// ── STATS ──
+function renderStats() {
+  const el = document.getElementById('statsContent');
+  if (!bookings.length) { el.innerHTML = `<div class="empty-state"><div class="empty-icon">📊</div><p>No data yet.</p></div>`; return; }
+  const byMonth = {}, byBand = {};
+  const grandTotal = bookings.reduce((s,b) => s + b.amount, 0);
+  bookings.forEach(b => {
+    const key = b.date.slice(0,7);
+    if (!byMonth[key]) byMonth[key] = { total:0, count:0, hours:0 };
+    byMonth[key].total += b.amount; byMonth[key].count++;
+    byMonth[key].hours += (timeToMins(b.to) - timeToMins(b.from)) / 60;
+    if (!byBand[b.band]) byBand[b.band] = { total:0, count:0 };
+    byBand[b.band].total += b.amount; byBand[b.band].count++;
+  });
+  const months   = Object.entries(byMonth).sort((a,b) => b[0].localeCompare(a[0]));
+  const topBands = Object.entries(byBand).sort((a,b) => b[1].total - a[1].total).slice(0,5);
+  const card = (content) => `<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;">${content}</div>`;
+  const sectionTitle = t => `<div style="font-family:var(--font-display);font-size:1rem;letter-spacing:2px;color:var(--muted);margin:18px 0 12px;">${t}</div>`;
+  el.innerHTML =
+    card(`<div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px;">All-Time Revenue</div>
+      <div style="font-family:var(--font-display);font-size:2.4rem;color:var(--accent);letter-spacing:2px;">₹${grandTotal.toLocaleString('en-IN')}</div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:4px;">${bookings.length} total bookings</div>`) +
+    sectionTitle('MONTHLY') +
+    months.map(([key,val]) => {
+      const label = new Date(key+'-01').toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+      const pct = Math.round((val.total/grandTotal)*100);
+      return card(`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-weight:700;font-size:0.88rem;">${label}</span>
+          <span style="font-family:var(--font-display);font-size:1.2rem;color:var(--accent);">₹${val.total.toLocaleString('en-IN')}</span>
+        </div>
+        <div style="background:var(--surface2);border-radius:4px;height:4px;margin-bottom:8px;">
+          <div style="background:var(--accent);height:4px;border-radius:4px;width:${pct}%;"></div>
+        </div>
+        <div style="font-size:0.72rem;color:var(--muted);">${val.count} bookings · ${val.hours.toFixed(1)}h booked</div>`);
+    }).join('') +
+    sectionTitle('TOP BANDS') +
+    topBands.map(([band,val],i) => card(`
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="font-family:var(--font-display);font-size:1.4rem;color:var(--muted2);width:24px;text-align:center;">${i+1}</div>
+        <div style="flex:1;font-weight:700;font-size:0.9rem;">${band}</div>
+        <div style="text-align:right;">
+          <div style="font-family:var(--font-display);font-size:1.1rem;color:var(--accent);">₹${val.total.toLocaleString('en-IN')}</div>
+          <div style="font-size:0.68rem;color:var(--muted);">${val.count} sessions</div>
+        </div>
+      </div>`)).join('');
+}
+
+// ── TABS ──
+function switchTab(tab) {
+  const tabs = ['book','schedule','stats'];
+  document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', tabs[i] === tab));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+tab).classList.add('active');
+  if (tab === 'schedule') renderSchedule();
+  if (tab === 'stats') renderStats();
+}
+</script>
+</body>
+</html>
