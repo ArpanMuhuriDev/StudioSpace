@@ -229,7 +229,6 @@
 <script>
 // ── CONFIG — injected by GitHub Actions ──
 const SCRIPT_URL = '%%SCRIPT_URL%%';
-const APP_TOKEN  = '%%APP_TOKEN%%';
 
 const LOCAL_KEY   = 'studiospace_local';
 const ICONS       = ['🎸','🥁','🎹','🎺','🎻','🎷','🎤','🪗'];
@@ -297,11 +296,27 @@ function setStatus(type, msg) {
 }
 
 // ── SHEETS ──
+// Use XMLHttpRequest instead of fetch — iOS WebKit handles
+// Apps Script redirects correctly with XHR but blocks fetch.
+function xhrGet(url) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.onload = () => {
+      try { resolve(JSON.parse(xhr.responseText)); }
+      catch { reject(new Error('Invalid JSON')); }
+    };
+    xhr.onerror   = () => reject(new Error('Network error'));
+    xhr.ontimeout = () => reject(new Error('Timeout'));
+    xhr.timeout   = 15000;
+    xhr.send();
+  });
+}
+
 async function loadFromSheets() {
   setSpin(true);
   try {
-    const res  = await fetch(`${SCRIPT_URL}?action=getAll&token=${APP_TOKEN}`);
-    const data = await res.json();
+    const data = await xhrGet(`${SCRIPT_URL}?action=getAll`);
     if (data.status === 'ok') {
       bookings = (data.bookings || []).map(b => ({ ...b, date: safeDate(b.date), from: safeTime(b.from), to: safeTime(b.to) }));
       saveLocal(bookings);
@@ -315,16 +330,18 @@ async function loadFromSheets() {
     renderSchedule(); renderStats(); renderCalendar();
   }
 }
+
 async function pushToSheets(booking) {
   try {
-    const res  = await fetch(`${SCRIPT_URL}?action=add&token=${APP_TOKEN}&data=${encodeURIComponent(JSON.stringify(booking))}`);
-    return (await res.json()).status === 'ok';
+    const data = await xhrGet(`${SCRIPT_URL}?action=add&data=${encodeURIComponent(JSON.stringify(booking))}`);
+    return data.status === 'ok';
   } catch { return false; }
 }
+
 async function deleteFromSheets(id) {
   try {
-    const res  = await fetch(`${SCRIPT_URL}?action=delete&token=${APP_TOKEN}&id=${encodeURIComponent(id)}`);
-    return (await res.json()).status === 'ok';
+    const data = await xhrGet(`${SCRIPT_URL}?action=delete&id=${encodeURIComponent(id)}`);
+    return data.status === 'ok';
   } catch { return false; }
 }
 function setSpin(on) { isSyncing = on; document.getElementById('syncBtn').classList.toggle('spinning', on); }
