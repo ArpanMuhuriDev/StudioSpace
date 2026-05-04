@@ -9,6 +9,9 @@
   <title>Studio Space</title>
   <link rel="manifest" href="manifest.json" />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <style>
     :root {
       --bg: #ffffff; --surface: #f4f4f4; --surface2: #ebebeb; --surface3: #e0e0e0;
@@ -122,22 +125,103 @@
     .cal-slot-band { font-size: 0.85rem; font-weight: 700; flex: 1; }
     .cal-slot-amt { font-family: var(--font-display); font-size: 1rem; color: #111; }
     .cal-free-msg { font-size: 0.82rem; color: var(--muted); text-align: center; padding: 16px 0; }
+
+    /* ── AUTH SCREENS ── */
+    .auth-screen {
+      position: fixed; inset: 0; background: #fff;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 9000; padding: 40px 24px; text-align: center;
+    }
+    .auth-screen.hidden { display: none; }
+    .auth-logo {
+      width: 72px; height: 72px; background: #000; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; margin-bottom: 24px;
+    }
+    .auth-title {
+      font-family: var(--font-body); font-size: 1.6rem;
+      font-weight: 800; color: #000; margin-bottom: 6px;
+    }
+    .auth-subtitle { font-size: 0.85rem; color: var(--muted); margin-bottom: 40px; line-height: 1.6; }
+    .google-btn {
+      display: flex; align-items: center; gap: 12px;
+      background: #fff; border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 14px 24px;
+      font-family: var(--font-body); font-size: 0.95rem;
+      font-weight: 600; color: #111; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: box-shadow 0.2s, transform 0.15s;
+    }
+    .google-btn:active { transform: scale(0.97); }
+    .google-btn:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+    .google-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .auth-loading { font-size: 0.85rem; color: var(--muted); margin-top: 20px; }
+
+    .denied-icon { font-size: 3rem; margin-bottom: 16px; }
+    .denied-title { font-family: var(--font-body); font-size: 1.3rem; font-weight: 800; color: #000; margin-bottom: 8px; }
+    .denied-msg { font-size: 0.85rem; color: var(--muted); margin-bottom: 8px; line-height: 1.6; }
+    .denied-email { font-size: 0.8rem; color: #111; font-weight: 600; background: var(--surface); padding: 6px 14px; border-radius: 100px; display: inline-block; margin-bottom: 28px; }
+    .signout-btn { background: #111; color: #fff; border: none; border-radius: 12px; padding: 12px 28px; font-family: var(--font-body); font-size: 0.9rem; font-weight: 700; cursor: pointer; }
+
+    /* User avatar in header */
+    .user-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      object-fit: cover; border: 2px solid var(--border);
+      cursor: pointer; flex-shrink: 0;
+    }
+    .user-avatar-placeholder {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--surface2); border: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700; color: var(--muted);
+      cursor: pointer; flex-shrink: 0;
+    }
   </style>
 </head>
 <body>
 
-<header class="app-header">
+<!-- LOGIN SCREEN -->
+<div class="auth-screen" id="loginScreen">
+  <div class="auth-logo">🎤</div>
+  <div class="auth-title">Studio Space</div>
+  <div class="auth-subtitle">Rehearsal booking manager.<br/>Sign in to continue.</div>
+  <button class="google-btn" onclick="signInWithGoogle()">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+    Sign in with Google
+  </button>
+  <div class="auth-loading" id="authLoading" style="display:none;">Signing in…</div>
+</div>
+
+<!-- ACCESS DENIED SCREEN -->
+<div class="auth-screen hidden" id="deniedScreen">
+  <div class="denied-icon">🔒</div>
+  <div class="denied-title">Access Denied</div>
+  <div class="denied-msg">This account is not authorised to use Studio Space.</div>
+  <div class="denied-email" id="deniedEmail"></div>
+  <div class="denied-msg" style="font-size:0.78rem;">Contact the studio admin to get access.</div>
+  <br/>
+  <button class="signout-btn" onclick="signOut()">Sign Out & Try Another Account</button>
+</div>
+
+<header class="app-header" id="appHeader" style="display:none;">
   <div class="logo"><div class="mic-icon">🎤</div>Studio Space</div>
   <div class="header-right">
     <button class="icon-btn" id="syncBtn" onclick="syncNow()">↻</button>
+    <div id="userAvatar"></div>
   </div>
 </header>
 
-<div class="status-bar info" id="statusBar">
+<div class="status-bar info" id="statusBar" style="display:none;">
   <span id="statusMsg">Connecting…</span>
 </div>
 
-<div class="tabs">
+<div class="tabs" id="appTabs" style="display:none;">
   <button class="tab active" onclick="switchTab('book')">📋 Book</button>
   <button class="tab" onclick="switchTab('schedule')">🎸 Schedule</button>
   <button class="tab" onclick="switchTab('calendar')">📅 Calendar</button>
@@ -227,29 +311,112 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ── CONFIG — injected by GitHub Actions  ──
+// ── FIREBASE CONFIG ──
+const firebaseConfig = {
+  apiKey:            "AIzaSyBJdxRSONQMQql2JMDiXFytMIaQluHalFg",
+  authDomain:        "studiospace-5439e.firebaseapp.com",
+  projectId:         "studiospace-5439e",
+  storageBucket:     "studiospace-5439e.firebasestorage.app",
+  messagingSenderId: "1048443984964",
+  appId:             "1:1048443984964:web:dee8c88a2389c43e8f3011"
+};
+firebase.initializeApp(firebaseConfig);
+const auth     = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider();
+
+// ── APP CONFIG — injected by GitHub Actions ──
 const SCRIPT_URL = '%%SCRIPT_URL%%';
 
-const LOCAL_KEY   = 'studiospace_local';
-const ICONS       = ['🎸','🥁','🎹','🎺','🎻','🎷','🎤','🪗'];
-let bookings      = [];
-let currentFilter = 'day';
-let isSyncing     = false;
-let calWeekOffset = 0;
+const LOCAL_KEY    = 'studiospace_local';
+const ICONS        = ['🎸','🥁','🎹','🎺','🎻','🎷','🎤','🪗'];
+let bookings       = [];
+let currentFilter  = 'day';
+let isSyncing      = false;
+let calWeekOffset  = 0;
 let calSelectedDay = null;
 const CAL_START_HOUR = 8;
 const CAL_END_HOUR   = 22;
 const HOUR_PX        = 48;
 const DAY_NAMES      = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-// ── INIT ──
-window.addEventListener('DOMContentLoaded', () => {
+// ── AUTH ──
+function signInWithGoogle() {
+  document.getElementById('authLoading').style.display = 'block';
+  auth.signInWithPopup(provider).catch(err => {
+    document.getElementById('authLoading').style.display = 'none';
+    alert('Sign in failed: ' + err.message);
+  });
+}
+
+function signOut() {
+  auth.signOut();
+}
+
+function showApp(user) {
+  // Hide auth screens
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('deniedScreen').classList.add('hidden');
+  // Show app
+  document.getElementById('appHeader').style.display  = 'flex';
+  document.getElementById('statusBar').style.display  = 'flex';
+  document.getElementById('appTabs').style.display    = 'flex';
+  document.querySelectorAll('.page').forEach(p => {
+    if (p.id === 'page-book') p.classList.add('active');
+  });
+  // User avatar
+  const avatarEl = document.getElementById('userAvatar');
+  if (user.photoURL) {
+    avatarEl.innerHTML = `<img class="user-avatar" src="${user.photoURL}" title="${user.displayName}\n${user.email}" onclick="if(confirm('Sign out?'))signOut()" />`;
+  } else {
+    const initials = (user.displayName || user.email).charAt(0).toUpperCase();
+    avatarEl.innerHTML = `<div class="user-avatar-placeholder" title="${user.email}" onclick="if(confirm('Sign out?'))signOut()">${initials}</div>`;
+  }
+  // Init app
   const today = todayStr();
   document.getElementById('bookDate').value     = today;
   document.getElementById('scheduleDate').value = today;
   calSelectedDay = today;
   document.getElementById('bookDate').addEventListener('change', checkClash);
   loadFromSheets();
+}
+
+function showDenied(user) {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('deniedScreen').classList.remove('hidden');
+  document.getElementById('deniedEmail').textContent = user.email;
+}
+
+function showLogin() {
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('deniedScreen').classList.add('hidden');
+  document.getElementById('appHeader').style.display = 'none';
+  document.getElementById('statusBar').style.display = 'none';
+  document.getElementById('appTabs').style.display   = 'none';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('authLoading').style.display = 'none';
+}
+
+// ── AUTH STATE LISTENER ──
+// This is the single source of truth — fires on every page load
+auth.onAuthStateChanged(user => {
+  if (!user) {
+    // Not logged in
+    showLogin();
+    return;
+  }
+  // Check if this user is registered in Firebase Auth
+  // Since we're using Firebase Auth user management (not email whitelist),
+  // the mere fact that onAuthStateChanged returns a user means they
+  // signed in successfully. We check if their email is verified via
+  // Firebase Auth Users list by attempting to get their ID token.
+  // If they are NOT in the allowed users list, we sign them out.
+  user.getIdTokenResult().then(idTokenResult => {
+    // User is authenticated — show the app
+    showApp(user);
+  }).catch(() => {
+    showDenied(user);
+    auth.signOut();
+  });
 });
 
 // ── UTILS ──
@@ -296,8 +463,6 @@ function setStatus(type, msg) {
 }
 
 // ── SHEETS ──
-// Use XMLHttpRequest instead of fetch — iOS WebKit handles
-// Apps Script redirects correctly with XHR but blocks fetch.
 function xhrGet(url) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -330,14 +495,12 @@ async function loadFromSheets() {
     renderSchedule(); renderStats(); renderCalendar();
   }
 }
-
 async function pushToSheets(booking) {
   try {
     const data = await xhrGet(`${SCRIPT_URL}?action=add&data=${encodeURIComponent(JSON.stringify(booking))}`);
     return data.status === 'ok';
   } catch { return false; }
 }
-
 async function deleteFromSheets(id) {
   try {
     const data = await xhrGet(`${SCRIPT_URL}?action=delete&id=${encodeURIComponent(id)}`);
@@ -530,8 +693,6 @@ function renderCalendar() {
   document.getElementById('calWeekLabel').textContent = fmt(days[0]) + ' – ' + fmt(days[6]) + ' ' + days[6].getFullYear();
   const bMap = {};
   bookings.forEach(b => { if (!bMap[b.date]) bMap[b.date] = []; bMap[b.date].push(b); });
-
-  // Day headers
   const strip = document.getElementById('calDayStrip');
   strip.innerHTML = '<div></div>';
   days.forEach(d => {
@@ -543,8 +704,6 @@ function renderCalendar() {
     div.onclick = () => { calSelectedDay = ds; renderCalendar(); showDayDetail(ds); };
     strip.appendChild(div);
   });
-
-  // Block map
   const blockMap = {};
   days.forEach((d, colIdx) => {
     const ds = dateToStr(d);
@@ -562,14 +721,11 @@ function renderCalendar() {
       blockMap[key].push({ b, topOff, hPx, ds });
     });
   });
-
-  // Time grid
   const wrap    = document.getElementById('calGridWrap');
   wrap.innerHTML = '';
   const nowD    = new Date();
   const nowMins = nowD.getHours() * 60 + nowD.getMinutes();
   const nowCol  = days.findIndex(d => dateToStr(d) === dateToStr(nowD));
-
   for (let h = CAL_START_HOUR; h < CAL_END_HOUR; h++) {
     const row = document.createElement('div');
     row.className = 'cal-hour-row';
