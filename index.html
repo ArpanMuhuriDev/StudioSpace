@@ -806,32 +806,30 @@ function jumpToToday() {
 }
 
 function renderCalendar() {
-  const days = getWeekDates(calWeekOffset);
-  const today = todayStr();
+  const days       = getWeekDates(calWeekOffset);
+  const today      = todayStr();
+  const totalHours = CAL_END_HOUR - CAL_START_HOUR;
+  const gutterW    = 48;
 
-  // Week label
-  const first = days[0], last = days[6];
-  const fmt = d => d.toLocaleDateString('en-IN', {day:'numeric', month:'short'});
-  document.getElementById('calWeekLabel').textContent = fmt(first) + ' – ' + fmt(last) + ' ' + last.getFullYear();
+  // ── Week label ──
+  const fmt = d => d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+  document.getElementById('calWeekLabel').textContent =
+    fmt(days[0]) + ' – ' + fmt(days[6]) + ' ' + days[6].getFullYear();
 
-  // Build bookings map: dateStr -> [booking]
+  // ── Bookings map ──
   const bMap = {};
-  bookings.forEach(b => {
-    if (!bMap[b.date]) bMap[b.date] = [];
-    bMap[b.date].push(b);
-  });
+  bookings.forEach(b => { if (!bMap[b.date]) bMap[b.date] = []; bMap[b.date].push(b); });
 
   // ── Day header strip ──
   const strip = document.getElementById('calDayStrip');
   strip.innerHTML = '<div class="gutter"></div>';
   days.forEach(d => {
-    const ds = dateToStr(d);
-    const isToday = ds === today;
-    const isSel   = ds === calSelectedDay;
-    const dayBookings = bMap[ds] || [];
-    const dots = dayBookings.slice(0,3).map(() => '<span class="booking-dot"></span>').join('');
+    const ds  = dateToStr(d);
     const div = document.createElement('div');
-    div.className = 'cal-day-header' + (isToday ? ' today' : '') + (isSel && !isToday ? ' selected' : '');
+    div.className = 'cal-day-header' +
+      (ds === today ? ' today' : '') +
+      (ds === calSelectedDay && ds !== today ? ' selected' : '');
+    const dots = (bMap[ds] || []).slice(0,3).map(() => '<span class="booking-dot"></span>').join('');
     div.innerHTML = `
       <div class="day-name">${DAY_NAMES[d.getDay()]}</div>
       <div class="day-num">${d.getDate()}</div>
@@ -840,81 +838,32 @@ function renderCalendar() {
     strip.appendChild(div);
   });
 
-  // ── Time grid ──
+  // ── Time grid (background cells) ──
   const grid = document.getElementById('calGrid');
   grid.innerHTML = '';
-  const totalHours = CAL_END_HOUR - CAL_START_HOUR;
-
-  // Build rows for each hour
   for (let h = CAL_START_HOUR; h < CAL_END_HOUR; h++) {
-    // Time label
-    const label = document.createElement('div');
-    label.className = 'cal-time-label';
-    const suffix = h < 12 ? 'am' : 'pm';
-    const disp   = h === 12 ? 12 : h % 12;
-    label.textContent = disp + suffix;
-    grid.appendChild(label);
-
-    // Day cells
+    const lbl = document.createElement('div');
+    lbl.className = 'cal-time-label';
+    lbl.textContent = (h === 12 ? 12 : h % 12) + (h < 12 ? 'am' : 'pm');
+    grid.appendChild(lbl);
     days.forEach(d => {
       const cell = document.createElement('div');
       cell.className = 'cal-cell';
       const ds = dateToStr(d);
       cell.onclick = () => {
-        // Pre-fill booking form with this date and hour
-        document.getElementById('bookDate').value = ds;
-        document.getElementById('fromTime').value = h.toString().padStart(2,'0') + ':00';
-        document.getElementById('toTime').value   = (h+1).toString().padStart(2,'0') + ':00';
+        document.getElementById('bookDate').value  = ds;
+        document.getElementById('fromTime').value  = h.toString().padStart(2,'0') + ':00';
+        document.getElementById('toTime').value    = (h+1).toString().padStart(2,'0') + ':00';
         switchTab('book');
       };
       grid.appendChild(cell);
     });
   }
 
-  // ── Place booking blocks ──
-  days.forEach((d, colIdx) => {
-    const ds = dateToStr(d);
-    const dayBs = bMap[ds] || [];
-    dayBs.forEach(b => {
-      const fromMins = timeToMins(b.from);
-      const toMins   = timeToMins(b.to);
-      const startMins = CAL_START_HOUR * 60;
-      const endMins   = CAL_END_HOUR * 60;
-      if (toMins <= startMins || fromMins >= endMins) return; // outside visible range
-      const clampedFrom = Math.max(fromMins, startMins);
-      const clampedTo   = Math.min(toMins, endMins);
-      const topPx    = ((clampedFrom - startMins) / 60) * HOUR_PX;
-      const heightPx = Math.max(((clampedTo - clampedFrom) / 60) * HOUR_PX, 20);
-
-      // Column position: colIdx+1 (skip gutter), 7 day cols
-      // Use CSS grid column offset
-      const block = document.createElement('div');
-      block.className = 'cal-booking';
-      block.style.top    = topPx + 'px';
-      block.style.height = heightPx + 'px';
-      // Position absolutely within grid — use grid-column overlay trick
-      block.style.position = 'absolute';
-      block.innerHTML = `<div class="cb-band">${b.band}</div>${heightPx > 30 ? '<div class="cb-time">'+b.from+'–'+b.to+'</div>' : ''}`;
-      block.onclick = (e) => { e.stopPropagation(); calSelectedDay = ds; renderCalendar(); showDayDetail(ds); };
-
-      // We need to overlay on the correct column cell
-      // Easiest: wrap in a positioned container
-      // We'll inject a wrapper div over the grid column
-      // Find the column wrapper (created below)
-      const colEl = document.getElementById('cal-col-'+colIdx);
-      if (colEl) colEl.appendChild(block);
-    });
-  });
-
-  // ── Column overlay wrappers (for absolute positioned blocks) ──
-  // Remove old overlays
+  // ── STEP 1: Create column overlay wrappers FIRST ──
   document.querySelectorAll('.cal-col-overlay').forEach(el => el.remove());
   const gridWrap = document.getElementById('calGridWrap');
-  const gridRect = grid.getBoundingClientRect();
-
-  // We build overlay columns directly inside cal-grid-wrap
-  const colWidth = 1 / 7; // fraction of grid (minus gutter)
-  const gutterW = 48; // px
+  gridWrap.style.position = 'relative';
 
   days.forEach((d, colIdx) => {
     const overlay = document.createElement('div');
@@ -928,67 +877,72 @@ function renderCalendar() {
       height: ${totalHours * HOUR_PX}px;
       pointer-events: none;
     `;
-    gridWrap.style.position = 'relative';
     gridWrap.appendChild(overlay);
   });
 
-  // Re-place bookings now that overlays exist
-  days.forEach((d, colIdx) => {
-    const ds = dateToStr(d);
-    const dayBs = bMap[ds] || [];
-    dayBs.forEach(b => {
-      const fromMins  = timeToMins(safeTime(b.from));
-      const toMins    = timeToMins(safeTime(b.to));
-      const startMins = CAL_START_HOUR * 60;
-      const endMins   = CAL_END_HOUR * 60;
-      if (toMins <= startMins || fromMins >= endMins) return;
-      const clampedFrom = Math.max(fromMins, startMins);
-      const clampedTo   = Math.min(toMins, endMins);
-      const topPx    = ((clampedFrom - startMins) / 60) * HOUR_PX;
-      const heightPx = Math.max(((clampedTo - clampedFrom) / 60) * HOUR_PX, 18);
-      const block = document.createElement('div');
-      block.className = 'cal-booking';
-      block.style.top    = topPx + 'px';
-      block.style.height = heightPx + 'px';
-      block.style.pointerEvents = 'auto';
-      block.innerHTML = `<div class="cb-band">${b.band}</div>${heightPx > 28 ? '<div class="cb-time">'+safeTime(b.from)+'–'+safeTime(b.to)+'</div>' : ''}`;
-      block.onclick = (e) => { e.stopPropagation(); calSelectedDay = ds; renderCalendar(); showDayDetail(ds); };
-      const colEl = document.getElementById('cal-col-' + colIdx);
-      if (colEl) colEl.appendChild(block);
-    });
-  });
-
-  // ── Current time line ──
-  document.querySelectorAll('.cal-now-line').forEach(el => el.remove());
-  const nowD = new Date();
-  const nowDateStr = dateToStr(nowD);
-  const nowColIdx = days.findIndex(d => dateToStr(d) === nowDateStr);
-  if (nowColIdx !== -1) {
-    const nowMins   = nowD.getHours() * 60 + nowD.getMinutes();
+  // ── STEP 2: Place booking blocks AFTER overlays exist in DOM ──
+  // Use requestAnimationFrame so the browser has painted the overlays first
+  requestAnimationFrame(() => {
     const startMins = CAL_START_HOUR * 60;
     const endMins   = CAL_END_HOUR * 60;
-    if (nowMins >= startMins && nowMins <= endMins) {
-      const topPx = ((nowMins - startMins) / 60) * HOUR_PX;
-      const line = document.createElement('div');
-      line.className = 'cal-now-line';
-      line.style.top = topPx + 'px';
-      line.innerHTML = '<div class="cal-now-dot"></div>';
-      const colEl = document.getElementById('cal-col-' + nowColIdx);
-      if (colEl) colEl.appendChild(line);
+
+    days.forEach((d, colIdx) => {
+      const ds    = dateToStr(d);
+      const dayBs = bMap[ds] || [];
+      const colEl = document.getElementById('cal-col-' + colIdx);
+      if (!colEl) return;
+
+      dayBs.forEach(b => {
+        const fromMins = timeToMins(safeTime(b.from));
+        const toMins   = timeToMins(safeTime(b.to));
+        if (toMins <= startMins || fromMins >= endMins) return;
+        const clampedFrom = Math.max(fromMins, startMins);
+        const clampedTo   = Math.min(toMins, endMins);
+        const topPx    = ((clampedFrom - startMins) / 60) * HOUR_PX;
+        const heightPx = Math.max(((clampedTo - clampedFrom) / 60) * HOUR_PX, 18);
+
+        const block = document.createElement('div');
+        block.className = 'cal-booking';
+        block.style.top          = topPx + 'px';
+        block.style.height       = heightPx + 'px';
+        block.style.pointerEvents = 'auto';
+        block.innerHTML = `
+          <div class="cb-band">${b.band}</div>
+          ${heightPx > 28 ? '<div class="cb-time">' + safeTime(b.from) + '–' + safeTime(b.to) + '</div>' : ''}`;
+        block.onclick = e => {
+          e.stopPropagation();
+          calSelectedDay = ds;
+          renderCalendar();
+          showDayDetail(ds);
+        };
+        colEl.appendChild(block);
+      });
+    });
+
+    // ── Current time line ──
+    const nowD       = new Date();
+    const nowColIdx  = days.findIndex(d => dateToStr(d) === dateToStr(nowD));
+    if (nowColIdx !== -1) {
+      const nowMins = nowD.getHours() * 60 + nowD.getMinutes();
+      if (nowMins >= startMins && nowMins <= endMins) {
+        const topPx = ((nowMins - startMins) / 60) * HOUR_PX;
+        const line  = document.createElement('div');
+        line.className = 'cal-now-line';
+        line.style.top = topPx + 'px';
+        line.style.pointerEvents = 'none';
+        line.innerHTML = '<div class="cal-now-dot"></div>';
+        const colEl = document.getElementById('cal-col-' + nowColIdx);
+        if (colEl) colEl.appendChild(line);
+      }
     }
-  }
 
-  // Scroll to 8am or current time
-  setTimeout(() => {
-    const wrap = document.getElementById('calGridWrap');
-    const nowMins = new Date().getHours() * 60 + new Date().getMinutes();
-    const startMins = CAL_START_HOUR * 60;
+    // ── Scroll to current time ──
+    const nowMins  = new Date().getHours() * 60 + new Date().getMinutes();
     const scrollTo = Math.max(0, ((nowMins - startMins - 60) / 60) * HOUR_PX);
-    if (calWeekOffset === 0) wrap.scrollTop = scrollTo;
-    else wrap.scrollTop = 0;
-  }, 50);
+    gridWrap.scrollTop = calWeekOffset === 0 ? scrollTo : 0;
+  });
 
-  // Show detail if a day is selected
+  // ── Day detail panel ──
   if (calSelectedDay) showDayDetail(calSelectedDay);
 }
 
