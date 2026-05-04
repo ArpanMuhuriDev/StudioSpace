@@ -548,26 +548,19 @@ async function loadFromSheets() {
 async function pushToSheets(booking) {
   const url = getScriptUrl(); if (!url) return false;
   try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'add', booking })
-    });
-    const data = await res.json();
-    return data.status === 'ok';
+    const data = encodeURIComponent(JSON.stringify(booking));
+    const res  = await fetch(url + '?action=add&data=' + data);
+    const json = await res.json();
+    return json.status === 'ok';
   } catch { return false; }
 }
 
 async function deleteFromSheets(id) {
   const url = getScriptUrl(); if (!url) return false;
   try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'delete', id })
-    });
-    const data = await res.json();
-    return data.status === 'ok';
+    const res  = await fetch(url + '?action=delete&id=' + encodeURIComponent(id));
+    const json = await res.json();
+    return json.status === 'ok';
   } catch { return false; }
 }
 
@@ -654,7 +647,11 @@ function shiftDate(d) {
   const el = document.getElementById('scheduleDate');
   const dt = new Date(el.value + 'T00:00:00');
   dt.setDate(dt.getDate() + d);
-  el.value = dt.toISOString().split('T')[0];
+  // Use local date parts to avoid UTC timezone shift
+  const y  = dt.getFullYear();
+  const m  = (dt.getMonth() + 1).toString().padStart(2, '0');
+  const dy = dt.getDate().toString().padStart(2, '0');
+  el.value = y + '-' + m + '-' + dy;
   renderSchedule();
 }
 function renderSchedule() {
