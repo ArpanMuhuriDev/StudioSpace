@@ -12,6 +12,7 @@
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <style>
     :root {
       --bg: #ffffff; --surface: #f4f4f4; --surface2: #ebebeb; --surface3: #e0e0e0;
@@ -321,11 +322,12 @@ const firebaseConfig = {
   appId:             "1:1048443984964:web:dee8c88a2389c43e8f3011"
 };
 firebase.initializeApp(firebaseConfig);
-const auth     = firebase.auth();
-const provider = new firebase.auth.GoogleAuthProvider();
+const auth      = firebase.auth();
+const db        = firebase.firestore();
+const provider  = new firebase.auth.GoogleAuthProvider();
 
 // ── APP CONFIG — injected by GitHub Actions ──
-const SCRIPT_URL = '%%SCRIPT_URL%%';
+const SCRIPT_URL = '%%SCRIPT_URL%%'.trim().replace(/[?&]+$/, '');
 
 const LOCAL_KEY    = 'studiospace_local';
 const ICONS        = ['🎸','🥁','🎹','🎺','🎻','🎷','🎤','🪗'];
@@ -406,20 +408,25 @@ function showLogin() {
 }
 
 // ── AUTH STATE LISTENER ──
-auth.onAuthStateChanged(user => {
+// After sign-in, check Firestore 'allowedUsers' collection
+// for a document whose ID matches the user's email.
+// Add/remove users by editing Firebase Console → Firestore → allowedUsers.
+auth.onAuthStateChanged(async user => {
   if (!user) { showLogin(); return; }
-  // getIdTokenResult succeeds for any valid Firebase auth user.
-  // Since we only add allowed users to Firebase Auth manually,
-  // any successfully authenticated user is an allowed user.
-  user.getIdTokenResult()
-    .then(() => showApp(user))
-    .catch(() => { showDenied(user); auth.signOut(); });
-});
-
-// Handle redirect result on mobile after Google sign-in redirect
-auth.getRedirectResult().catch(err => {
-  if (err.code !== 'auth/no-current-user') {
-    console.error('Redirect error:', err.message);
+  try {
+    const email = user.email.toLowerCase().trim();
+    const doc   = await db.collection('allowedUsers').doc(email).get();
+    if (doc.exists) {
+      showApp(user);
+    } else {
+      showDenied(user);
+      await auth.signOut();
+    }
+  } catch(err) {
+    // Firestore read failed — deny access to be safe
+    console.error('Auth check failed:', err.message);
+    showDenied(user);
+    await auth.signOut();
   }
 });
 
@@ -489,8 +496,10 @@ function xhrGet(url) {
 async function loadFromSheets() {
   setSpin(true);
   setStatus('info', 'Connecting…');
+  const url = `${SCRIPT_URL}?action=getAll`;
+  console.log('Calling:', url);
   try {
-    const data = await xhrGet(`${SCRIPT_URL}?action=getAll`);
+    const data = await xhrGet(url);
     if (data.status === 'ok') {
       bookings = (data.bookings || []).map(b => ({ ...b, date: safeDate(b.date), from: safeTime(b.from), to: safeTime(b.to) }));
       saveLocal(bookings);
