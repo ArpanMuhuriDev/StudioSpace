@@ -27,14 +27,13 @@ jobs:
         run: |
           python3 -c "
           import os
-          url = os.environ['SCRIPT_URL']
+          url = os.environ['SCRIPT_URL'].strip()
           with open('index.html', 'r') as f:
               content = f.read()
           content = content.replace('%%SCRIPT_URL%%', url)
           with open('index.html', 'w') as f:
               f.write(content)
-          print('Replaced SCRIPT_URL successfully')
-          print('URL starts with:', url[:40])
+          print('SCRIPT_URL starts with:', url[:40])
           "
 
       - name: Upload Pages artifact
