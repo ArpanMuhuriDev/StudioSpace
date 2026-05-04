@@ -11,76 +11,29 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #ffffff;
-      --surface: #f4f4f4;
-      --surface2: #ebebeb;
-      --surface3: #e0e0e0;
-      --accent: #111111;
-      --accent-dim: rgba(17,17,17,0.08);
-      --red: #e03030;
-      --red-dim: rgba(224,48,48,0.08);
-      --green: #1a9e5c;
-      --text: #111111;
-      --muted: #888888;
-      --muted2: #bbbbbb;
-      --border: #e0e0e0;
-      --radius: 18px;
-      --font-display: 'Bebas Neue', sans-serif;
-      --font-body: 'Syne', sans-serif;
+      --bg: #ffffff; --surface: #f4f4f4; --surface2: #ebebeb; --surface3: #e0e0e0;
+      --accent: #111111; --accent-dim: rgba(17,17,17,0.08);
+      --red: #e03030; --red-dim: rgba(224,48,48,0.08);
+      --green: #1a9e5c; --text: #111111; --muted: #888888; --muted2: #bbbbbb;
+      --border: #e0e0e0; --radius: 18px;
+      --font-display: 'Bebas Neue', sans-serif; --font-body: 'Syne', sans-serif;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { height: 100%; }
-    body {
-      background: var(--bg); color: var(--text);
-      font-family: var(--font-body);
-      min-height: 100dvh; overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-    }
-    .app-header {
-      padding: 18px 20px 0;
-      display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; z-index: 100; background: var(--bg);
-    }
-    .logo {
-      display: flex; align-items: center; gap: 10px;
-      font-family: var(--font-body); font-size: 1.4rem;
-      font-weight: 800; letter-spacing: 0.5px; color: #000; line-height: 1;
-    }
-    .logo .mic-icon {
-      width: 32px; height: 32px; background: #000; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1rem; flex-shrink: 0;
-    }
-    .logo em { color: #111111; font-style: normal; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100dvh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+    .app-header { padding: 18px 20px 0; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; background: var(--bg); }
+    .logo { display: flex; align-items: center; gap: 10px; font-family: var(--font-body); font-size: 1.4rem; font-weight: 800; letter-spacing: 0.5px; color: #000; line-height: 1; }
+    .logo .mic-icon { width: 32px; height: 32px; background: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
     .header-right { display: flex; align-items: center; gap: 10px; }
-    .icon-btn {
-      width: 36px; height: 36px; background: var(--surface2);
-      border: 1px solid var(--border); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 1rem; color: var(--muted);
-      transition: all 0.2s;
-    }
-    .icon-btn.active { border-color: #000; color: #000; background: var(--surface3); }
+    .icon-btn { width: 36px; height: 36px; background: var(--surface2); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; color: var(--muted); transition: all 0.2s; }
     .icon-btn.spinning { animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .status-bar {
-      margin: 10px 20px 0; padding: 8px 14px; border-radius: 10px;
-      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.8px;
-      text-transform: uppercase; display: flex; align-items: center; gap: 8px;
-    }
-    .status-bar.ok  { background: rgba(26,158,92,0.07); color: var(--green); border: 1px solid rgba(26,158,92,0.2); }
+    .status-bar { margin: 10px 20px 0; padding: 8px 14px; border-radius: 10px; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+    .status-bar.ok   { background: rgba(26,158,92,0.07); color: var(--green); border: 1px solid rgba(26,158,92,0.2); }
     .status-bar.warn { background: var(--red-dim); color: var(--red); border: 1px solid rgba(224,48,48,0.2); }
     .status-bar.info { background: var(--accent-dim); color: #555; border: 1px solid #ddd; }
-    .tabs {
-      display: flex; margin: 16px 20px 0;
-      background: var(--surface); border-radius: 14px; padding: 4px; gap: 3px;
-      border: 1px solid var(--border);
-    }
-    .tab {
-      flex: 1; padding: 10px 6px; border: none; background: transparent;
-      color: var(--muted); font-family: var(--font-body); font-size: 0.8rem;
-      font-weight: 700; border-radius: 11px; cursor: pointer; transition: all 0.2s;
-    }
+    .tabs { display: flex; margin: 16px 20px 0; background: var(--surface); border-radius: 14px; padding: 4px; gap: 3px; border: 1px solid var(--border); }
+    .tab { flex: 1; padding: 10px 6px; border: none; background: transparent; color: var(--muted); font-family: var(--font-body); font-size: 0.8rem; font-weight: 700; border-radius: 11px; cursor: pointer; transition: all 0.2s; }
     .tab.active { background: #111; color: #fff; }
     .page { display: none; padding: 20px; animation: fadeUp 0.25s ease; }
     .page.active { display: block; }
@@ -89,68 +42,34 @@
     .section-title span { color: #111; }
     .field { margin-bottom: 14px; }
     label { display: block; font-size: 0.68rem; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
-    input, select {
-      width: 100%; background: var(--surface); border: 1.5px solid var(--border);
-      border-radius: 13px; padding: 13px 15px; color: var(--text);
-      font-family: var(--font-body); font-size: 0.95rem; outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none;
-    }
-    input:focus, select:focus { border-color: #111; box-shadow: 0 0 0 3px rgba(240,192,64,0.1); }
+    input, select { width: 100%; background: var(--surface); border: 1.5px solid var(--border); border-radius: 13px; padding: 13px 15px; color: var(--text); font-family: var(--font-body); font-size: 0.95rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; }
+    input:focus, select:focus { border-color: #111; box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
     input::placeholder { color: var(--muted2); }
     .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .amount-wrap { position: relative; }
     .amount-wrap input { padding-left: 34px; }
     .currency-sign { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #111; font-weight: 700; font-size: 0.95rem; pointer-events: none; }
-    .clash-box {
-      background: var(--red-dim); border: 1px solid rgba(255,80,80,0.3);
-      border-radius: 11px; padding: 10px 14px; font-size: 0.8rem; color: var(--red);
-      margin-bottom: 14px; display: none; align-items: center; gap: 8px;
-    }
+    .clash-box { background: var(--red-dim); border: 1px solid rgba(255,80,80,0.3); border-radius: 11px; padding: 10px 14px; font-size: 0.8rem; color: var(--red); margin-bottom: 14px; display: none; align-items: center; gap: 8px; }
     .clash-box.show { display: flex; }
-    .submit-btn {
-      width: 100%; margin-top: 6px; background: #111; color: #fff;
-      border: none; border-radius: 14px; padding: 15px;
-      font-family: var(--font-display); font-size: 1.2rem; letter-spacing: 2.5px;
-      cursor: pointer; transition: transform 0.15s, opacity 0.15s;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-    }
+    .submit-btn { width: 100%; margin-top: 6px; background: #111; color: #fff; border: none; border-radius: 14px; padding: 15px; font-family: var(--font-display); font-size: 1.2rem; letter-spacing: 2.5px; cursor: pointer; transition: transform 0.15s, opacity 0.15s; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
     .submit-btn:active { transform: scale(0.97); }
     .submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
     .btn-spinner { display: none; }
     .submit-btn.loading .btn-text { display: none; }
     .submit-btn.loading .btn-spinner { display: inline; }
-    .summary-bar {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 14px 16px;
-      display: grid; grid-template-columns: 1fr 1px 1fr 1px 1fr;
-      margin-bottom: 18px;
-    }
+    .summary-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: grid; grid-template-columns: 1fr 1px 1fr 1px 1fr; margin-bottom: 18px; }
     .summary-item { text-align: center; padding: 2px 8px; }
     .summary-divider { background: var(--border); }
     .summary-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 4px; }
     .summary-value { font-family: var(--font-display); font-size: 1.4rem; color: #111; letter-spacing: 1px; }
     .date-nav { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-    .date-nav-btn {
-      width: 36px; height: 36px; background: var(--surface); border: 1px solid var(--border);
-      border-radius: 10px; color: var(--text); font-size: 1rem; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
+    .date-nav-btn { width: 36px; height: 36px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .date-nav input[type="date"] { flex: 1; text-align: center; padding: 9px 12px; font-size: 0.85rem; font-weight: 700; border-radius: 10px; }
     .filter-row { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; margin-bottom: 14px; }
     .filter-row::-webkit-scrollbar { display: none; }
-    .chip {
-      flex-shrink: 0; padding: 6px 14px; border-radius: 100px;
-      border: 1px solid var(--border); background: transparent;
-      color: var(--muted); font-family: var(--font-body); font-size: 0.75rem;
-      font-weight: 600; cursor: pointer; transition: all 0.15s;
-    }
+    .chip { flex-shrink: 0; padding: 6px 14px; border-radius: 100px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-family: var(--font-body); font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
     .chip.active { background: #111; border-color: #111; color: #fff; }
-    .booking-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 14px 14px 14px 18px;
-      margin-bottom: 10px; display: flex; align-items: center; gap: 12px;
-      position: relative; overflow: hidden; animation: fadeUp 0.2s ease;
-    }
+    .booking-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 14px 14px 18px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; position: relative; overflow: hidden; animation: fadeUp 0.2s ease; }
     .booking-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #111; }
     .booking-card.past::before { background: var(--muted2); }
     .booking-card.past { opacity: 0.6; }
@@ -166,124 +85,35 @@
     .empty-state { text-align: center; padding: 56px 20px; color: var(--muted); }
     .empty-icon { font-size: 3rem; margin-bottom: 12px; }
     .empty-state p { font-size: 0.88rem; line-height: 1.7; }
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(4px); z-index: 500;
-      display: none; align-items: flex-end;
-    }
-    .modal-overlay.show { display: flex; }
-    .modal {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 24px 24px 0 0; padding: 24px 20px 36px; width: 100%;
-      animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    .modal-handle { width: 40px; height: 4px; background: var(--muted2); border-radius: 2px; margin: 0 auto 20px; }
-    .modal-title { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: 2px; margin-bottom: 8px; }
-    .modal-title span { color: #111; }
-    .modal-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
-    .modal-save-btn {
-      width: 100%; background: #111; color: #fff; border: none;
-      border-radius: 13px; padding: 14px; font-family: var(--font-display);
-      font-size: 1.1rem; letter-spacing: 2px; cursor: pointer; margin-top: 6px;
-    }
-    .modal-help { margin-top: 14px; font-size: 0.75rem; color: var(--muted); text-align: center; line-height: 1.5; }
-    .toast {
-      position: fixed; bottom: 28px; left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: var(--surface2); border: 1px solid var(--border);
-      color: var(--text); padding: 11px 22px; border-radius: 100px;
-      font-size: 0.82rem; font-weight: 600; z-index: 1000;
-      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-      white-space: nowrap; max-width: 90vw;
-    }
+    .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 11px 22px; border-radius: 100px; font-size: 0.82rem; font-weight: 600; z-index: 1000; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); white-space: nowrap; max-width: 90vw; }
     .toast.show { transform: translateX(-50%) translateY(0); }
     .toast.success { border-color: var(--green); color: var(--green); }
     .toast.error { border-color: var(--red); color: var(--red); }
-
-    /* ── CALENDAR ── */
-    .cal-week-nav {
-      display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
-    }
-    .cal-week-nav .date-nav-btn {
-      width: 36px; height: 36px; background: var(--surface); border: 1px solid var(--border);
-      border-radius: 10px; color: var(--text); font-size: 1rem; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
-    .cal-week-label {
-      flex: 1; text-align: center; font-weight: 700; font-size: 0.85rem; color: var(--text);
-    }
-    .cal-today-btn {
-      background: #111; color: #fff; border: none; border-radius: 8px;
-      padding: 7px 14px; font-family: var(--font-body); font-size: 0.75rem;
-      font-weight: 700; cursor: pointer; flex-shrink: 0;
-    }
-    /* Day strip */
-    .cal-day-strip {
-      display: grid; grid-template-columns: 40px repeat(7, 1fr);
-      border-bottom: 1px solid var(--border);
-    }
-    .cal-day-header {
-      text-align: center; padding: 6px 2px 8px; cursor: pointer;
-    }
+    /* CALENDAR */
+    .cal-week-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+    .cal-week-nav .date-nav-btn { width: 36px; height: 36px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .cal-week-label { flex: 1; text-align: center; font-weight: 700; font-size: 0.85rem; color: var(--text); }
+    .cal-today-btn { background: #111; color: #fff; border: none; border-radius: 8px; padding: 7px 14px; font-family: var(--font-body); font-size: 0.75rem; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+    .cal-day-strip { display: grid; grid-template-columns: 40px repeat(7, 1fr); border-bottom: 1px solid var(--border); }
+    .cal-day-header { text-align: center; padding: 6px 2px 8px; cursor: pointer; }
     .cal-day-header .day-name { font-size: 0.6rem; font-weight: 700; color: var(--muted); text-transform: uppercase; }
-    .cal-day-header .day-num {
-      width: 26px; height: 26px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      margin: 3px auto 0; font-size: 0.82rem; font-weight: 700; color: var(--text);
-    }
+    .cal-day-header .day-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 3px auto 0; font-size: 0.82rem; font-weight: 700; color: var(--text); }
     .cal-day-header.today .day-num { background: #111; color: #fff; }
     .cal-day-header.selected .day-num { background: #555; color: #fff; }
     .cal-day-header .dot-row { display: flex; justify-content: center; gap: 2px; margin-top: 3px; height: 5px; }
     .cal-day-header .booking-dot { width: 4px; height: 4px; border-radius: 50%; background: #111; }
-    /* Scrollable time grid */
-    .cal-grid-wrap {
-      overflow-y: auto; max-height: calc(100dvh - 310px);
-      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
-    }
-    /* One row per hour: time-label + 7 day columns */
-    .cal-hour-row {
-      display: grid; grid-template-columns: 40px repeat(7, 1fr);
-      min-height: 48px;
-    }
-    .cal-time-label {
-      font-size: 0.6rem; color: var(--muted); text-align: right;
-      padding: 0 6px 0 0; padding-top: 0; margin-top: -7px;
-      user-select: none; min-height: 48px;
-    }
-    /* Each day column in a row */
-    .cal-col {
-      border-left: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      min-height: 48px; position: relative; cursor: pointer;
-    }
+    .cal-grid-wrap { overflow-y: auto; max-height: calc(100dvh - 310px); scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+    .cal-hour-row { display: grid; grid-template-columns: 40px repeat(7, 1fr); min-height: 48px; }
+    .cal-time-label { font-size: 0.6rem; color: var(--muted); text-align: right; padding: 0 6px 0 0; margin-top: -7px; user-select: none; min-height: 48px; }
+    .cal-col { border-left: 1px solid var(--border); border-bottom: 1px solid var(--border); min-height: 48px; position: relative; cursor: pointer; }
     .cal-col:hover { background: var(--surface); }
-    /* Booking block — absolutely inside its starting cal-col */
-    .cal-booking {
-      position: absolute; left: 2px; right: 2px; top: 0;
-      background: #111; color: #fff;
-      border-radius: 6px; padding: 3px 5px;
-      font-size: 0.67rem; font-weight: 700;
-      overflow: hidden; cursor: pointer; z-index: 10;
-      line-height: 1.3; box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-    }
+    .cal-booking { position: absolute; left: 2px; right: 2px; top: 0; background: #111; color: #fff; border-radius: 6px; padding: 3px 5px; font-size: 0.67rem; font-weight: 700; overflow: hidden; cursor: pointer; z-index: 10; line-height: 1.3; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
     .cal-booking:active { opacity: 0.8; }
     .cal-booking .cb-band { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .cal-booking .cb-time { font-size: 0.58rem; opacity: 0.7; font-weight: 400; }
-    /* Current time line */
-    .cal-now-line {
-      position: absolute; left: 0; right: 0; height: 2px;
-      background: var(--red); z-index: 20; pointer-events: none;
-    }
-    .cal-now-dot {
-      position: absolute; left: -3px; top: -4px;
-      width: 8px; height: 8px; border-radius: 50%; background: var(--red);
-    }
-    /* Day detail */
-    .cal-detail {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 14px; padding: 14px; margin-top: 12px; display: none;
-    }
+    .cal-now-line { position: absolute; left: 0; right: 0; height: 2px; background: var(--red); z-index: 20; pointer-events: none; }
+    .cal-now-dot { position: absolute; left: -3px; top: -4px; width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+    .cal-detail { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-top: 12px; display: none; }
     .cal-detail.show { display: block; }
     .cal-detail-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 10px; }
     .cal-slot { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
@@ -297,18 +127,14 @@
 <body>
 
 <header class="app-header">
-  <div class="logo">
-    <div class="mic-icon">🎤</div>
-    Studio Space
-  </div>
+  <div class="logo"><div class="mic-icon">🎤</div>Studio Space</div>
   <div class="header-right">
     <button class="icon-btn" id="syncBtn" onclick="syncNow()">↻</button>
-    <button class="icon-btn" id="configBtn" onclick="openSetup()">⚙</button>
   </div>
 </header>
 
 <div class="status-bar info" id="statusBar">
-  <span id="statusMsg">Configure Google Sheets to sync across devices</span>
+  <span id="statusMsg">Connecting…</span>
 </div>
 
 <div class="tabs">
@@ -376,21 +202,16 @@
 
 <!-- CALENDAR -->
 <div class="page" id="page-calendar">
-  <!-- Week navigation -->
   <div class="cal-week-nav" style="margin-top:18px;">
     <button class="date-nav-btn" onclick="shiftWeek(-1)">‹</button>
     <div class="cal-week-label" id="calWeekLabel"></div>
     <button class="cal-today-btn" onclick="jumpToToday()">Today</button>
     <button class="date-nav-btn" onclick="shiftWeek(1)">›</button>
   </div>
-
-  <!-- Day headers + time grid -->
   <div style="border:1px solid var(--border);border-radius:14px;overflow:hidden;">
     <div class="cal-day-strip" id="calDayStrip"></div>
     <div class="cal-grid-wrap" id="calGridWrap"></div>
   </div>
-
-  <!-- Selected day detail -->
   <div class="cal-detail" id="calDetail">
     <div class="cal-detail-title" id="calDetailTitle"></div>
     <div id="calDetailBody"></div>
@@ -403,58 +224,41 @@
   <div id="statsContent"></div>
 </div>
 
-<!-- SETUP MODAL -->
-<div class="modal-overlay" id="setupModal">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Google <span>Sheets</span></div>
-    <p class="modal-desc">Paste your Apps Script Web App URL. Both phones will read and write through this URL — same data, always in sync.</p>
-    <div class="field">
-      <label>Apps Script Web App URL</label>
-      <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec" />
-    </div>
-    <button class="modal-save-btn" onclick="saveConfig()">SAVE & CONNECT</button>
-    <p class="modal-help">Don't have a URL yet? Open <strong>setup-guide.html</strong> for step-by-step instructions (5 minutes).</p>
-  </div>
-</div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-const SCRIPT_URL_KEY = 'jampad_script_url';
-const LOCAL_KEY = 'jampad_local';
-const ICONS = ['🎸','🥁','🎹','🎺','🎻','🎷','🎤','🪗'];
-let bookings = [];
+// ── CONFIG — injected by GitHub Actions ──
+const SCRIPT_URL = '%%SCRIPT_URL%%';
+const APP_TOKEN  = '%%APP_TOKEN%%';
+
+const LOCAL_KEY   = 'studiospace_local';
+const ICONS       = ['🎸','🥁','🎹','🎺','🎻','🎷','🎤','🪗'];
+let bookings      = [];
 let currentFilter = 'day';
-let isSyncing = false;
+let isSyncing     = false;
+let calWeekOffset = 0;
+let calSelectedDay = null;
+const CAL_START_HOUR = 8;
+const CAL_END_HOUR   = 22;
+const HOUR_PX        = 48;
+const DAY_NAMES      = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 // ── INIT ──
 window.addEventListener('DOMContentLoaded', () => {
   const today = todayStr();
-  document.getElementById('bookDate').value = today;
+  document.getElementById('bookDate').value     = today;
   document.getElementById('scheduleDate').value = today;
   calSelectedDay = today;
   document.getElementById('bookDate').addEventListener('change', checkClash);
-  const url = getScriptUrl();
-  if (url) {
-    document.getElementById('scriptUrl').value = url;
-    document.getElementById('configBtn').classList.add('active');
-    setStatus('info', 'Connecting to Google Sheets…');
-    loadFromSheets();
-  } else {
-    bookings = getLocal();
-    renderSchedule(); renderStats();
-  }
+  loadFromSheets();
 });
 
 // ── UTILS ──
-const todayStr = () => new Date().toISOString().split('T')[0];
-const timeToMins = t => { const [h,m] = t.split(':').map(Number); return h*60+m; };
-const getScriptUrl = () => localStorage.getItem(SCRIPT_URL_KEY) || '';
-const getLocal = () => JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
-const saveLocal = d => localStorage.setItem(LOCAL_KEY, JSON.stringify(d));
+const todayStr   = () => new Date().toISOString().split('T')[0];
+const timeToMins = t  => { const [h,m] = t.split(':').map(Number); return h*60+m; };
+const getLocal   = () => JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
+const saveLocal  = d  => localStorage.setItem(LOCAL_KEY, JSON.stringify(d));
 
-// Safety parser: ensure time is always HH:MM
 function safeTime(val) {
   if (!val) return '--:--';
   const str = val.toString().trim();
@@ -463,8 +267,6 @@ function safeTime(val) {
   if (!isNaN(d)) return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
   return str;
 }
-
-// Safety parser: ensure date is always YYYY-MM-DD
 function safeDate(val) {
   if (!val) return '';
   const str = val.toString().trim();
@@ -473,66 +275,35 @@ function safeDate(val) {
   if (!isNaN(d)) return d.getFullYear() + '-' + (d.getMonth()+1).toString().padStart(2,'0') + '-' + d.getDate().toString().padStart(2,'0');
   return str;
 }
-
 function formatDate(dateStr) {
   const clean = safeDate(dateStr);
   const d = new Date(clean + 'T00:00:00');
   const t = todayStr();
   const tom = new Date(); tom.setDate(tom.getDate()+1);
-  const tomStr = tom.toISOString().split('T')[0];
   if (clean === t) return 'Today';
-  if (clean === tomStr) return 'Tomorrow';
+  if (clean === tom.toISOString().split('T')[0]) return 'Tomorrow';
   if (isNaN(d)) return clean;
   return d.toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short' });
 }
-
 function showToast(msg, type='') {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast show' + (type ? ' '+type : '');
   setTimeout(() => t.className = 'toast', 2800);
 }
-
 function setStatus(type, msg) {
-  const bar = document.getElementById('statusBar');
-  bar.className = 'status-bar ' + type;
+  document.getElementById('statusBar').className = 'status-bar ' + type;
   document.getElementById('statusMsg').textContent = msg;
 }
 
-// ── SETUP MODAL ──
-function openSetup() { document.getElementById('setupModal').classList.add('show'); }
-function closeSetup() { document.getElementById('setupModal').classList.remove('show'); }
-document.getElementById('setupModal').addEventListener('click', e => {
-  if (e.target === document.getElementById('setupModal')) closeSetup();
-});
-function saveConfig() {
-  const url = document.getElementById('scriptUrl').value.trim();
-  if (!url || !url.startsWith('https://script.google.com')) {
-    showToast('Enter a valid Apps Script URL', 'error'); return;
-  }
-  localStorage.setItem(SCRIPT_URL_KEY, url);
-  document.getElementById('configBtn').classList.add('active');
-  closeSetup();
-  setStatus('info', 'Connecting…');
-  showToast('Connecting to Sheets…');
-  loadFromSheets();
-}
-
-// ── GOOGLE SHEETS ──
+// ── SHEETS ──
 async function loadFromSheets() {
-  const url = getScriptUrl();
-  if (!url) { bookings = getLocal(); renderSchedule(); renderStats(); return; }
   setSpin(true);
   try {
-    const res = await fetch(url + '?action=getAll');
+    const res  = await fetch(`${SCRIPT_URL}?action=getAll&token=${APP_TOKEN}`);
     const data = await res.json();
     if (data.status === 'ok') {
-      bookings = (data.bookings || []).map(b => ({
-        ...b,
-        date: safeDate(b.date),
-        from: safeTime(b.from),
-        to:   safeTime(b.to)
-      }));
+      bookings = (data.bookings || []).map(b => ({ ...b, date: safeDate(b.date), from: safeTime(b.from), to: safeTime(b.to) }));
       saveLocal(bookings);
       setStatus('ok', '✓ Synced · ' + bookings.length + ' bookings');
     } else throw new Error(data.message);
@@ -544,36 +315,24 @@ async function loadFromSheets() {
     renderSchedule(); renderStats(); renderCalendar();
   }
 }
-
 async function pushToSheets(booking) {
-  const url = getScriptUrl(); if (!url) return false;
   try {
-    const data = encodeURIComponent(JSON.stringify(booking));
-    const res  = await fetch(url + '?action=add&data=' + data);
-    const json = await res.json();
-    return json.status === 'ok';
+    const res  = await fetch(`${SCRIPT_URL}?action=add&token=${APP_TOKEN}&data=${encodeURIComponent(JSON.stringify(booking))}`);
+    return (await res.json()).status === 'ok';
   } catch { return false; }
 }
-
 async function deleteFromSheets(id) {
-  const url = getScriptUrl(); if (!url) return false;
   try {
-    const res  = await fetch(url + '?action=delete&id=' + encodeURIComponent(id));
-    const json = await res.json();
-    return json.status === 'ok';
+    const res  = await fetch(`${SCRIPT_URL}?action=delete&token=${APP_TOKEN}&id=${encodeURIComponent(id)}`);
+    return (await res.json()).status === 'ok';
   } catch { return false; }
 }
-
-function setSpin(on) {
-  isSyncing = on;
-  document.getElementById('syncBtn').classList.toggle('spinning', on);
-}
-
+function setSpin(on) { isSyncing = on; document.getElementById('syncBtn').classList.toggle('spinning', on); }
 async function syncNow() {
   if (isSyncing) return;
   setStatus('info', 'Syncing…');
   await loadFromSheets();
-  if (getScriptUrl()) showToast('Synced!', 'success');
+  showToast('Synced!', 'success');
 }
 
 // ── CLASH ──
@@ -604,23 +363,18 @@ async function addBooking() {
   const btn = document.getElementById('submitBtn');
   btn.classList.add('loading'); btn.disabled = true;
   const booking = { id: Date.now().toString(), band, date, from, to, amount: parseFloat(amount), notes, createdAt: new Date().toISOString() };
-  const url = getScriptUrl();
-  if (url) {
-    const ok = await pushToSheets(booking);
-    if (ok) {
-      bookings.push(booking); saveLocal(bookings);
-      showToast('✅ Saved to Google Sheets!', 'success');
-      setStatus('ok', '✓ Synced · ' + bookings.length + ' bookings');
-    } else {
-      booking._pending = true; bookings.push(booking); saveLocal(bookings);
-      showToast('Saved locally (offline)', '');
-      setStatus('warn', '⚠ Offline — tap ↻ to sync');
-    }
-  } else {
+  const ok = await pushToSheets(booking);
+  if (ok) {
     bookings.push(booking); saveLocal(bookings);
-    showToast('Saved locally');
+    showToast('✅ Saved to Google Sheets!', 'success');
+    setStatus('ok', '✓ Synced · ' + bookings.length + ' bookings');
+  } else {
+    booking._pending = true; bookings.push(booking); saveLocal(bookings);
+    showToast('Saved locally (offline)', '');
+    setStatus('warn', '⚠ Offline — tap ↻ to sync');
   }
   ['bandName','fromTime','toTime','amount','notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('bookDate').value = todayStr();
   document.getElementById('clashBox').classList.remove('show');
   btn.classList.remove('loading'); btn.disabled = false;
   switchTab('schedule');
@@ -629,8 +383,7 @@ async function addBooking() {
 // ── DELETE ──
 async function deleteBooking(id) {
   if (!confirm('Remove this booking?')) return;
-  const url = getScriptUrl();
-  if (url) { setSpin(true); await deleteFromSheets(id); setSpin(false); }
+  setSpin(true); await deleteFromSheets(id); setSpin(false);
   bookings = bookings.filter(b => b.id !== id);
   saveLocal(bookings); renderSchedule(); renderStats();
   showToast('Booking removed');
@@ -640,38 +393,30 @@ async function deleteBooking(id) {
 function setFilter(f, el) {
   currentFilter = f;
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  renderSchedule();
+  el.classList.add('active'); renderSchedule();
 }
-function shiftDate(d) {
+function shiftDate(delta) {
   const el = document.getElementById('scheduleDate');
   const dt = new Date(el.value + 'T00:00:00');
-  dt.setDate(dt.getDate() + d);
-  // Use local date parts to avoid UTC timezone shift
-  const y  = dt.getFullYear();
-  const m  = (dt.getMonth() + 1).toString().padStart(2, '0');
-  const dy = dt.getDate().toString().padStart(2, '0');
-  el.value = y + '-' + m + '-' + dy;
+  dt.setDate(dt.getDate() + delta);
+  el.value = dt.getFullYear() + '-' + (dt.getMonth()+1).toString().padStart(2,'0') + '-' + dt.getDate().toString().padStart(2,'0');
   renderSchedule();
 }
 function renderSchedule() {
-  const list = document.getElementById('bookingList');
-  const sel  = document.getElementById('scheduleDate').value;
+  const list  = document.getElementById('bookingList');
+  const sel   = document.getElementById('scheduleDate').value;
   const today = todayStr();
   let filtered = [...bookings];
-  if (currentFilter === 'day')      filtered = filtered.filter(b => b.date === sel);
+  if (currentFilter === 'day')           filtered = filtered.filter(b => b.date === sel);
   else if (currentFilter === 'upcoming') filtered = filtered.filter(b => b.date >= today);
   else if (currentFilter === 'past')     filtered = filtered.filter(b => b.date < today);
   filtered.sort((a,b) => a.date === b.date ? a.from.localeCompare(b.from) : a.date.localeCompare(b.date));
-  const summarySet = currentFilter === 'day' ? filtered : bookings;
-  const totalMins = summarySet.reduce((s,b) => s + (timeToMins(b.to) - timeToMins(b.from)), 0);
-  document.getElementById('sumCount').textContent  = summarySet.length;
-  document.getElementById('sumAmount').textContent = '₹' + summarySet.reduce((s,b) => s+b.amount, 0).toLocaleString('en-IN');
-  document.getElementById('sumHours').textContent  = (totalMins/60).toFixed(1) + 'h';
-  if (!filtered.length) {
-    list.innerHTML = `<div class="empty-state"><div class="empty-icon">🎸</div><p>No bookings here.<br/>Use the Book tab to add one!</p></div>`;
-    return;
-  }
+  const ss = currentFilter === 'day' ? filtered : bookings;
+  const tm = ss.reduce((s,b) => s + (timeToMins(b.to) - timeToMins(b.from)), 0);
+  document.getElementById('sumCount').textContent  = ss.length;
+  document.getElementById('sumAmount').textContent = '₹' + ss.reduce((s,b) => s+b.amount, 0).toLocaleString('en-IN');
+  document.getElementById('sumHours').textContent  = (tm/60).toFixed(1) + 'h';
+  if (!filtered.length) { list.innerHTML = `<div class="empty-state"><div class="empty-icon">🎸</div><p>No bookings here.<br/>Use the Book tab to add one!</p></div>`; return; }
   list.innerHTML = filtered.map((b,i) => `
     <div class="booking-card ${b.date < today ? 'past' : ''}">
       <div class="card-icon">${ICONS[i % ICONS.length]}</div>
@@ -703,16 +448,16 @@ function renderStats() {
   });
   const months   = Object.entries(byMonth).sort((a,b) => b[0].localeCompare(a[0]));
   const topBands = Object.entries(byBand).sort((a,b) => b[1].total - a[1].total).slice(0,5);
-  const card = (content) => `<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;">${content}</div>`;
-  const sectionTitle = t => `<div style="font-family:var(--font-display);font-size:1rem;letter-spacing:2px;color:var(--muted);margin:18px 0 12px;">${t}</div>`;
+  const card = c => `<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;">${c}</div>`;
+  const sec  = t => `<div style="font-family:var(--font-display);font-size:1rem;letter-spacing:2px;color:var(--muted);margin:18px 0 12px;">${t}</div>`;
   el.innerHTML =
     card(`<div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px;">All-Time Revenue</div>
       <div style="font-family:var(--font-display);font-size:2.4rem;color:#111;letter-spacing:2px;">₹${grandTotal.toLocaleString('en-IN')}</div>
       <div style="font-size:0.78rem;color:var(--muted);margin-top:4px;">${bookings.length} total bookings</div>`) +
-    sectionTitle('MONTHLY') +
+    sec('MONTHLY') +
     months.map(([key,val]) => {
       const label = new Date(key+'-01').toLocaleDateString('en-IN',{month:'long',year:'numeric'});
-      const pct = Math.round((val.total/grandTotal)*100);
+      const pct   = Math.round((val.total/grandTotal)*100);
       return card(`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <span style="font-weight:700;font-size:0.88rem;">${label}</span>
           <span style="font-family:var(--font-display);font-size:1.2rem;color:#111;">₹${val.total.toLocaleString('en-IN')}</span>
@@ -722,7 +467,7 @@ function renderStats() {
         </div>
         <div style="font-size:0.72rem;color:var(--muted);">${val.count} bookings · ${val.hours.toFixed(1)}h booked</div>`);
     }).join('') +
-    sectionTitle('TOP BANDS') +
+    sec('TOP BANDS') +
     topBands.map(([band,val],i) => card(`
       <div style="display:flex;align-items:center;gap:12px;">
         <div style="font-family:var(--font-display);font-size:1.4rem;color:var(--muted2);width:24px;text-align:center;">${i+1}</div>
@@ -741,87 +486,49 @@ function switchTab(tab) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-'+tab).classList.add('active');
   if (tab === 'schedule') renderSchedule();
-  if (tab === 'stats') renderStats();
+  if (tab === 'stats')    renderStats();
   if (tab === 'calendar') renderCalendar();
 }
 
 // ── CALENDAR ──
-const CAL_START_HOUR = 8;   // grid starts at 8am
-const CAL_END_HOUR   = 22;  // grid ends at 10pm
-const HOUR_PX        = 48;  // pixels per hour
-const DAY_NAMES      = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-
-let calWeekOffset = 0;   // 0 = current week
-let calSelectedDay = null;
-
 function getWeekDates(offset) {
   const now = new Date();
-  const dow = now.getDay(); // 0=Sun
   const monday = new Date(now);
-  monday.setDate(now.getDate() - dow + 1 + offset * 7); // start from Monday
+  monday.setDate(now.getDate() - now.getDay() + 1 + offset * 7);
   monday.setHours(0,0,0,0);
-  return Array.from({length: 7}, (_, i) => {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    return d;
-  });
+  return Array.from({length:7}, (_,i) => { const d = new Date(monday); d.setDate(monday.getDate()+i); return d; });
 }
-
 function dateToStr(d) {
-  return d.getFullYear() + '-' +
-    (d.getMonth()+1).toString().padStart(2,'0') + '-' +
-    d.getDate().toString().padStart(2,'0');
+  return d.getFullYear() + '-' + (d.getMonth()+1).toString().padStart(2,'0') + '-' + d.getDate().toString().padStart(2,'0');
 }
-
-function shiftWeek(delta) {
-  calWeekOffset += delta;
-  renderCalendar();
-}
-
-function jumpToToday() {
-  calWeekOffset = 0;
-  calSelectedDay = todayStr();
-  renderCalendar();
-  showDayDetail(todayStr());
-}
+function shiftWeek(delta) { calWeekOffset += delta; renderCalendar(); }
+function jumpToToday() { calWeekOffset = 0; calSelectedDay = todayStr(); renderCalendar(); showDayDetail(todayStr()); }
 
 function renderCalendar() {
-  const days       = getWeekDates(calWeekOffset);
-  const today      = todayStr();
-  const startMins  = CAL_START_HOUR * 60;
-  const endMins    = CAL_END_HOUR * 60;
-  const totalHours = CAL_END_HOUR - CAL_START_HOUR;
-
-  // Week label
+  const days      = getWeekDates(calWeekOffset);
+  const today     = todayStr();
+  const startMins = CAL_START_HOUR * 60;
+  const endMins   = CAL_END_HOUR * 60;
   const fmt = d => d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
-  document.getElementById('calWeekLabel').textContent =
-    fmt(days[0]) + ' – ' + fmt(days[6]) + ' ' + days[6].getFullYear();
-
-  // Bookings map: dateStr -> [booking]
+  document.getElementById('calWeekLabel').textContent = fmt(days[0]) + ' – ' + fmt(days[6]) + ' ' + days[6].getFullYear();
   const bMap = {};
   bookings.forEach(b => { if (!bMap[b.date]) bMap[b.date] = []; bMap[b.date].push(b); });
 
-  // ── Day header strip ──
+  // Day headers
   const strip = document.getElementById('calDayStrip');
-  strip.innerHTML = '<div></div>'; // gutter
+  strip.innerHTML = '<div></div>';
   days.forEach(d => {
-    const ds   = dateToStr(d);
-    const div  = document.createElement('div');
-    div.className = 'cal-day-header' +
-      (ds === today ? ' today' : '') +
-      (ds === calSelectedDay && ds !== today ? ' selected' : '');
+    const ds  = dateToStr(d);
+    const div = document.createElement('div');
+    div.className = 'cal-day-header' + (ds === today ? ' today' : '') + (ds === calSelectedDay && ds !== today ? ' selected' : '');
     const dots = (bMap[ds] || []).slice(0,3).map(() => '<span class="booking-dot"></span>').join('');
-    div.innerHTML = `<div class="day-name">${DAY_NAMES[d.getDay()]}</div>
-      <div class="day-num">${d.getDate()}</div>
-      <div class="dot-row">${dots}</div>`;
+    div.innerHTML = `<div class="day-name">${DAY_NAMES[d.getDay()]}</div><div class="day-num">${d.getDate()}</div><div class="dot-row">${dots}</div>`;
     div.onclick = () => { calSelectedDay = ds; renderCalendar(); showDayDetail(ds); };
     strip.appendChild(div);
   });
 
-  // ── Build booking lookup: for each day+hour, which booking starts here ──
-  // Key: "dateStr:hour" -> booking (we anchor to the starting hour row)
-  // We also need height in px = duration * HOUR_PX / 60
-  const blockMap = {}; // "colIdx:hour" -> [{booking, topOffset, heightPx}]
+  // Block map
+  const blockMap = {};
   days.forEach((d, colIdx) => {
     const ds = dateToStr(d);
     (bMap[ds] || []).forEach(b => {
@@ -830,8 +537,8 @@ function renderCalendar() {
       if (tMins <= startMins || fMins >= endMins) return;
       const cFrom  = Math.max(fMins, startMins);
       const cTo    = Math.min(tMins, endMins);
-      const startH = Math.floor(cFrom / 60); // which hour row to anchor in
-      const topOff = ((cFrom - startH * 60) / 60) * HOUR_PX; // offset within that row
+      const startH = Math.floor(cFrom / 60);
+      const topOff = ((cFrom - startH * 60) / 60) * HOUR_PX;
       const hPx    = Math.max(((cTo - cFrom) / 60) * HOUR_PX, 18);
       const key    = colIdx + ':' + startH;
       if (!blockMap[key]) blockMap[key] = [];
@@ -839,11 +546,9 @@ function renderCalendar() {
     });
   });
 
-  // ── Time grid: one .cal-hour-row per hour ──
-  const wrap = document.getElementById('calGridWrap');
+  // Time grid
+  const wrap    = document.getElementById('calGridWrap');
   wrap.innerHTML = '';
-
-  // Current time
   const nowD    = new Date();
   const nowMins = nowD.getHours() * 60 + nowD.getMinutes();
   const nowCol  = days.findIndex(d => dateToStr(d) === dateToStr(nowD));
@@ -851,14 +556,10 @@ function renderCalendar() {
   for (let h = CAL_START_HOUR; h < CAL_END_HOUR; h++) {
     const row = document.createElement('div');
     row.className = 'cal-hour-row';
-
-    // Time label
     const lbl = document.createElement('div');
     lbl.className = 'cal-time-label';
     lbl.textContent = (h === 12 ? 12 : h % 12) + (h < 12 ? 'am' : 'pm');
     row.appendChild(lbl);
-
-    // 7 day columns
     days.forEach((d, colIdx) => {
       const ds  = dateToStr(d);
       const col = document.createElement('div');
@@ -866,52 +567,30 @@ function renderCalendar() {
       col.onclick = () => {
         document.getElementById('bookDate').value = ds;
         document.getElementById('fromTime').value = h.toString().padStart(2,'0') + ':00';
-        document.getElementById('toTime').value   = (h + 1).toString().padStart(2,'0') + ':00';
+        document.getElementById('toTime').value   = (h+1).toString().padStart(2,'0') + ':00';
         switchTab('book');
       };
-
-      // Booking blocks anchored to this hour
-      const key = colIdx + ':' + h;
-      (blockMap[key] || []).forEach(({ b, topOff, hPx, ds: bds }) => {
+      (blockMap[colIdx + ':' + h] || []).forEach(({ b, topOff, hPx, ds: bds }) => {
         const block = document.createElement('div');
-        block.className = 'cal-booking';
-        block.style.top    = topOff + 'px';
+        block.className  = 'cal-booking';
+        block.style.top  = topOff + 'px';
         block.style.height = hPx + 'px';
-        block.innerHTML    = `<div class="cb-band">${b.band}</div>` +
-          (hPx > 28 ? `<div class="cb-time">${safeTime(b.from)}–${safeTime(b.to)}</div>` : '');
-        block.onclick = e => {
-          e.stopPropagation();
-          calSelectedDay = bds;
-          renderCalendar();
-          showDayDetail(bds);
-        };
+        block.innerHTML  = `<div class="cb-band">${b.band}</div>` + (hPx > 28 ? `<div class="cb-time">${safeTime(b.from)}–${safeTime(b.to)}</div>` : '');
+        block.onclick = e => { e.stopPropagation(); calSelectedDay = bds; renderCalendar(); showDayDetail(bds); };
         col.appendChild(block);
       });
-
-      // Current time line — in the correct hour row and column
-      if (colIdx === nowCol && h === nowD.getHours() &&
-          nowMins >= startMins && nowMins <= endMins) {
-        const topPx  = ((nowMins - h * 60) / 60) * HOUR_PX;
-        const line   = document.createElement('div');
+      if (colIdx === nowCol && h === nowD.getHours() && nowMins >= startMins && nowMins <= endMins) {
+        const line = document.createElement('div');
         line.className = 'cal-now-line';
-        line.style.top = topPx + 'px';
+        line.style.top = ((nowMins - h * 60) / 60) * HOUR_PX + 'px';
         line.innerHTML = '<div class="cal-now-dot"></div>';
         col.appendChild(line);
       }
-
       row.appendChild(col);
     });
-
     wrap.appendChild(row);
   }
-
-  // Scroll to current time on this week, else top
-  const scrollTo = calWeekOffset === 0
-    ? Math.max(0, ((nowMins - startMins - 60) / 60) * HOUR_PX)
-    : 0;
-  wrap.scrollTop = scrollTo;
-
-  // Day detail
+  wrap.scrollTop = calWeekOffset === 0 ? Math.max(0, ((nowMins - startMins - 60) / 60) * HOUR_PX) : 0;
   if (calSelectedDay) showDayDetail(calSelectedDay);
 }
 
@@ -919,20 +598,16 @@ function showDayDetail(ds) {
   const detail = document.getElementById('calDetail');
   const title  = document.getElementById('calDetailTitle');
   const body   = document.getElementById('calDetailBody');
-  const d = new Date(ds + 'T00:00:00');
-  const label = d.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long' });
-  title.textContent = label;
+  title.textContent = new Date(ds + 'T00:00:00').toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long' });
   const dayBs = bookings.filter(b => b.date === ds).sort((a,b) => a.from.localeCompare(b.from));
-  if (!dayBs.length) {
-    body.innerHTML = '<div class="cal-free-msg">✅ No bookings — day is fully available</div>';
-  } else {
-    body.innerHTML = dayBs.map(b => `
-      <div class="cal-slot">
-        <div class="cal-slot-time">${safeTime(b.from)} – ${safeTime(b.to)}</div>
-        <div class="cal-slot-band">${b.band}${b.notes ? '<br><span style="font-size:0.72rem;color:var(--muted);font-weight:400;">' + b.notes + '</span>' : ''}</div>
-        <div class="cal-slot-amt">₹${b.amount.toLocaleString('en-IN')}</div>
-      </div>`).join('');
-  }
+  body.innerHTML = !dayBs.length
+    ? '<div class="cal-free-msg">✅ No bookings — day is fully available</div>'
+    : dayBs.map(b => `
+        <div class="cal-slot">
+          <div class="cal-slot-time">${safeTime(b.from)} – ${safeTime(b.to)}</div>
+          <div class="cal-slot-band">${b.band}${b.notes ? '<br><span style="font-size:0.72rem;color:var(--muted);font-weight:400;">' + b.notes + '</span>' : ''}</div>
+          <div class="cal-slot-amt">₹${b.amount.toLocaleString('en-IN')}</div>
+        </div>`).join('');
   detail.classList.add('show');
 }
 </script>
