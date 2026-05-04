@@ -21,10 +21,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Inject secrets into index.html
+      - name: Inject Script URL into index.html
         run: |
           sed -i "s|%%SCRIPT_URL%%|${{ vars.SCRIPT_URL }}|g" index.html
-          sed -i "s|%%APP_TOKEN%%|${{ secrets.APP_TOKEN }}|g" index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
