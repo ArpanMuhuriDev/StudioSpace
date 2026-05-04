@@ -340,12 +340,22 @@ const HOUR_PX        = 48;
 const DAY_NAMES      = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 // ── AUTH ──
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
 function signInWithGoogle() {
   document.getElementById('authLoading').style.display = 'block';
-  auth.signInWithPopup(provider).catch(err => {
-    document.getElementById('authLoading').style.display = 'none';
-    alert('Sign in failed: ' + err.message);
-  });
+  if (isMobile) {
+    // Use redirect on mobile — popup causes page reload issues on iOS
+    auth.signInWithRedirect(provider).catch(err => {
+      document.getElementById('authLoading').style.display = 'none';
+      alert('Sign in failed: ' + err.message);
+    });
+  } else {
+    auth.signInWithPopup(provider).catch(err => {
+      document.getElementById('authLoading').style.display = 'none';
+      alert('Sign in failed: ' + err.message);
+    });
+  }
 }
 
 function signOut() {
@@ -353,10 +363,8 @@ function signOut() {
 }
 
 function showApp(user) {
-  // Hide auth screens
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('deniedScreen').classList.add('hidden');
-  // Show app
   document.getElementById('appHeader').style.display  = 'flex';
   document.getElementById('statusBar').style.display  = 'flex';
   document.getElementById('appTabs').style.display    = 'flex';
@@ -377,7 +385,8 @@ function showApp(user) {
   document.getElementById('scheduleDate').value = today;
   calSelectedDay = today;
   document.getElementById('bookDate').addEventListener('change', checkClash);
-  loadFromSheets();
+  // Small delay to let the page fully settle after auth redirect on iOS
+  setTimeout(() => loadFromSheets(), 300);
 }
 
 function showDenied(user) {
@@ -397,26 +406,21 @@ function showLogin() {
 }
 
 // ── AUTH STATE LISTENER ──
-// This is the single source of truth — fires on every page load
 auth.onAuthStateChanged(user => {
-  if (!user) {
-    // Not logged in
-    showLogin();
-    return;
+  if (!user) { showLogin(); return; }
+  // getIdTokenResult succeeds for any valid Firebase auth user.
+  // Since we only add allowed users to Firebase Auth manually,
+  // any successfully authenticated user is an allowed user.
+  user.getIdTokenResult()
+    .then(() => showApp(user))
+    .catch(() => { showDenied(user); auth.signOut(); });
+});
+
+// Handle redirect result on mobile after Google sign-in redirect
+auth.getRedirectResult().catch(err => {
+  if (err.code !== 'auth/no-current-user') {
+    console.error('Redirect error:', err.message);
   }
-  // Check if this user is registered in Firebase Auth
-  // Since we're using Firebase Auth user management (not email whitelist),
-  // the mere fact that onAuthStateChanged returns a user means they
-  // signed in successfully. We check if their email is verified via
-  // Firebase Auth Users list by attempting to get their ID token.
-  // If they are NOT in the allowed users list, we sign them out.
-  user.getIdTokenResult().then(idTokenResult => {
-    // User is authenticated — show the app
-    showApp(user);
-  }).catch(() => {
-    showDenied(user);
-    auth.signOut();
-  });
 });
 
 // ── UTILS ──
@@ -468,11 +472,15 @@ function xhrGet(url) {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.onload = () => {
-      try { resolve(JSON.parse(xhr.responseText)); }
-      catch { reject(new Error('Invalid JSON')); }
+      if (xhr.status === 200) {
+        try { resolve(JSON.parse(xhr.responseText)); }
+        catch { reject(new Error('Invalid JSON: ' + xhr.responseText.slice(0, 100))); }
+      } else {
+        reject(new Error('HTTP ' + xhr.status + ' — ' + xhr.statusText));
+      }
     };
-    xhr.onerror   = () => reject(new Error('Network error'));
-    xhr.ontimeout = () => reject(new Error('Timeout'));
+    xhr.onerror   = () => reject(new Error('Network error — check internet connection'));
+    xhr.ontimeout = () => reject(new Error('Timeout — Apps Script took too long'));
     xhr.timeout   = 15000;
     xhr.send();
   });
@@ -480,16 +488,19 @@ function xhrGet(url) {
 
 async function loadFromSheets() {
   setSpin(true);
+  setStatus('info', 'Connecting…');
   try {
     const data = await xhrGet(`${SCRIPT_URL}?action=getAll`);
     if (data.status === 'ok') {
       bookings = (data.bookings || []).map(b => ({ ...b, date: safeDate(b.date), from: safeTime(b.from), to: safeTime(b.to) }));
       saveLocal(bookings);
       setStatus('ok', '✓ Synced · ' + bookings.length + ' bookings');
-    } else throw new Error(data.message);
-  } catch {
+    } else {
+      throw new Error(data.message || 'Unknown error from sheet');
+    }
+  } catch(err) {
     bookings = getLocal();
-    setStatus('warn', '⚠ Offline — showing local data');
+    setStatus('warn', '⚠ Offline — ' + err.message);
   } finally {
     setSpin(false);
     renderSchedule(); renderStats(); renderCalendar();
