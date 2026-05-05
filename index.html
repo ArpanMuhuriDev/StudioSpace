@@ -344,17 +344,29 @@ const DAY_NAMES      = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 // ── AUTH ──
 let accessDenied = false;
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 function signInWithGoogle() {
   document.getElementById('authLoading').style.display = 'block';
   document.getElementById('googleSignInBtn').style.display = 'none';
   document.getElementById('authError').style.display = 'none';
-  auth.signInWithRedirect(provider).catch(err => {
-    document.getElementById('authLoading').style.display = 'none';
-    document.getElementById('googleSignInBtn').style.display = 'flex';
-    document.getElementById('authError').textContent = 'Sign in failed: ' + err.message;
-    document.getElementById('authError').style.display = 'block';
-  });
+
+  if (isMobile) {
+    // Mobile: use redirect (works fine on mobile browsers)
+    auth.signInWithRedirect(provider).catch(handleAuthError);
+  } else {
+    // Desktop: use popup but configure it to feel inline
+    // Set custom parameters to show account chooser inline
+    provider.setCustomParameters({ prompt: 'select_account' });
+    auth.signInWithPopup(provider).catch(handleAuthError);
+  }
+}
+
+function handleAuthError(err) {
+  document.getElementById('authLoading').style.display = 'none';
+  document.getElementById('googleSignInBtn').style.display = 'flex';
+  document.getElementById('authError').textContent = 'Sign in failed: ' + err.message;
+  document.getElementById('authError').style.display = 'block';
 }
 
 function signOut() {
