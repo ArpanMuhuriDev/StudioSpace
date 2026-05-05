@@ -371,7 +371,9 @@ function handleAuthError(err) {
 
 function signOut() {
   accessDenied = false;
-  auth.signOut();
+  auth.signOut().then(() => {
+    showLogin();
+  });
 }
 
 function showApp(user) {
