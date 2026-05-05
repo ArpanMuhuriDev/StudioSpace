@@ -187,7 +187,7 @@
   <div class="auth-logo">🎤</div>
   <div class="auth-title">Studio Space</div>
   <div class="auth-subtitle">Rehearsal booking manager.<br/>Sign in to continue.</div>
-  <button class="google-btn" onclick="signInWithGoogle()">
+  <button class="google-btn" id="googleSignInBtn" onclick="signInWithGoogle()">
     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
       <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -197,6 +197,7 @@
     Sign in with Google
   </button>
   <div class="auth-loading" id="authLoading" style="display:none;">Signing in…</div>
+  <div id="authError" style="display:none;margin-top:14px;font-size:0.8rem;color:var(--red);background:var(--red-dim);border:1px solid rgba(224,48,48,0.2);border-radius:10px;padding:10px 14px;max-width:300px;text-align:center;"></div>
 </div>
 
 <!-- ACCESS DENIED SCREEN -->
@@ -342,29 +343,27 @@ const HOUR_PX        = 48;
 const DAY_NAMES      = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 // ── AUTH ──
-const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+let accessDenied = false;
 
 function signInWithGoogle() {
   document.getElementById('authLoading').style.display = 'block';
-  if (isMobile) {
-    // Use redirect on mobile — popup causes page reload issues on iOS
-    auth.signInWithRedirect(provider).catch(err => {
-      document.getElementById('authLoading').style.display = 'none';
-      alert('Sign in failed: ' + err.message);
-    });
-  } else {
-    auth.signInWithPopup(provider).catch(err => {
-      document.getElementById('authLoading').style.display = 'none';
-      alert('Sign in failed: ' + err.message);
-    });
-  }
+  document.getElementById('googleSignInBtn').style.display = 'none';
+  document.getElementById('authError').style.display = 'none';
+  auth.signInWithRedirect(provider).catch(err => {
+    document.getElementById('authLoading').style.display = 'none';
+    document.getElementById('googleSignInBtn').style.display = 'flex';
+    document.getElementById('authError').textContent = 'Sign in failed: ' + err.message;
+    document.getElementById('authError').style.display = 'block';
+  });
 }
 
 function signOut() {
+  accessDenied = false;
   auth.signOut();
 }
 
 function showApp(user) {
+  accessDenied = false;
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('deniedScreen').classList.add('hidden');
   document.getElementById('appHeader').style.display  = 'flex';
@@ -373,7 +372,6 @@ function showApp(user) {
   document.querySelectorAll('.page').forEach(p => {
     if (p.id === 'page-book') p.classList.add('active');
   });
-  // User avatar
   const avatarEl = document.getElementById('userAvatar');
   if (user.photoURL) {
     avatarEl.innerHTML = `<img class="user-avatar" src="${user.photoURL}" title="${user.displayName}\n${user.email}" onclick="if(confirm('Sign out?'))signOut()" />`;
@@ -381,23 +379,26 @@ function showApp(user) {
     const initials = (user.displayName || user.email).charAt(0).toUpperCase();
     avatarEl.innerHTML = `<div class="user-avatar-placeholder" title="${user.email}" onclick="if(confirm('Sign out?'))signOut()">${initials}</div>`;
   }
-  // Init app
   const today = todayStr();
   document.getElementById('bookDate').value     = today;
   document.getElementById('scheduleDate').value = today;
   calSelectedDay = today;
   document.getElementById('bookDate').addEventListener('change', checkClash);
-  // Small delay to let the page fully settle after auth redirect on iOS
   setTimeout(() => loadFromSheets(), 300);
 }
 
 function showDenied(user) {
+  accessDenied = true;
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('deniedScreen').classList.remove('hidden');
+  document.getElementById('appHeader').style.display = 'none';
+  document.getElementById('statusBar').style.display = 'none';
+  document.getElementById('appTabs').style.display   = 'none';
   document.getElementById('deniedEmail').textContent = user.email;
 }
 
 function showLogin() {
+  if (accessDenied) return;
   document.getElementById('loginScreen').classList.remove('hidden');
   document.getElementById('deniedScreen').classList.add('hidden');
   document.getElementById('appHeader').style.display = 'none';
@@ -405,12 +406,10 @@ function showLogin() {
   document.getElementById('appTabs').style.display   = 'none';
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('authLoading').style.display = 'none';
+  document.getElementById('googleSignInBtn').style.display = 'flex';
 }
 
 // ── AUTH STATE LISTENER ──
-// After sign-in, check Firestore 'allowedUsers' collection
-// for a document whose ID matches the user's email.
-// Add/remove users by editing Firebase Console → Firestore → allowedUsers.
 auth.onAuthStateChanged(async user => {
   if (!user) { showLogin(); return; }
   try {
@@ -423,10 +422,21 @@ auth.onAuthStateChanged(async user => {
       await auth.signOut();
     }
   } catch(err) {
-    // Firestore read failed — deny access to be safe
     console.error('Auth check failed:', err.message);
     showDenied(user);
     await auth.signOut();
+  }
+});
+
+// Handle result when page reloads after Google redirect
+auth.getRedirectResult().then(result => {
+  if (result && result.user) console.log('Redirect sign-in complete');
+}).catch(err => {
+  document.getElementById('authLoading').style.display = 'none';
+  document.getElementById('googleSignInBtn').style.display = 'flex';
+  if (err.code !== 'auth/no-current-user') {
+    document.getElementById('authError').textContent = 'Sign in failed. Please try again.';
+    document.getElementById('authError').style.display = 'block';
   }
 });
 
