@@ -367,7 +367,7 @@ function signInWithGoogle() {
 function handleAuthError(err) {
   document.getElementById('authLoading').style.display = 'none';
   document.getElementById('googleSignInBtn').style.display = 'flex';
-  document.getElementById('authError').textContent = 'Sign in failed. Please try again.';
+  document.getElementById('authError').textContent = err.code + ': ' + err.message;
   document.getElementById('authError').style.display = 'block';
   console.error('Auth error:', err.code, err.message);
 }
