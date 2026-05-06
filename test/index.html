@@ -46,9 +46,15 @@
     .field { margin-bottom: 14px; }
     label { display: block; font-size: 0.68rem; font-weight: 700; letter-spacing: 1.8px; color: var(--muted); margin-bottom: 7px; }
     input, select { width: 100%; background: var(--surface); border: 1.5px solid var(--border); border-radius: 13px; padding: 13px 15px; color: var(--text); font-family: var(--font-body); font-size: 0.95rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; accent-color: #111; }
+    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
     input:focus, select:focus { border-color: #111; box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
     input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0); cursor: pointer; }
+    input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0); cursor: pointer; }
+    input[type="time"]::-webkit-datetime-edit-ampm-field:focus,
+    input[type="time"]::-webkit-datetime-edit-hours-field:focus,
+    input[type="time"]::-webkit-datetime-edit-minutes-field:focus { background: #111; color: #fff; border-radius: 3px; }
     select option:checked { background: #111; color: #fff; }
+    select option { border-radius: 8px; }
     input::placeholder { color: var(--muted2); }
     .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .amount-wrap { position: relative; }
@@ -234,16 +240,8 @@
     <input type="date" id="bookDate" />
   </div>
   <div class="time-row">
-    <div class="field"><label>From <span style="color:var(--red)">★</span></label>
-      <select id="fromTime" onchange="checkClash()">
-        <option value="">Select</option>
-      </select>
-    </div>
-    <div class="field"><label>To <span style="color:var(--red)">★</span></label>
-      <select id="toTime" onchange="checkClash()">
-        <option value="">Select</option>
-      </select>
-    </div>
+    <div class="field"><label>From <span style="color:var(--red)">★</span></label><input type="time" id="fromTime" onchange="checkClash()" step="1800" /></div>
+    <div class="field"><label>To <span style="color:var(--red)">★</span></label><input type="time" id="toTime" onchange="checkClash()" step="1800" /></div>
   </div>
   <div class="clash-box" id="clashBox"><span>⚠️</span><span id="clashMsg"></span></div>
   <div class="field">
@@ -432,7 +430,6 @@ function showApp(user) {
   document.getElementById('scheduleDate').value = today;
   calSelectedDay = today;
   document.getElementById('bookDate').addEventListener('change', checkClash);
-  populateTimeDropdowns();
   setTimeout(() => loadFromSheets(), 300);
 }
 
@@ -587,28 +584,6 @@ function checkClash() {
   box.classList.remove('show'); return false;
 }
 
-// ── POPULATE TIME DROPDOWNS ──
-function populateTimeDropdowns(selectedFrom, selectedTo) {
-  ['fromTime','toTime'].forEach(id => {
-    const sel = document.getElementById(id);
-    const current = sel.value;
-    sel.innerHTML = '<option value="">Select</option>';
-    for (let h = 0; h < 24; h++) {
-      ['00','30'].forEach(m => {
-        const val   = h.toString().padStart(2,'0') + ':' + m;
-        const label = (h === 0 ? 12 : h > 12 ? h - 12 : h) + ':' + m + (h < 12 ? ' AM' : ' PM');
-        const opt   = document.createElement('option');
-        opt.value   = val;
-        opt.textContent = label;
-        sel.appendChild(opt);
-      });
-    }
-    // Restore selection
-    if (id === 'fromTime' && selectedFrom) sel.value = selectedFrom;
-    else if (id === 'toTime' && selectedTo)   sel.value = selectedTo;
-    else sel.value = current;
-  });
-}
 function calcAmountDue() {
   const amount  = parseFloat(document.getElementById('amount').value) || 0;
   const advance = parseFloat(document.getElementById('advancePaid').value) || 0;
@@ -623,7 +598,8 @@ function editBooking(id) {
   document.getElementById('editingId').value       = id;
   document.getElementById('bandName').value        = b.band;
   document.getElementById('bookDate').value        = b.date;
-  populateTimeDropdowns(b.from, b.to);
+  document.getElementById('fromTime').value = b.from;
+  document.getElementById('toTime').value   = b.to;
   document.getElementById('amount').value          = b.amount;
   document.getElementById('advancePaid').value     = b.advancePaid || 0;
   document.getElementById('amountDue').value       = b.amountDue  || 0;
@@ -640,9 +616,7 @@ function resetForm() {
   document.getElementById('editingId').value = '';
   document.getElementById('formTitle').innerHTML = 'New <span>Booking</span>';
   document.getElementById('submitBtnText').textContent = 'CONFIRM BOOKING';
-  ['bandName','amount','advancePaid','notes'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('fromTime').value   = '';
-  document.getElementById('toTime').value     = '';
+  ['bandName','fromTime','toTime','amount','advancePaid','notes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('amountDue').value  = '';
   document.getElementById('status').value     = 'Attending';
   document.getElementById('bookDate').value   = todayStr();
