@@ -100,6 +100,34 @@
     .toast.show { transform: translateX(-50%) translateY(0); }
     .toast.success { border-color: var(--green); color: var(--green); }
     .toast.error { border-color: var(--red); color: var(--red); }
+    /* ── CUSTOM TIME PICKER ── */
+    .time-picker-wrap { position: relative; }
+    .time-picker-input {
+      width: 100%; background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 13px; padding: 13px 15px; color: var(--text);
+      font-family: var(--font-body); font-size: 0.95rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+      user-select: none; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .time-picker-input.open { border-color: #111; box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
+    .time-picker-input .tp-placeholder { color: var(--muted2); }
+    .time-picker-input .tp-arrow { font-size: 0.65rem; color: var(--muted); }
+    .time-picker-dropdown {
+      position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+      background: #fff; border: 1.5px solid var(--border); border-radius: 13px;
+      overflow-y: auto; z-index: 200;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      max-height: 220px; display: none;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    }
+    .time-picker-dropdown.open { display: block; }
+    .time-option {
+      padding: 10px 15px; font-family: var(--font-body); font-size: 0.92rem;
+      cursor: pointer; color: var(--text); transition: background 0.1s;
+    }
+    .time-option:hover { background: var(--surface); }
+    .time-option.selected { background: #111; color: #fff; font-weight: 700; }
+
     /* CALENDAR */
     .cal-week-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
     .cal-week-nav .date-nav-btn { width: 36px; height: 36px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -240,8 +268,28 @@
     <input type="date" id="bookDate" />
   </div>
   <div class="time-row">
-    <div class="field"><label>From <span style="color:var(--red)">★</span></label><input type="time" id="fromTime" onchange="checkClash()" step="1800" /></div>
-    <div class="field"><label>To <span style="color:var(--red)">★</span></label><input type="time" id="toTime" onchange="checkClash()" step="1800" /></div>
+    <div class="field">
+      <label>From <span style="color:var(--red)">★</span></label>
+      <div class="time-picker-wrap">
+        <div class="time-picker-input" id="fromTimeDisplay" onclick="toggleTimePicker('from')">
+          <span class="tp-placeholder" id="fromTimeLabel">Select time</span>
+          <span class="tp-arrow">▼</span>
+        </div>
+        <div class="time-picker-dropdown" id="fromTimeDropdown"></div>
+        <input type="hidden" id="fromTime" />
+      </div>
+    </div>
+    <div class="field">
+      <label>To <span style="color:var(--red)">★</span></label>
+      <div class="time-picker-wrap">
+        <div class="time-picker-input" id="toTimeDisplay" onclick="toggleTimePicker('to')">
+          <span class="tp-placeholder" id="toTimeLabel">Select time</span>
+          <span class="tp-arrow">▼</span>
+        </div>
+        <div class="time-picker-dropdown" id="toTimeDropdown"></div>
+        <input type="hidden" id="toTime" />
+      </div>
+    </div>
   </div>
   <div class="clash-box" id="clashBox"><span>⚠️</span><span id="clashMsg"></span></div>
   <div class="field">
@@ -584,6 +632,71 @@ function checkClash() {
   box.classList.remove('show'); return false;
 }
 
+// ── CUSTOM TIME PICKER ──
+const TIME_SLOTS = [];
+for (let h = 0; h < 24; h++) {
+  ['00','30'].forEach(m => {
+    const val  = h.toString().padStart(2,'0') + ':' + m;
+    const h12  = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    const ampm = h < 12 ? 'AM' : 'PM';
+    TIME_SLOTS.push({ val, label: h12 + ':' + m + ' ' + ampm });
+  });
+}
+
+function buildTimePicker(which) {
+  const dropdown = document.getElementById(which + 'TimeDropdown');
+  const current  = document.getElementById(which + 'Time').value;
+  dropdown.innerHTML = TIME_SLOTS.map(s =>
+    `<div class="time-option${s.val === current ? ' selected' : ''}"
+      onclick="selectTime('${which}','${s.val}','${s.label}')">${s.label}</div>`
+  ).join('');
+  // Scroll to selected
+  setTimeout(() => {
+    const sel = dropdown.querySelector('.selected');
+    if (sel) sel.scrollIntoView({ block: 'center' });
+  }, 30);
+}
+
+function toggleTimePicker(which) {
+  const dropdown = document.getElementById(which + 'TimeDropdown');
+  const display  = document.getElementById(which + 'TimeDisplay');
+  const isOpen   = dropdown.classList.contains('open');
+  // Close all pickers first
+  closeAllTimePickers();
+  if (!isOpen) {
+    buildTimePicker(which);
+    dropdown.classList.add('open');
+    display.classList.add('open');
+  }
+}
+
+function selectTime(which, val, label) {
+  document.getElementById(which + 'Time').value       = val;
+  document.getElementById(which + 'TimeLabel').textContent = label;
+  document.getElementById(which + 'TimeLabel').classList.remove('tp-placeholder');
+  closeAllTimePickers();
+  checkClash();
+}
+
+function closeAllTimePickers() {
+  document.querySelectorAll('.time-picker-dropdown').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.time-picker-input').forEach(d => d.classList.remove('open'));
+}
+
+function setTimePickerValue(which, val) {
+  if (!val) return;
+  const slot = TIME_SLOTS.find(s => s.val === val);
+  if (!slot) return;
+  document.getElementById(which + 'Time').value            = val;
+  document.getElementById(which + 'TimeLabel').textContent = slot.label;
+  document.getElementById(which + 'TimeLabel').classList.remove('tp-placeholder');
+}
+
+// Close pickers when clicking outside
+document.addEventListener('click', e => {
+  if (!e.target.closest('.time-picker-wrap')) closeAllTimePickers();
+});
+
 function calcAmountDue() {
   const amount  = parseFloat(document.getElementById('amount').value) || 0;
   const advance = parseFloat(document.getElementById('advancePaid').value) || 0;
@@ -600,6 +713,8 @@ function editBooking(id) {
   document.getElementById('bookDate').value        = b.date;
   document.getElementById('fromTime').value = b.from;
   document.getElementById('toTime').value   = b.to;
+  setTimePickerValue('from', b.from);
+  setTimePickerValue('to',   b.to);
   document.getElementById('amount').value          = b.amount;
   document.getElementById('advancePaid').value     = b.advancePaid || 0;
   document.getElementById('amountDue').value       = b.amountDue  || 0;
@@ -617,6 +732,10 @@ function resetForm() {
   document.getElementById('formTitle').innerHTML = 'New <span>Booking</span>';
   document.getElementById('submitBtnText').textContent = 'CONFIRM BOOKING';
   ['bandName','fromTime','toTime','amount','advancePaid','notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fromTimeLabel').textContent = 'Select time';
+  document.getElementById('fromTimeLabel').className   = 'tp-placeholder';
+  document.getElementById('toTimeLabel').textContent   = 'Select time';
+  document.getElementById('toTimeLabel').className     = 'tp-placeholder';
   document.getElementById('amountDue').value  = '';
   document.getElementById('status').value     = 'Attending';
   document.getElementById('bookDate').value   = todayStr();
