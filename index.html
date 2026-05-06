@@ -83,8 +83,6 @@
     .card-date-lbl { font-size: 0.68rem; color: var(--muted2); margin-top: 1px; }
     .card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
     .card-amount { font-family: var(--font-display); font-size: 1.25rem; color: #111; letter-spacing: 1px; }
-    .card-del { background: transparent; border: none; color: var(--muted2); font-size: 0.85rem; cursor: pointer; padding: 2px; transition: color 0.2s; }
-    .card-del:hover { color: var(--red); }
     .empty-state { text-align: center; padding: 56px 20px; color: var(--muted); }
     .empty-icon { font-size: 3rem; margin-bottom: 12px; }
     .empty-state p { font-size: 0.88rem; line-height: 1.7; }
@@ -174,7 +172,7 @@
 
 <!-- LOGIN SCREEN -->
 <div class="auth-screen" id="loginScreen">
-  <img src="https://raw.githubusercontent.com/ArpanMuhuriDev/StudioSpace/main/Logos/IMG_20241026_104514_243.webp" alt="Studio Space" style="width:200px;height:auto;margin-bottom:16px;object-fit:contain;" />
+  <img src="Logos/IMG_20241026_104514_243.webp" alt="Studio Space" style="width:200px;height:auto;margin-bottom:16px;object-fit:contain;" />
   <div class="auth-subtitle">Rehearsal booking manager.<br/>Sign in to continue.</div>
   <button class="google-btn" id="googleSignInBtn" onclick="signInWithGoogle()">
     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -201,7 +199,7 @@
 </div>
 
 <header class="app-header" id="appHeader" style="display:none;">
-  <div class="logo"><img src="https://raw.githubusercontent.com/ArpanMuhuriDev/StudioSpace/main/Logos/IMG_20241026_104514_243.webp" alt="Studio Space" style="height:36px;width:auto;object-fit:contain;" /></div>
+  <div class="logo"><img src="Logos/IMG_20241026_104514_243.webp" alt="Studio Space" style="height:36px;width:auto;object-fit:contain;" /></div>
   <div class="header-right">
     <button class="icon-btn" id="syncBtn" onclick="syncNow()">↻</button>
     <div id="userAvatar"></div>
@@ -239,8 +237,30 @@
     <label>Amount (₹) <span style="color:var(--red)">★</span></label>
     <div class="amount-wrap">
       <span class="currency-sign">₹</span>
-      <input type="number" id="amount" placeholder="0" inputmode="numeric" min="0" />
+      <input type="number" id="amount" placeholder="0" inputmode="numeric" min="0" oninput="calcAmountDue()" />
     </div>
+  </div>
+  <div class="field">
+    <label>Advance Paid (₹)</label>
+    <div class="amount-wrap">
+      <span class="currency-sign">₹</span>
+      <input type="number" id="advancePaid" placeholder="0" inputmode="numeric" min="0" oninput="calcAmountDue()" />
+    </div>
+  </div>
+  <div class="field">
+    <label>Amount Due (₹)</label>
+    <div class="amount-wrap">
+      <span class="currency-sign">₹</span>
+      <input type="number" id="amountDue" placeholder="0" readonly style="background:var(--surface2);color:var(--muted);cursor:not-allowed;" />
+    </div>
+  </div>
+  <div class="field">
+    <label>Status <span style="color:var(--red)">★</span></label>
+    <select id="status">
+      <option value="Attending" selected>Attending</option>
+      <option value="Attended">Attended</option>
+      <option value="Cancelled">Cancelled</option>
+    </select>
   </div>
   <div class="field">
     <label>Notes <span style="font-size:0.62rem;color:var(--muted);font-weight:400;letter-spacing:0;text-transform:none;">(optional)</span></label>
@@ -534,12 +554,6 @@ async function pushToSheets(booking) {
     return data.status === 'ok';
   } catch { return false; }
 }
-async function deleteFromSheets(id) {
-  try {
-    const data = await xhrGet(`${SCRIPT_URL}?action=delete&id=${encodeURIComponent(id)}`);
-    return data.status === 'ok';
-  } catch { return false; }
-}
 function setSpin(on) { isSyncing = on; document.getElementById('syncBtn').classList.toggle('spinning', on); }
 async function syncNow() {
   if (isSyncing) return;
@@ -563,19 +577,33 @@ function checkClash() {
   box.classList.remove('show'); return false;
 }
 
+// ── AMOUNT DUE CALCULATOR ──
+function calcAmountDue() {
+  const amount  = parseFloat(document.getElementById('amount').value) || 0;
+  const advance = parseFloat(document.getElementById('advancePaid').value) || 0;
+  document.getElementById('amountDue').value = Math.max(0, amount - advance);
+}
+
 // ── ADD BOOKING ──
 async function addBooking() {
-  const band   = document.getElementById('bandName').value.trim();
-  const date   = document.getElementById('bookDate').value;
-  const from   = document.getElementById('fromTime').value;
-  const to     = document.getElementById('toTime').value;
-  const amount = document.getElementById('amount').value;
-  const notes  = document.getElementById('notes').value.trim();
+  const band        = document.getElementById('bandName').value.trim();
+  const date        = document.getElementById('bookDate').value;
+  const from        = document.getElementById('fromTime').value;
+  const to          = document.getElementById('toTime').value;
+  const amount      = document.getElementById('amount').value;
+  const advancePaid = parseFloat(document.getElementById('advancePaid').value) || 0;
+  const amountDue   = parseFloat(document.getElementById('amountDue').value) || 0;
+  const status      = document.getElementById('status').value;
+  const notes       = document.getElementById('notes').value.trim();
   if (!band || !date || !from || !to || !amount) { showToast('Fill all required fields', 'error'); return; }
   if (checkClash()) { showToast('Fix the slot clash first', 'error'); return; }
   const btn = document.getElementById('submitBtn');
   btn.classList.add('loading'); btn.disabled = true;
-  const booking = { id: Date.now().toString(), band, date, from, to, amount: parseFloat(amount), notes, createdAt: new Date().toISOString() };
+  const booking = {
+    id: Date.now().toString(), band, date, from, to,
+    amount: parseFloat(amount), advancePaid, amountDue,
+    status, notes, createdAt: new Date().toISOString()
+  };
   const ok = await pushToSheets(booking);
   if (ok) {
     bookings.push(booking); saveLocal(bookings);
@@ -586,20 +614,13 @@ async function addBooking() {
     showToast('Saved locally (offline)', '');
     setStatus('warn', '⚠ Offline — tap ↻ to sync');
   }
-  ['bandName','fromTime','toTime','amount','notes'].forEach(id => document.getElementById(id).value = '');
+  ['bandName','fromTime','toTime','amount','advancePaid','notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('amountDue').value = '';
+  document.getElementById('status').value = 'Attending';
   document.getElementById('bookDate').value = todayStr();
   document.getElementById('clashBox').classList.remove('show');
   btn.classList.remove('loading'); btn.disabled = false;
   switchTab('schedule');
-}
-
-// ── DELETE ──
-async function deleteBooking(id) {
-  if (!confirm('Remove this booking?')) return;
-  setSpin(true); await deleteFromSheets(id); setSpin(false);
-  bookings = bookings.filter(b => b.id !== id);
-  saveLocal(bookings); renderSchedule(); renderStats();
-  showToast('Booking removed');
 }
 
 // ── SCHEDULE ──
@@ -630,7 +651,9 @@ function renderSchedule() {
   document.getElementById('sumAmount').textContent = '₹' + ss.reduce((s,b) => s+b.amount, 0).toLocaleString('en-IN');
   document.getElementById('sumHours').textContent  = (tm/60).toFixed(1) + 'h';
   if (!filtered.length) { list.innerHTML = `<div class="empty-state"><div class="empty-icon">🎸</div><p>No bookings here.<br/>Use the Book tab to add one!</p></div>`; return; }
-  list.innerHTML = filtered.map((b,i) => `
+  list.innerHTML = filtered.map((b,i) => {
+    const statusColor = b.status === 'Cancelled' ? 'var(--red)' : b.status === 'Attended' ? 'var(--green)' : '#f0a500';
+    return `
     <div class="booking-card ${b.date < today ? 'past' : ''}">
       <div class="card-icon">${ICONS[i % ICONS.length]}</div>
       <div class="card-info">
@@ -640,9 +663,9 @@ function renderSchedule() {
       </div>
       <div class="card-right">
         <div class="card-amount">₹${b.amount.toLocaleString('en-IN')}</div>
-        <button class="card-del" onclick="deleteBooking('${b.id}')">✕</button>
+        <div style="font-size:0.65rem;font-weight:700;color:${statusColor};text-align:right;">${b.status || 'Attending'}</div>
       </div>
-    </div>`).join('');
+    </div>`}).join('');
 }
 
 // ── STATS ──
