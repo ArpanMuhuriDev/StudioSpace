@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JamPad Setup Guide</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0a; --surface: #161616; --border: #272727;
+      --accent: #f0c040; --text: #efefef; --muted: #777;
+      --green: #4cffb0; --red: #ff5050;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; padding: 24px 20px 60px; max-width: 640px; margin: 0 auto; line-height: 1.7; }
+    h1 { font-family: 'Bebas Neue'; font-size: 2.4rem; letter-spacing: 4px; color: var(--accent); margin-bottom: 4px; }
+    h1 em { color: var(--text); font-style: normal; }
+    .subtitle { color: var(--muted); font-size: 0.88rem; margin-bottom: 36px; }
+    .step {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 18px; padding: 20px; margin-bottom: 16px;
+      position: relative; padding-left: 64px;
+    }
+    .step-num {
+      position: absolute; left: 18px; top: 18px;
+      font-family: 'Bebas Neue'; font-size: 2rem; color: var(--accent);
+      line-height: 1;
+    }
+    .step-title { font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
+    .step-body { font-size: 0.85rem; color: var(--muted); }
+    .step-body strong { color: var(--text); }
+    .step-body a { color: var(--accent); text-decoration: none; }
+    .code-block {
+      background: #0d0d0d; border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 14px; margin: 10px 0;
+      font-family: monospace; font-size: 0.8rem; color: var(--green);
+      word-break: break-all; line-height: 1.5;
+    }
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 100px;
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px;
+    }
+    .badge.warn { background: rgba(255,80,80,0.1); color: var(--red); border: 1px solid rgba(255,80,80,0.2); }
+    .badge.ok { background: rgba(76,255,176,0.1); color: var(--green); border: 1px solid rgba(76,255,176,0.2); }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+    .final-box {
+      background: rgba(240,192,64,0.07); border: 1px solid rgba(240,192,64,0.25);
+      border-radius: 18px; padding: 20px; text-align: center;
+    }
+    .final-box h2 { font-family: 'Bebas Neue'; font-size: 1.6rem; letter-spacing: 2px; color: var(--accent); margin-bottom: 8px; }
+    .final-box p { font-size: 0.85rem; color: var(--muted); }
+    ul { padding-left: 18px; margin-top: 8px; }
+    ul li { font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
+    ul li strong { color: var(--text); }
+    ol { padding-left: 18px; margin-top: 8px; }
+    ol li { font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+    ol li strong { color: var(--text); }
+  </style>
+</head>
+<body>
+
+<h1>Jam<em>Pad</em> Setup</h1>
+<p class="subtitle">Connect your app to Google Sheets in 5 minutes · One-time setup</p>
+
+<!-- STEP 1 -->
+<div class="step">
+  <div class="step-num">1</div>
+  <div class="step-title">Create a Google Sheet</div>
+  <div class="step-body">
+    Go to <a href="https://sheets.google.com" target="_blank">sheets.google.com</a> and create a new blank spreadsheet.<br /><br />
+    Name it anything — e.g. <strong>JamPad Bookings</strong>.<br /><br />
+    <span class="badge ok">✓ TIP</span> &nbsp;Both users should use the same Google account, or you can share the sheet later.
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step">
+  <div class="step-num">2</div>
+  <div class="step-title">Open Apps Script</div>
+  <div class="step-body">
+    Inside your Google Sheet, click the menu:<br />
+    <strong>Extensions → Apps Script</strong><br /><br />
+    A new browser tab opens with a code editor. You'll see a default empty function. <strong>Delete everything</strong> in that editor.
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step">
+  <div class="step-num">3</div>
+  <div class="step-title">Paste the backend code</div>
+  <div class="step-body">
+    Open the file <strong>Code.gs</strong> (provided alongside this guide).<br /><br />
+    Copy the <strong>entire contents</strong> of Code.gs and paste it into the Apps Script editor.<br /><br />
+    Then click the 💾 <strong>Save</strong> button (or press Ctrl+S / Cmd+S).
+  </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="step">
+  <div class="step-num">4</div>
+  <div class="step-title">Deploy as a Web App</div>
+  <div class="step-body">
+    In the Apps Script editor, click the blue <strong>Deploy</strong> button (top right) → <strong>New deployment</strong>.<br /><br />
+    <ol>
+      <li>Click the ⚙ gear icon next to "Select type" → choose <strong>Web app</strong></li>
+      <li>Description: type anything like <strong>JamPad API</strong></li>
+      <li>Execute as: <strong>Me</strong></li>
+      <li>Who has access: <strong>Anyone</strong> &nbsp;<span class="badge warn">Important</span></li>
+      <li>Click <strong>Deploy</strong></li>
+    </ol>
+    <br />
+    Google will ask you to <strong>Authorize</strong> — click through and allow access. This is normal and safe; it's your own script accessing your own sheet.
+  </div>
+</div>
+
+<!-- STEP 5 -->
+<div class="step">
+  <div class="step-num">5</div>
+  <div class="step-title">Copy your Web App URL</div>
+  <div class="step-body">
+    After deployment, Google shows you a <strong>Web App URL</strong>. It looks like this:
+    <div class="code-block">https://script.google.com/macros/s/AKfycb.../exec</div>
+    <strong>Copy this URL.</strong> This is your database endpoint. Keep it safe — anyone with this URL can add bookings.
+  </div>
+</div>
+
+<!-- STEP 6 -->
+<div class="step">
+  <div class="step-num">6</div>
+  <div class="step-title">Connect the app</div>
+  <div class="step-body">
+    Open <strong>index.html</strong> (the JamPad app) on your phone.<br /><br />
+    Tap the <strong>⚙ gear icon</strong> in the top right corner.<br /><br />
+    Paste your Web App URL into the field and tap <strong>SAVE &amp; CONNECT</strong>.<br /><br />
+    <span class="badge ok">✓ Done!</span> &nbsp;The app will immediately load all bookings from your sheet.
+  </div>
+</div>
+
+<!-- STEP 7 -->
+<div class="step">
+  <div class="step-num">7</div>
+  <div class="step-title">Set up the second phone</div>
+  <div class="step-body">
+    Open <strong>index.html</strong> on the second phone (share the file via WhatsApp, email, or host it on GitHub Pages).<br /><br />
+    Tap ⚙, paste the <strong>same Web App URL</strong>, and tap SAVE &amp; CONNECT.<br /><br />
+    Both phones now read and write from the same Google Sheet. Any booking made on one phone appears on the other after tapping the <strong>↻ sync button</strong>.
+  </div>
+</div>
+
+<hr class="divider" />
+
+<!-- HOSTING -->
+<div class="step">
+  <div class="step-num" style="font-size:1.4rem;top:20px;">🌐</div>
+  <div class="step-title">Host on GitHub Pages (recommended)</div>
+  <div class="step-body">
+    So both phones can always access the latest version via a URL:
+    <ol>
+      <li>Create a free account at <a href="https://github.com" target="_blank">github.com</a></li>
+      <li>Create a new repository named e.g. <strong>jampad</strong></li>
+      <li>Upload <strong>index.html</strong> and <strong>manifest.json</strong> to the repo</li>
+      <li>Go to repo <strong>Settings → Pages → Source → main branch</strong> → Save</li>
+      <li>Your URL: <strong>yourusername.github.io/jampad</strong></li>
+    </ol>
+    <br />
+    Open this URL on any phone → tap <strong>Add to Home Screen</strong> → it installs like an app.
+  </div>
+</div>
+
+<hr class="divider" />
+
+<div class="final-box">
+  <h2>You're All Set 🎸</h2>
+  <p>Your JamPad app is now connected to Google Sheets.<br />Both phones share one live database.<br />Your bookings also appear as rows in the Sheet — filter by date anytime on your laptop.</p>
+</div>
+
+</body>
+</html>
