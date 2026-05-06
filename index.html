@@ -45,8 +45,16 @@
     .section-title span { color: #111; }
     .field { margin-bottom: 14px; }
     label { display: block; font-size: 0.68rem; font-weight: 700; letter-spacing: 1.8px; color: var(--muted); margin-bottom: 7px; }
-    input, select { width: 100%; background: var(--surface); border: 1.5px solid var(--border); border-radius: 13px; padding: 13px 15px; color: var(--text); font-family: var(--font-body); font-size: 0.95rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; }
+    input, select { width: 100%; background: var(--surface); border: 1.5px solid var(--border); border-radius: 13px; padding: 13px 15px; color: var(--text); font-family: var(--font-body); font-size: 0.95rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; accent-color: #111; }
+    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
     input:focus, select:focus { border-color: #111; box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0); cursor: pointer; }
+    input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0); cursor: pointer; }
+    input[type="time"]::-webkit-datetime-edit-ampm-field:focus,
+    input[type="time"]::-webkit-datetime-edit-hours-field:focus,
+    input[type="time"]::-webkit-datetime-edit-minutes-field:focus { background: #111; color: #fff; border-radius: 3px; }
+    select option:checked { background: #111; color: #fff; }
+    select option { border-radius: 8px; }
     input::placeholder { color: var(--muted2); }
     .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .amount-wrap { position: relative; }
@@ -83,6 +91,8 @@
     .card-date-lbl { font-size: 0.68rem; color: var(--muted2); margin-top: 1px; }
     .card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
     .card-amount { font-family: var(--font-display); font-size: 1.25rem; color: #111; letter-spacing: 1px; }
+    .card-edit { background: transparent; border: 1px solid var(--border); color: var(--muted); font-size: 0.78rem; cursor: pointer; padding: 4px 7px; border-radius: 7px; transition: all 0.2s; margin-top: 2px; }
+    .card-edit:hover { border-color: #111; color: #111; }
     .empty-state { text-align: center; padding: 56px 20px; color: var(--muted); }
     .empty-icon { font-size: 3rem; margin-bottom: 12px; }
     .empty-state p { font-size: 0.88rem; line-height: 1.7; }
@@ -90,6 +100,34 @@
     .toast.show { transform: translateX(-50%) translateY(0); }
     .toast.success { border-color: var(--green); color: var(--green); }
     .toast.error { border-color: var(--red); color: var(--red); }
+    /* ── CUSTOM TIME PICKER ── */
+    .time-picker-wrap { position: relative; }
+    .time-picker-input {
+      width: 100%; background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 13px; padding: 13px 15px; color: var(--text);
+      font-family: var(--font-body); font-size: 0.95rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+      user-select: none; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .time-picker-input.open { border-color: #111; box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
+    .time-picker-input .tp-placeholder { color: var(--muted2); }
+    .time-picker-input .tp-arrow { font-size: 0.65rem; color: var(--muted); }
+    .time-picker-dropdown {
+      position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+      background: #fff; border: 1.5px solid var(--border); border-radius: 13px;
+      overflow-y: auto; z-index: 200;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      max-height: 220px; display: none;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    }
+    .time-picker-dropdown.open { display: block; }
+    .time-option {
+      padding: 10px 15px; font-family: var(--font-body); font-size: 0.92rem;
+      cursor: pointer; color: var(--text); transition: background 0.1s;
+    }
+    .time-option:hover { background: var(--surface); }
+    .time-option.selected { background: #111; color: #fff; font-weight: 700; }
+
     /* CALENDAR */
     .cal-week-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
     .cal-week-nav .date-nav-btn { width: 36px; height: 36px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -219,7 +257,8 @@
 
 <!-- BOOK -->
 <div class="page active" id="page-book">
-  <p class="section-title" style="margin-top:18px">New <span>Booking</span></p>
+  <p class="section-title" style="margin-top:18px" id="formTitle">New <span>Booking</span></p>
+  <input type="hidden" id="editingId" value="" />
   <div class="field">
     <label>Band Name <span style="color:var(--red)">★</span></label>
     <input type="text" id="bandName" placeholder="e.g. XYZ Rockers" autocomplete="off" />
@@ -229,8 +268,28 @@
     <input type="date" id="bookDate" />
   </div>
   <div class="time-row">
-    <div class="field"><label>From <span style="color:var(--red)">★</span></label><input type="time" id="fromTime" onchange="checkClash()" /></div>
-    <div class="field"><label>To <span style="color:var(--red)">★</span></label><input type="time" id="toTime" onchange="checkClash()" /></div>
+    <div class="field">
+      <label>From <span style="color:var(--red)">★</span></label>
+      <div class="time-picker-wrap">
+        <div class="time-picker-input" id="fromTimeDisplay" onclick="toggleTimePicker('from')">
+          <span class="tp-placeholder" id="fromTimeLabel">Select time</span>
+          <span class="tp-arrow">▼</span>
+        </div>
+        <div class="time-picker-dropdown" id="fromTimeDropdown"></div>
+        <input type="hidden" id="fromTime" />
+      </div>
+    </div>
+    <div class="field">
+      <label>To <span style="color:var(--red)">★</span></label>
+      <div class="time-picker-wrap">
+        <div class="time-picker-input" id="toTimeDisplay" onclick="toggleTimePicker('to')">
+          <span class="tp-placeholder" id="toTimeLabel">Select time</span>
+          <span class="tp-arrow">▼</span>
+        </div>
+        <div class="time-picker-dropdown" id="toTimeDropdown"></div>
+        <input type="hidden" id="toTime" />
+      </div>
+    </div>
   </div>
   <div class="clash-box" id="clashBox"><span>⚠️</span><span id="clashMsg"></span></div>
   <div class="field">
@@ -266,8 +325,8 @@
     <label>Notes <span style="font-size:0.62rem;color:var(--muted);font-weight:400;letter-spacing:0;text-transform:none;">(optional)</span></label>
     <input type="text" id="notes" placeholder="e.g. needs drum kit" autocomplete="off" />
   </div>
-  <button class="submit-btn" id="submitBtn" onclick="addBooking()">
-    <span class="btn-text">CONFIRM BOOKING</span>
+  <button class="submit-btn" id="submitBtn" onclick="saveBooking()">
+    <span class="btn-text" id="submitBtnText">CONFIRM BOOKING</span>
     <span class="btn-spinner">SAVING…</span>
   </button>
 </div>
@@ -543,6 +602,13 @@ async function pushToSheets(booking) {
     return data.status === 'ok';
   } catch { return false; }
 }
+
+async function updateInSheets(booking) {
+  try {
+    const data = await xhrGet(`${SCRIPT_URL}?action=update&data=${encodeURIComponent(JSON.stringify(booking))}`);
+    return data.status === 'ok';
+  } catch { return false; }
+}
 function setSpin(on) { isSyncing = on; document.getElementById('syncBtn').classList.toggle('spinning', on); }
 async function syncNow() {
   if (isSyncing) return;
@@ -566,11 +632,124 @@ function checkClash() {
   box.classList.remove('show'); return false;
 }
 
-// ── AMOUNT DUE CALCULATOR ──
+// ── CUSTOM TIME PICKER ──
+const TIME_SLOTS = [];
+for (let h = 0; h < 24; h++) {
+  ['00','30'].forEach(m => {
+    const val  = h.toString().padStart(2,'0') + ':' + m;
+    const h12  = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    const ampm = h < 12 ? 'AM' : 'PM';
+    TIME_SLOTS.push({ val, label: h12 + ':' + m + ' ' + ampm });
+  });
+}
+
+function buildTimePicker(which) {
+  const dropdown = document.getElementById(which + 'TimeDropdown');
+  const current  = document.getElementById(which + 'Time').value;
+  dropdown.innerHTML = TIME_SLOTS.map(s =>
+    `<div class="time-option${s.val === current ? ' selected' : ''}"
+      onclick="selectTime('${which}','${s.val}','${s.label}')">${s.label}</div>`
+  ).join('');
+  // Scroll to selected
+  setTimeout(() => {
+    const sel = dropdown.querySelector('.selected');
+    if (sel) sel.scrollIntoView({ block: 'center' });
+  }, 30);
+}
+
+function toggleTimePicker(which) {
+  const dropdown = document.getElementById(which + 'TimeDropdown');
+  const display  = document.getElementById(which + 'TimeDisplay');
+  const isOpen   = dropdown.classList.contains('open');
+  // Close all pickers first
+  closeAllTimePickers();
+  if (!isOpen) {
+    buildTimePicker(which);
+    dropdown.classList.add('open');
+    display.classList.add('open');
+  }
+}
+
+function selectTime(which, val, label) {
+  document.getElementById(which + 'Time').value       = val;
+  document.getElementById(which + 'TimeLabel').textContent = label;
+  document.getElementById(which + 'TimeLabel').classList.remove('tp-placeholder');
+  closeAllTimePickers();
+  checkClash();
+}
+
+function closeAllTimePickers() {
+  document.querySelectorAll('.time-picker-dropdown').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.time-picker-input').forEach(d => d.classList.remove('open'));
+}
+
+function setTimePickerValue(which, val) {
+  if (!val) return;
+  const slot = TIME_SLOTS.find(s => s.val === val);
+  if (!slot) return;
+  document.getElementById(which + 'Time').value            = val;
+  document.getElementById(which + 'TimeLabel').textContent = slot.label;
+  document.getElementById(which + 'TimeLabel').classList.remove('tp-placeholder');
+}
+
+// Close pickers when clicking outside
+document.addEventListener('click', e => {
+  if (!e.target.closest('.time-picker-wrap')) closeAllTimePickers();
+});
+
 function calcAmountDue() {
   const amount  = parseFloat(document.getElementById('amount').value) || 0;
   const advance = parseFloat(document.getElementById('advancePaid').value) || 0;
   document.getElementById('amountDue').value = Math.max(0, amount - advance);
+}
+
+// ── EDIT BOOKING ──
+function editBooking(id) {
+  const b = bookings.find(b => b.id === id);
+  if (!b) return;
+  // Populate form
+  document.getElementById('editingId').value       = id;
+  document.getElementById('bandName').value        = b.band;
+  document.getElementById('bookDate').value        = b.date;
+  document.getElementById('fromTime').value = b.from;
+  document.getElementById('toTime').value   = b.to;
+  setTimePickerValue('from', b.from);
+  setTimePickerValue('to',   b.to);
+  document.getElementById('amount').value          = b.amount;
+  document.getElementById('advancePaid').value     = b.advancePaid || 0;
+  document.getElementById('amountDue').value       = b.amountDue  || 0;
+  document.getElementById('status').value          = b.status     || 'Attending';
+  document.getElementById('notes').value           = b.notes      || '';
+  // Update form title and button
+  document.getElementById('formTitle').innerHTML   = 'Edit <span>Booking</span>';
+  document.getElementById('submitBtnText').textContent = 'UPDATE BOOKING';
+  switchTab('book');
+  window.scrollTo(0, 0);
+}
+
+function resetForm() {
+  document.getElementById('editingId').value = '';
+  document.getElementById('formTitle').innerHTML = 'New <span>Booking</span>';
+  document.getElementById('submitBtnText').textContent = 'CONFIRM BOOKING';
+  ['bandName','fromTime','toTime','amount','advancePaid','notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fromTimeLabel').textContent = 'Select time';
+  document.getElementById('fromTimeLabel').className   = 'tp-placeholder';
+  document.getElementById('toTimeLabel').textContent   = 'Select time';
+  document.getElementById('toTimeLabel').className     = 'tp-placeholder';
+  document.getElementById('amountDue').value  = '';
+  document.getElementById('status').value     = 'Attending';
+  document.getElementById('bookDate').value   = todayStr();
+  document.getElementById('clashBox').classList.remove('show');
+}
+
+// ── SAVE BOOKING (handles both add and update) ──
+async function saveBooking() {
+  const editingId = document.getElementById('editingId').value;
+  if (editingId) {
+    await updateBooking(editingId);
+  } else {
+    await addBooking();
+  }
 }
 
 // ── ADD BOOKING ──
@@ -581,18 +760,14 @@ async function addBooking() {
   const to          = document.getElementById('toTime').value;
   const amount      = document.getElementById('amount').value;
   const advancePaid = parseFloat(document.getElementById('advancePaid').value) || 0;
-  const amountDue   = parseFloat(document.getElementById('amountDue').value) || 0;
+  const amountDue   = parseFloat(document.getElementById('amountDue').value)   || 0;
   const status      = document.getElementById('status').value;
   const notes       = document.getElementById('notes').value.trim();
   if (!band || !date || !from || !to || !amount) { showToast('Fill all required fields', 'error'); return; }
   if (checkClash()) { showToast('Fix the slot clash first', 'error'); return; }
   const btn = document.getElementById('submitBtn');
   btn.classList.add('loading'); btn.disabled = true;
-  const booking = {
-    id: Date.now().toString(), band, date, from, to,
-    amount: parseFloat(amount), advancePaid, amountDue,
-    status, notes, createdAt: new Date().toISOString()
-  };
+  const booking = { id: Date.now().toString(), band, date, from, to, amount: parseFloat(amount), advancePaid, amountDue, status, notes, createdAt: new Date().toISOString() };
   const ok = await pushToSheets(booking);
   if (ok) {
     bookings.push(booking); saveLocal(bookings);
@@ -603,12 +778,39 @@ async function addBooking() {
     showToast('Saved locally (offline)', '');
     setStatus('warn', '⚠ Offline — tap ↻ to sync');
   }
-  ['bandName','fromTime','toTime','amount','advancePaid','notes'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('amountDue').value = '';
-  document.getElementById('status').value = 'Attending';
-  document.getElementById('bookDate').value = todayStr();
-  document.getElementById('clashBox').classList.remove('show');
   btn.classList.remove('loading'); btn.disabled = false;
+  resetForm();
+  switchTab('schedule');
+}
+
+// ── UPDATE BOOKING ──
+async function updateBooking(id) {
+  const band        = document.getElementById('bandName').value.trim();
+  const date        = document.getElementById('bookDate').value;
+  const from        = document.getElementById('fromTime').value;
+  const to          = document.getElementById('toTime').value;
+  const amount      = document.getElementById('amount').value;
+  const advancePaid = parseFloat(document.getElementById('advancePaid').value) || 0;
+  const amountDue   = parseFloat(document.getElementById('amountDue').value)   || 0;
+  const status      = document.getElementById('status').value;
+  const notes       = document.getElementById('notes').value.trim();
+  if (!band || !date || !from || !to || !amount) { showToast('Fill all required fields', 'error'); return; }
+  const btn = document.getElementById('submitBtn');
+  btn.classList.add('loading'); btn.disabled = true;
+  const original  = bookings.find(b => b.id === id);
+  const updated   = { ...original, band, date, from, to, amount: parseFloat(amount), advancePaid, amountDue, status, notes };
+  const ok = await updateInSheets(updated);
+  if (ok) {
+    const idx = bookings.findIndex(b => b.id === id);
+    if (idx !== -1) bookings[idx] = updated;
+    saveLocal(bookings);
+    showToast('✅ Booking updated!', 'success');
+    setStatus('ok', '✓ Synced · ' + bookings.length + ' bookings');
+  } else {
+    showToast('Update failed — check connection', 'error');
+  }
+  btn.classList.remove('loading'); btn.disabled = false;
+  resetForm();
   switchTab('schedule');
 }
 
@@ -653,6 +855,7 @@ function renderSchedule() {
       <div class="card-right">
         <div class="card-amount">₹${b.amount.toLocaleString('en-IN')}</div>
         <div style="font-size:0.65rem;font-weight:700;color:${statusColor};text-align:right;">${b.status || 'Attending'}</div>
+        <button class="card-edit" onclick="editBooking('${b.id}')">✏️</button>
       </div>
     </div>`}).join('');
 }
