@@ -436,6 +436,9 @@ function showLogin() {
 auth.onAuthStateChanged(async user => {
   if (!user) { showLogin(); return; }
   try {
+    // Force token refresh to ensure email claim is available
+    // This is critical on mobile after signInWithRedirect
+    await user.getIdToken(true);
     const email = user.email.toLowerCase().trim();
     const doc   = await db.collection('allowedUsers').doc(email).get();
     if (doc.exists) {
@@ -445,9 +448,24 @@ auth.onAuthStateChanged(async user => {
       await auth.signOut();
     }
   } catch(err) {
-    console.error('Auth check failed:', err.message);
-    showDenied(user);
-    await auth.signOut();
+    console.error('Firestore check failed:', err.code, err.message);
+    setTimeout(async () => {
+      try {
+        await user.getIdToken(true);
+        const email = user.email.toLowerCase().trim();
+        const doc   = await db.collection('allowedUsers').doc(email).get();
+        if (doc.exists) {
+          showApp(user);
+        } else {
+          showDenied(user);
+          await auth.signOut();
+        }
+      } catch(retryErr) {
+        console.error('Firestore retry failed:', retryErr.message);
+        showDenied(user);
+        await auth.signOut();
+      }
+    }, 1500);
   }
 });
 
