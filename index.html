@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#ffffff" />
   <title>Studio Space</title>
-  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -100,7 +100,47 @@
     .toast.show { transform: translateX(-50%) translateY(0); }
     .toast.success { border-color: var(--green); color: var(--green); }
     .toast.error { border-color: var(--red); color: var(--red); }
-    /* ── CUSTOM TIME PICKER ── */
+    /* ── PROFILE DROPDOWN ── */
+    .profile-wrap { position: relative; }
+    .profile-btn {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 100px; padding: 4px 10px 4px 4px;
+      cursor: pointer; transition: border-color 0.2s;
+    }
+    .profile-btn:hover { border-color: #111; }
+    .profile-btn img, .profile-btn .profile-initial {
+      width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
+    }
+    .profile-btn .profile-initial {
+      background: #111; color: #fff; display: flex; align-items: center;
+      justify-content: center; font-size: 0.78rem; font-weight: 700;
+    }
+    .profile-btn .profile-name {
+      font-size: 0.78rem; font-weight: 700; color: var(--text);
+      max-width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .profile-dropdown {
+      position: absolute; top: calc(100% + 8px); right: 0;
+      background: #fff; border: 1.5px solid var(--border); border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1); min-width: 170px;
+      z-index: 300; display: none; overflow: hidden;
+      animation: fadeUp 0.15s ease;
+    }
+    .profile-dropdown.open { display: block; }
+    .profile-dropdown-header {
+      padding: 12px 14px; border-bottom: 1px solid var(--border);
+      font-size: 0.72rem; color: var(--muted); line-height: 1.4;
+    }
+    .profile-dropdown-header strong { display: block; color: var(--text); font-size: 0.82rem; }
+    .dropdown-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 14px; font-size: 0.85rem; font-weight: 600;
+      color: var(--text); cursor: pointer; transition: background 0.15s;
+    }
+    .dropdown-item:hover { background: var(--surface); }
+    .dropdown-item.danger { color: var(--red); }
+    .dropdown-item .di-icon { font-size: 1rem; width: 20px; text-align: center; }
     .time-picker-wrap { position: relative; }
     .time-picker-input {
       width: 100%; background: var(--surface); border: 1.5px solid var(--border);
@@ -192,18 +232,6 @@
     .signout-btn { background: #111; color: #fff; border: none; border-radius: 12px; padding: 12px 28px; font-family: var(--font-body); font-size: 0.9rem; font-weight: 700; cursor: pointer; }
 
     /* User avatar in header */
-    .user-avatar {
-      width: 32px; height: 32px; border-radius: 50%;
-      object-fit: cover; border: 2px solid var(--border);
-      cursor: pointer; flex-shrink: 0;
-    }
-    .user-avatar-placeholder {
-      width: 32px; height: 32px; border-radius: 50%;
-      background: var(--surface2); border: 1.5px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.8rem; font-weight: 700; color: var(--muted);
-      cursor: pointer; flex-shrink: 0;
-    }
   </style>
 </head>
 <body>
@@ -240,7 +268,24 @@
   <div class="logo"><img src="Logos/IMG_20241026_104514_243.webp" alt="Studio Space" style="height:36px;width:auto;object-fit:contain;" /></div>
   <div class="header-right">
     <button class="icon-btn" id="syncBtn" onclick="syncNow()">↻</button>
-    <div id="userAvatar"></div>
+    <div class="profile-wrap">
+      <div class="profile-btn" id="profileBtn" onclick="toggleProfileMenu()">
+        <div id="profileAvatar"></div>
+        <span class="profile-name" id="profileName">Profile</span>
+      </div>
+      <div class="profile-dropdown" id="profileDropdown">
+        <div class="profile-dropdown-header">
+          <strong id="profileFullName">—</strong>
+          <span id="profileEmail">—</span>
+        </div>
+        <div class="dropdown-item" onclick="closeProfileMenu(); switchTab('settings')">
+          <span class="di-icon"><i class="fa fa-cog"></i></span> Settings
+        </div>
+        <div class="dropdown-item danger" onclick="signOut()">
+          <span class="di-icon"><i class="fa fa-sign-out"></i></span> Log out
+        </div>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -378,6 +423,66 @@
   <div id="statsContent"></div>
 </div>
 
+<!-- SETTINGS -->
+<div class="page" id="page-settings">
+  <p class="section-title" style="margin-top:18px">Studio <span>Rates</span></p>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px;">
+    <div style="font-size:0.72rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:14px;">DAY RATE</div>
+    <div style="font-size:0.82rem;color:var(--muted);margin-bottom:10px;">Applied between <strong id="dayStartLabel">10:00 AM</strong> and <strong id="dayEndLabel">10:00 PM</strong></div>
+    <div class="time-row" style="margin-bottom:12px;">
+      <div class="field" style="margin-bottom:0;">
+        <label>From</label>
+        <div class="time-picker-wrap">
+          <div class="time-picker-input" id="dayStartDisplay" onclick="toggleTimePicker('dayStart')">
+            <span id="dayStartLabel2">10:00 AM</span><span class="tp-arrow">▼</span>
+          </div>
+          <div class="time-picker-dropdown" id="dayStartDropdown"></div>
+          <input type="hidden" id="dayStart" value="10:00" />
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label>To</label>
+        <div class="time-picker-wrap">
+          <div class="time-picker-input" id="dayEndDisplay" onclick="toggleTimePicker('dayEnd')">
+            <span id="dayEndLabel2">10:00 PM</span><span class="tp-arrow">▼</span>
+          </div>
+          <div class="time-picker-dropdown" id="dayEndDropdown"></div>
+          <input type="hidden" id="dayEnd" value="22:00" />
+        </div>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:0;">
+      <label>Rate (₹ per hour)</label>
+      <div class="amount-wrap">
+        <span class="currency-sign">₹</span>
+        <input type="number" id="dayRate" value="250" min="0" inputmode="numeric" />
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px;">
+    <div style="font-size:0.72rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">NIGHT RATE</div>
+    <div style="font-size:0.82rem;color:var(--muted);margin-bottom:10px;">Applied outside of day rate hours</div>
+    <div class="field" style="margin-bottom:0;">
+      <label>Rate (₹ per hour)</label>
+      <div class="amount-wrap">
+        <span class="currency-sign">₹</span>
+        <input type="number" id="nightRate" value="350" min="0" inputmode="numeric" />
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;">
+    <div style="font-size:0.72rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">PREVIEW</div>
+    <div id="ratePreview" style="font-size:0.85rem;color:var(--text);line-height:1.8;"></div>
+  </div>
+
+  <button class="submit-btn" onclick="saveRates()">
+    <span>SAVE RATES</span>
+  </button>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -466,13 +571,18 @@ function showApp(user) {
   document.querySelectorAll('.page').forEach(p => {
     if (p.id === 'page-book') p.classList.add('active');
   });
-  const avatarEl = document.getElementById('userAvatar');
+  // Populate profile button
+  const avatarEl = document.getElementById('profileAvatar');
   if (user.photoURL) {
-    avatarEl.innerHTML = `<img class="user-avatar" src="${user.photoURL}" title="${user.displayName}\n${user.email}" onclick="if(confirm('Sign out?'))signOut()" />`;
+    avatarEl.innerHTML = `<img src="${user.photoURL}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" />`;
   } else {
-    const initials = (user.displayName || user.email).charAt(0).toUpperCase();
-    avatarEl.innerHTML = `<div class="user-avatar-placeholder" title="${user.email}" onclick="if(confirm('Sign out?'))signOut()">${initials}</div>`;
+    const initial = (user.displayName || user.email).charAt(0).toUpperCase();
+    avatarEl.innerHTML = `<div class="profile-initial">${initial}</div>`;
   }
+  const displayName = user.displayName || user.email.split('@')[0];
+  document.getElementById('profileName').textContent     = displayName;
+  document.getElementById('profileFullName').textContent = user.displayName || displayName;
+  document.getElementById('profileEmail').textContent    = user.email;
   const today = todayStr();
   document.getElementById('bookDate').value     = today;
   document.getElementById('scheduleDate').value = today;
@@ -593,6 +703,7 @@ async function loadFromSheets() {
     setStatus('warn', '⚠ Offline — ' + err.message);
   } finally {
     setSpin(false);
+    await loadRatesFromSheets();
     renderSchedule(); renderStats(); renderCalendar();
   }
 }
@@ -676,6 +787,8 @@ function selectTime(which, val, label) {
   document.getElementById(which + 'TimeLabel').classList.remove('tp-placeholder');
   closeAllTimePickers();
   checkClash();
+  // Auto-populate amount only for booking form (from/to), not settings pickers
+  if (which === 'from' || which === 'to') calcAmount();
 }
 
 function closeAllTimePickers() {
@@ -696,6 +809,102 @@ function setTimePickerValue(which, val) {
 document.addEventListener('click', e => {
   if (!e.target.closest('.time-picker-wrap')) closeAllTimePickers();
 });
+
+// ── RATES ──
+const RATES_KEY     = 'studiospace_rates';
+const DEFAULT_RATES = { dayStart: '10:00', dayEnd: '22:00', dayRate: 250, nightRate: 350 };
+
+function getRates() {
+  const stored = localStorage.getItem(RATES_KEY);
+  return stored ? JSON.parse(stored) : DEFAULT_RATES;
+}
+
+async function saveRates() {
+  const rates = {
+    dayStart:  document.getElementById('dayStart').value  || '10:00',
+    dayEnd:    document.getElementById('dayEnd').value    || '22:00',
+    dayRate:   parseFloat(document.getElementById('dayRate').value)   || 250,
+    nightRate: parseFloat(document.getElementById('nightRate').value) || 350
+  };
+  // Save locally immediately
+  localStorage.setItem(RATES_KEY, JSON.stringify(rates));
+  updateRatePreview();
+  // Sync to Sheets
+  setSpin(true);
+  try {
+    const data = await xhrGet(`${SCRIPT_URL}?action=saveRates&data=${encodeURIComponent(JSON.stringify(rates))}`);
+    if (data.status === 'ok') {
+      showToast('✅ Rates saved & synced!', 'success');
+    } else {
+      showToast('Saved locally — sheet sync failed', '');
+    }
+  } catch {
+    showToast('Saved locally — offline', '');
+  } finally {
+    setSpin(false);
+  }
+}
+
+async function loadRatesFromSheets() {
+  try {
+    const data = await xhrGet(`${SCRIPT_URL}?action=getRates`);
+    if (data.status === 'ok' && data.rates) {
+      localStorage.setItem(RATES_KEY, JSON.stringify(data.rates));
+    }
+  } catch {
+    // Fall back to localStorage rates silently
+  }
+}
+
+function computeAmount(from, to, rates) {
+  const fMins = timeToMins(from);
+  let   tMins = timeToMins(to);
+  if (tMins <= fMins) tMins += 24 * 60; // overnight booking
+  const dayS = timeToMins(rates.dayStart);
+  const dayE = timeToMins(rates.dayEnd);
+  let dayMins = 0, nightMins = 0;
+  for (let t = fMins; t < tMins; t += 30) {
+    const tNorm = t % (24 * 60);
+    if (tNorm >= dayS && tNorm < dayE) dayMins += 30;
+    else nightMins += 30;
+  }
+  return Math.round((dayMins / 60) * rates.dayRate + (nightMins / 60) * rates.nightRate);
+}
+
+function calcAmount() {
+  const from = document.getElementById('fromTime').value;
+  const to   = document.getElementById('toTime').value;
+  if (!from || !to) return;
+  const amount = computeAmount(from, to, getRates());
+  if (amount > 0) {
+    document.getElementById('amount').value = amount;
+    calcAmountDue();
+  }
+}
+
+function initSettingsTab() {
+  const rates = getRates();
+  document.getElementById('dayRate').value   = rates.dayRate;
+  document.getElementById('nightRate').value = rates.nightRate;
+  setTimePickerValue('dayStart', rates.dayStart);
+  setTimePickerValue('dayEnd',   rates.dayEnd);
+  document.getElementById('dayStart').value = rates.dayStart;
+  document.getElementById('dayEnd').value   = rates.dayEnd;
+  updateRatePreview();
+}
+
+function updateRatePreview() {
+  const rates = getRates();
+  const examples = [
+    { label: '2 hrs day (11AM–1PM)',    from: '11:00', to: '13:00' },
+    { label: '2 hrs night (10PM–12AM)', from: '22:00', to: '00:00' },
+    { label: '3 hrs mixed (9PM–12AM)',  from: '21:00', to: '00:00' }
+  ];
+  document.getElementById('ratePreview').innerHTML = examples.map(e => {
+    const amt = computeAmount(e.from, e.to, rates);
+    return `<div style="display:flex;justify-content:space-between;padding:2px 0;"><span>${e.label}</span><strong>₹${amt.toLocaleString('en-IN')}</strong></div>`;
+  }).join('');
+}
 
 function calcAmountDue() {
   const amount  = parseFloat(document.getElementById('amount').value) || 0;
@@ -909,14 +1118,29 @@ function renderStats() {
 
 // ── TABS ──
 function switchTab(tab) {
-  const tabs = ['book','schedule','calendar','stats'];
+  const tabs = ['book','schedule','calendar','stats','settings'];
   document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', tabs[i] === tab));
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-'+tab).classList.add('active');
   if (tab === 'schedule') renderSchedule();
   if (tab === 'stats')    renderStats();
   if (tab === 'calendar') renderCalendar();
+  if (tab === 'settings') initSettingsTab();
 }
+
+function toggleProfileMenu() {
+  const dd = document.getElementById('profileDropdown');
+  dd.classList.toggle('open');
+}
+
+function closeProfileMenu() {
+  document.getElementById('profileDropdown').classList.remove('open');
+}
+
+// Close profile menu when clicking outside
+document.addEventListener('click', e => {
+  if (!e.target.closest('.profile-wrap')) closeProfileMenu();
+});
 
 // ── CALENDAR ──
 function getWeekDates(offset) {
