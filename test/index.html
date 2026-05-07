@@ -427,54 +427,55 @@
 <div class="page" id="page-settings">
   <p class="section-title" style="margin-top:18px">Studio <span>Rates</span></p>
 
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px;">
-    <div style="font-size:0.72rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:14px;">DAY RATE</div>
-    <div style="font-size:0.82rem;color:var(--muted);margin-bottom:10px;">Applied between <strong id="dayStartLabel">10:00 AM</strong> and <strong id="dayEndLabel">10:00 PM</strong></div>
-    <div class="time-row" style="margin-bottom:12px;">
-      <div class="field" style="margin-bottom:0;">
-        <label>From</label>
-        <div class="time-picker-wrap">
-          <div class="time-picker-input" id="dayStartDisplay" onclick="toggleTimePicker('dayStart')">
-            <span id="dayStartLabel2">10:00 AM</span><span class="tp-arrow">▼</span>
-          </div>
-          <div class="time-picker-dropdown" id="dayStartDropdown"></div>
-          <input type="hidden" id="dayStart" value="10:00" />
+  <!-- Rate table header -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 4px;margin-bottom:6px;">
+    <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);">START TIME</div>
+    <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);">END TIME</div>
+    <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);">RATE (₹/hr)</div>
+  </div>
+
+  <!-- Day Rate Row -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;">
+    <div style="font-size:0.7rem;font-weight:700;color:var(--muted);margin-bottom:10px;letter-spacing:1px;">DAY RATE</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:center;">
+      <div class="time-picker-wrap">
+        <div class="time-picker-input" id="dayStartDisplay" onclick="toggleTimePicker('dayStart')">
+          <span id="dayStartLabel">10:00 AM</span><span class="tp-arrow">▼</span>
         </div>
+        <div class="time-picker-dropdown" id="dayStartDropdown"></div>
+        <input type="hidden" id="dayStart" value="10:00" />
       </div>
-      <div class="field" style="margin-bottom:0;">
-        <label>To</label>
-        <div class="time-picker-wrap">
-          <div class="time-picker-input" id="dayEndDisplay" onclick="toggleTimePicker('dayEnd')">
-            <span id="dayEndLabel2">10:00 PM</span><span class="tp-arrow">▼</span>
-          </div>
-          <div class="time-picker-dropdown" id="dayEndDropdown"></div>
-          <input type="hidden" id="dayEnd" value="22:00" />
+      <div class="time-picker-wrap">
+        <div class="time-picker-input" id="dayEndDisplay" onclick="toggleTimePicker('dayEnd')">
+          <span id="dayEndLabel">10:00 PM</span><span class="tp-arrow">▼</span>
         </div>
+        <div class="time-picker-dropdown" id="dayEndDropdown"></div>
+        <input type="hidden" id="dayEnd" value="22:00" />
       </div>
-    </div>
-    <div class="field" style="margin-bottom:0;">
-      <label>Rate (₹ per hour)</label>
       <div class="amount-wrap">
         <span class="currency-sign">₹</span>
-        <input type="number" id="dayRate" value="250" min="0" inputmode="numeric" />
+        <input type="number" id="dayRate" value="250" min="0" inputmode="numeric" style="padding-left:28px;" />
       </div>
     </div>
   </div>
 
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px;">
-    <div style="font-size:0.72rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">NIGHT RATE</div>
-    <div style="font-size:0.82rem;color:var(--muted);margin-bottom:10px;">Applied outside of day rate hours</div>
-    <div class="field" style="margin-bottom:0;">
-      <label>Rate (₹ per hour)</label>
+  <!-- Night Rate Row -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:20px;">
+    <div style="font-size:0.7rem;font-weight:700;color:var(--muted);margin-bottom:10px;letter-spacing:1px;">NIGHT RATE</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:center;">
+      <div style="font-size:0.85rem;font-weight:600;color:var(--muted);padding:13px 0;" id="nightStartLabel">10:00 PM</div>
+      <div style="font-size:0.85rem;font-weight:600;color:var(--muted);padding:13px 0;" id="nightEndLabel">10:00 AM</div>
       <div class="amount-wrap">
         <span class="currency-sign">₹</span>
-        <input type="number" id="nightRate" value="350" min="0" inputmode="numeric" />
+        <input type="number" id="nightRate" value="350" min="0" inputmode="numeric" style="padding-left:28px;" />
       </div>
     </div>
+    <div style="font-size:0.72rem;color:var(--muted2);margin-top:8px;">Night times are automatically set as the inverse of day rate hours.</div>
   </div>
 
+  <!-- Preview -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;">
-    <div style="font-size:0.72rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">PREVIEW</div>
+    <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:10px;">PREVIEW</div>
     <div id="ratePreview" style="font-size:0.85rem;color:var(--text);line-height:1.8;"></div>
   </div>
 
@@ -501,7 +502,7 @@ const db        = firebase.firestore();
 const provider  = new firebase.auth.GoogleAuthProvider();
 
 // ── APP CONFIG — injected by GitHub Actions ──
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9RTkpKropzysmarIlgteHQeNUmDCAVBCOrUiNw5HXO25Bonbt9i1NoUonswuCgmSOiQ/exec'.trim().replace(/[?&]+$/, '');
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz444K7C8mJJI3k6X2xaMppZguRb8yI6kWsPSX_bDV10RK35ApvSRw0FBQLpBhm_A5Prg/exec'.trim().replace(/[?&]+$/, '');
 
 const LOCAL_KEY    = 'studiospace_local';
 const ICONS        = ['🎸','🥁','🎹','🎺','🎻','🎷','🎤','🪗'];
@@ -782,13 +783,13 @@ function toggleTimePicker(which) {
 }
 
 function selectTime(which, val, label) {
-  document.getElementById(which + 'Time').value       = val;
+  document.getElementById(which + 'Time').value            = val;
   document.getElementById(which + 'TimeLabel').textContent = label;
   document.getElementById(which + 'TimeLabel').classList.remove('tp-placeholder');
   closeAllTimePickers();
   checkClash();
-  // Auto-populate amount only for booking form (from/to), not settings pickers
   if (which === 'from' || which === 'to') calcAmount();
+  if (which === 'dayStart' || which === 'dayEnd') syncNightLabels();
 }
 
 function closeAllTimePickers() {
@@ -826,18 +827,13 @@ async function saveRates() {
     dayRate:   parseFloat(document.getElementById('dayRate').value)   || 250,
     nightRate: parseFloat(document.getElementById('nightRate').value) || 350
   };
-  // Save locally immediately
   localStorage.setItem(RATES_KEY, JSON.stringify(rates));
+  syncNightLabels();
   updateRatePreview();
-  // Sync to Sheets
   setSpin(true);
   try {
     const data = await xhrGet(`${SCRIPT_URL}?action=saveRates&data=${encodeURIComponent(JSON.stringify(rates))}`);
-    if (data.status === 'ok') {
-      showToast('✅ Rates saved & synced!', 'success');
-    } else {
-      showToast('Saved locally — sheet sync failed', '');
-    }
+    showToast(data.status === 'ok' ? '✅ Rates saved & synced!' : 'Saved locally — sheet sync failed', data.status === 'ok' ? 'success' : '');
   } catch {
     showToast('Saved locally — offline', '');
   } finally {
@@ -886,11 +882,20 @@ function initSettingsTab() {
   const rates = getRates();
   document.getElementById('dayRate').value   = rates.dayRate;
   document.getElementById('nightRate').value = rates.nightRate;
+  document.getElementById('dayStart').value  = rates.dayStart;
+  document.getElementById('dayEnd').value    = rates.dayEnd;
   setTimePickerValue('dayStart', rates.dayStart);
   setTimePickerValue('dayEnd',   rates.dayEnd);
-  document.getElementById('dayStart').value = rates.dayStart;
-  document.getElementById('dayEnd').value   = rates.dayEnd;
+  syncNightLabels();
   updateRatePreview();
+}
+
+function syncNightLabels() {
+  // Night start = day end, Night end = day start
+  const dayStartSlot = TIME_SLOTS.find(s => s.val === document.getElementById('dayStart').value);
+  const dayEndSlot   = TIME_SLOTS.find(s => s.val === document.getElementById('dayEnd').value);
+  if (dayEndSlot)   document.getElementById('nightStartLabel').textContent = dayEndSlot.label;
+  if (dayStartSlot) document.getElementById('nightEndLabel').textContent   = dayStartSlot.label;
 }
 
 function updateRatePreview() {
