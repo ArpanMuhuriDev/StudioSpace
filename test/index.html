@@ -1217,9 +1217,11 @@ function renderCalendar() {
       const col = document.createElement('div');
       col.className = 'cal-col';
       col.onclick = () => {
+        const fromVal = h.toString().padStart(2,'0') + ':00';
+        const toVal   = (h + 1 < 24 ? h + 1 : 0).toString().padStart(2,'0') + ':00';
         document.getElementById('bookDate').value = ds;
-        document.getElementById('fromTime').value = h.toString().padStart(2,'0') + ':00';
-        document.getElementById('toTime').value   = (h+1).toString().padStart(2,'0') + ':00';
+        setTimePickerValue('from', fromVal);
+        setTimePickerValue('to',   toVal);
         switchTab('book');
       };
       (blockMap[colIdx + ':' + h] || []).forEach(({ b, topOff, hPx, ds: bds }) => {
