@@ -338,14 +338,14 @@
   </div>
   <div class="clash-box" id="clashBox"><span>⚠️</span><span id="clashMsg"></span></div>
   <div class="field">
-    <label>Total amount (₹) <span style="color:var(--red)">★</span></label>
+    <label>Amount (₹) <span style="color:var(--red)">★</span></label>
     <div class="amount-wrap">
       <span class="currency-sign">₹</span>
       <input type="number" id="amount" placeholder="0" inputmode="numeric" min="0" oninput="calcAmountDue()" />
     </div>
   </div>
   <div class="field">
-    <label>Paid (₹)</label>
+    <label>Advance Paid (₹)</label>
     <div class="amount-wrap">
       <span class="currency-sign">₹</span>
       <input type="number" id="advancePaid" placeholder="0" inputmode="numeric" min="0" oninput="calcAmountDue()" />
@@ -799,9 +799,14 @@ function closeAllTimePickers() {
 
 function setTimePickerValue(which, val) {
   if (!val) return;
-  const slot = TIME_SLOTS.find(s => s.val === val);
+  // Snap to nearest :00 or :30 slot in case value has other minutes
+  const [h, m] = val.split(':').map(Number);
+  const snappedM = m < 15 ? 0 : m < 45 ? 30 : 0;
+  const snappedH = m >= 45 ? (h + 1) % 24 : h;
+  const snapped  = snappedH.toString().padStart(2,'0') + ':' + snappedM.toString().padStart(2,'0');
+  const slot = TIME_SLOTS.find(s => s.val === snapped);
   if (!slot) return;
-  document.getElementById(which + 'Time').value            = val;
+  document.getElementById(which + 'Time').value            = snapped;
   document.getElementById(which + 'TimeLabel').textContent = slot.label;
   document.getElementById(which + 'TimeLabel').classList.remove('tp-placeholder');
 }
@@ -1075,7 +1080,7 @@ function renderSchedule() {
   else if (currentFilter === 'upcoming') filtered = filtered.filter(b => b.date >= today);
   else if (currentFilter === 'past')     filtered = filtered.filter(b => b.date < today);
   filtered.sort((a,b) => a.date === b.date ? a.from.localeCompare(b.from) : a.date.localeCompare(b.date));
-  const ss = currentFilter === 'day' ? filtered : bookings;
+  const ss = filtered;
   const tm = ss.reduce((s,b) => s + (timeToMins(b.to) - timeToMins(b.from)), 0);
   document.getElementById('sumCount').textContent  = ss.length;
   document.getElementById('sumAmount').textContent = '₹' + ss.reduce((s,b) => s+b.amount, 0).toLocaleString('en-IN');
