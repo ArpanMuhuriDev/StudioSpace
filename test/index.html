@@ -502,7 +502,7 @@ const db        = firebase.firestore();
 const provider  = new firebase.auth.GoogleAuthProvider();
 
 // ── APP CONFIG — injected by GitHub Actions ──
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz444K7C8mJJI3k6X2xaMppZguRb8yI6kWsPSX_bDV10RK35ApvSRw0FBQLpBhm_A5Prg/exec'.trim().replace(/[?&]+$/, '');
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwdC0qlGzOINKDeyUqB90B5-Ev3gpeVzkVN56eO8RgImEvIc-W0ppVAgANvs-YqPeSdTg/exec'.trim().replace(/[?&]+$/, '');
 
 const LOCAL_KEY    = 'studiospace_local';
 const ICONS        = ['🎸','🥁','🎹','🎺','🎻','🎷','🎤','🪗'];
@@ -878,7 +878,9 @@ function calcAmount() {
   }
 }
 
-function initSettingsTab() {
+async function initSettingsTab() {
+  // Always fetch fresh from Sheets before showing
+  await loadRatesFromSheets();
   const rates = getRates();
   document.getElementById('dayRate').value   = rates.dayRate;
   document.getElementById('nightRate').value = rates.nightRate;
