@@ -439,18 +439,18 @@
     <div style="font-size:0.7rem;font-weight:700;color:var(--muted);margin-bottom:10px;letter-spacing:1px;">DAY RATE</div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:center;">
       <div class="time-picker-wrap">
-        <div class="time-picker-input" id="dayStartDisplay" onclick="toggleTimePicker('dayStart')">
-          <span id="dayStartLabel">10:00 AM</span><span class="tp-arrow">▼</span>
+        <div class="time-picker-input" id="dayStartTimeDisplay" onclick="toggleTimePicker('dayStart')">
+          <span id="dayStartTimeLabel" class="tp-placeholder">Select</span><span class="tp-arrow">▼</span>
         </div>
-        <div class="time-picker-dropdown" id="dayStartDropdown"></div>
-        <input type="hidden" id="dayStart" value="10:00" />
+        <div class="time-picker-dropdown" id="dayStartTimeDropdown"></div>
+        <input type="hidden" id="dayStartTime" value="10:00" />
       </div>
       <div class="time-picker-wrap">
-        <div class="time-picker-input" id="dayEndDisplay" onclick="toggleTimePicker('dayEnd')">
-          <span id="dayEndLabel">10:00 PM</span><span class="tp-arrow">▼</span>
+        <div class="time-picker-input" id="dayEndTimeDisplay" onclick="toggleTimePicker('dayEnd')">
+          <span id="dayEndTimeLabel" class="tp-placeholder">Select</span><span class="tp-arrow">▼</span>
         </div>
-        <div class="time-picker-dropdown" id="dayEndDropdown"></div>
-        <input type="hidden" id="dayEnd" value="22:00" />
+        <div class="time-picker-dropdown" id="dayEndTimeDropdown"></div>
+        <input type="hidden" id="dayEndTime" value="22:00" />
       </div>
       <div class="amount-wrap">
         <span class="currency-sign">₹</span>
@@ -502,7 +502,7 @@ const db        = firebase.firestore();
 const provider  = new firebase.auth.GoogleAuthProvider();
 
 // ── APP CONFIG — injected by GitHub Actions ──
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzu8jbKJvIuLtW--61cc1dufpElygLrngsyDu9iF_5mkWExr4x0qSFtNqZ_jtDYjjVjtg/exec'.trim().replace(/[?&]+$/, '');
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzmk7memddQ6sywVLcURPkZCYVKLYVtkfPC6t6mRLe3vuxMT0qvjsks6pF6myjLXJQclQ/exec'.trim().replace(/[?&]+$/, '');
 
 const LOCAL_KEY    = 'studiospace_local';
 const ICONS        = ['🎸','🥁','🎹','🎺','🎻','🎷','🎤','🪗'];
@@ -822,8 +822,8 @@ function getRates() {
 
 async function saveRates() {
   const rates = {
-    dayStart:  document.getElementById('dayStart').value  || '10:00',
-    dayEnd:    document.getElementById('dayEnd').value    || '22:00',
+    dayStart:  document.getElementById('dayStartTime').value  || '10:00',
+    dayEnd:    document.getElementById('dayEndTime').value    || '22:00',
     dayRate:   parseFloat(document.getElementById('dayRate').value)   || 250,
     nightRate: parseFloat(document.getElementById('nightRate').value) || 350
   };
@@ -844,7 +844,6 @@ async function saveRates() {
 async function loadRatesFromSheets() {
   try {
     const data = await xhrGet(`${SCRIPT_URL}?action=getRates`);
-    console.log('Rates from sheet:', JSON.stringify(data));
     if (data.status === 'ok' && data.rates) {
       localStorage.setItem(RATES_KEY, JSON.stringify(data.rates));
     }
@@ -885,8 +884,8 @@ async function initSettingsTab() {
   const rates = getRates();
   document.getElementById('dayRate').value   = rates.dayRate;
   document.getElementById('nightRate').value = rates.nightRate;
-  document.getElementById('dayStart').value  = rates.dayStart;
-  document.getElementById('dayEnd').value    = rates.dayEnd;
+  document.getElementById('dayStartTime').value = rates.dayStart;
+  document.getElementById('dayEndTime').value   = rates.dayEnd;
   setTimePickerValue('dayStart', rates.dayStart);
   setTimePickerValue('dayEnd',   rates.dayEnd);
   syncNightLabels();
@@ -895,8 +894,8 @@ async function initSettingsTab() {
 
 function syncNightLabels() {
   // Night start = day end, Night end = day start
-  const dayStartSlot = TIME_SLOTS.find(s => s.val === document.getElementById('dayStart').value);
-  const dayEndSlot   = TIME_SLOTS.find(s => s.val === document.getElementById('dayEnd').value);
+  const dayStartSlot = TIME_SLOTS.find(s => s.val === document.getElementById('dayStartTime').value);
+  const dayEndSlot   = TIME_SLOTS.find(s => s.val === document.getElementById('dayEndTime').value);
   if (dayEndSlot)   document.getElementById('nightStartLabel').textContent = dayEndSlot.label;
   if (dayStartSlot) document.getElementById('nightEndLabel').textContent   = dayStartSlot.label;
 }
