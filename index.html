@@ -878,7 +878,9 @@ function calcAmount() {
   }
 }
 
-function initSettingsTab() {
+async function initSettingsTab() {
+  // Always fetch fresh from Sheets before showing
+  await loadRatesFromSheets();
   const rates = getRates();
   document.getElementById('dayRate').value   = rates.dayRate;
   document.getElementById('nightRate').value = rates.nightRate;
