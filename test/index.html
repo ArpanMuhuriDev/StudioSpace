@@ -338,14 +338,14 @@
   </div>
   <div class="clash-box" id="clashBox"><span>⚠️</span><span id="clashMsg"></span></div>
   <div class="field">
-    <label>Amount (₹) <span style="color:var(--red)">★</span></label>
+    <label>Total amount (₹) <span style="color:var(--red)">★</span></label>
     <div class="amount-wrap">
       <span class="currency-sign">₹</span>
       <input type="number" id="amount" placeholder="0" inputmode="numeric" min="0" oninput="calcAmountDue()" />
     </div>
   </div>
   <div class="field">
-    <label>Advance Paid (₹)</label>
+    <label>Paid (₹)</label>
     <div class="amount-wrap">
       <span class="currency-sign">₹</span>
       <input type="number" id="advancePaid" placeholder="0" inputmode="numeric" min="0" oninput="calcAmountDue()" />
@@ -502,7 +502,7 @@ const db        = firebase.firestore();
 const provider  = new firebase.auth.GoogleAuthProvider();
 
 // ── APP CONFIG — injected by GitHub Actions ──
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzmk7memddQ6sywVLcURPkZCYVKLYVtkfPC6t6mRLe3vuxMT0qvjsks6pF6myjLXJQclQ/exec'.trim().replace(/[?&]+$/, '');
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgvFt4VIHyk5fHoFj6px54Nsg6SK0QUeLzyZRtYPaqvdlp89xqj-EyW-QrKh9mFuXVVQ/exec'.trim().replace(/[?&]+$/, '');
 
 const LOCAL_KEY    = 'studiospace_local';
 const ICONS        = ['🎸','🥁','🎹','🎺','🎻','🎷','🎤','🪗'];
