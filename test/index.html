@@ -923,12 +923,11 @@ function calcAmountDue() {
 function editBooking(id) {
   const b = bookings.find(b => b.id === id);
   if (!b) return;
-  // Populate form
   document.getElementById('editingId').value       = id;
   document.getElementById('bandName').value        = b.band;
   document.getElementById('bookDate').value        = b.date;
-  document.getElementById('fromTime').value = b.from;
-  document.getElementById('toTime').value   = b.to;
+  document.getElementById('fromTime').value        = b.from;
+  document.getElementById('toTime').value          = b.to;
   setTimePickerValue('from', b.from);
   setTimePickerValue('to',   b.to);
   document.getElementById('amount').value          = b.amount;
@@ -936,11 +935,33 @@ function editBooking(id) {
   document.getElementById('amountDue').value       = b.amountDue  || 0;
   document.getElementById('status').value          = b.status     || 'Attending';
   document.getElementById('notes').value           = b.notes      || '';
-  // Update form title and button
   document.getElementById('formTitle').innerHTML   = 'Edit <span>Booking</span>';
   document.getElementById('submitBtnText').textContent = 'UPDATE BOOKING';
+
+  // Lock fields if status is Attended
+  const isAttended = (b.status || '') === 'Attended';
+  lockField('fromTimeDisplay',  isAttended);
+  lockField('toTimeDisplay',    isAttended);
+  lockField('advancePaid',      isAttended);
+
   switchTab('book');
   window.scrollTo(0, 0);
+}
+
+function lockField(id, lock) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (lock) {
+    el.style.opacity      = '0.5';
+    el.style.pointerEvents = 'none';
+    el.style.cursor        = 'not-allowed';
+    el.setAttribute('data-locked', '1');
+  } else {
+    el.style.opacity       = '';
+    el.style.pointerEvents = '';
+    el.style.cursor        = '';
+    el.removeAttribute('data-locked');
+  }
 }
 
 function resetForm() {
@@ -956,6 +977,8 @@ function resetForm() {
   document.getElementById('status').value     = 'Attending';
   document.getElementById('bookDate').value   = todayStr();
   document.getElementById('clashBox').classList.remove('show');
+  // Always unlock fields on reset
+  ['fromTimeDisplay','toTimeDisplay','advancePaid'].forEach(id => lockField(id, false));
 }
 
 // ── SAVE BOOKING (handles both add and update) ──
