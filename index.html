@@ -844,11 +844,12 @@ async function saveRates() {
 async function loadRatesFromSheets() {
   try {
     const data = await xhrGet(`${SCRIPT_URL}?action=getRates`);
+    console.log('Rates from sheet:', JSON.stringify(data));
     if (data.status === 'ok' && data.rates) {
       localStorage.setItem(RATES_KEY, JSON.stringify(data.rates));
     }
-  } catch {
-    // Fall back to localStorage rates silently
+  } catch(err) {
+    console.error('loadRatesFromSheets error:', err.message);
   }
 }
 
