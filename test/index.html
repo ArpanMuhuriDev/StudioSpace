@@ -168,7 +168,6 @@
     .time-option:hover { background: var(--surface); }
     .time-option.selected { background: #111; color: #fff; font-weight: 700; }
 
-    /* CALENDAR */
     .cal-week-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
     .cal-week-nav .date-nav-btn { width: 36px; height: 36px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .cal-week-label { flex: 1; text-align: center; font-weight: 700; font-size: 0.85rem; color: var(--text); }
@@ -342,9 +341,9 @@
     <input type="text" id="totalHours" placeholder="—" readonly
       style="background:var(--surface2);color:var(--muted);cursor:not-allowed;" />
   </div>
-  <div class="field" style="margin-bottom:10px;display:flex;align-items:center;gap:10px;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
     <input type="checkbox" id="customRateEnabled" onchange="toggleCustomRate()"
-      style="width:18px;height:18px;border-radius:4px;cursor:pointer;flex-shrink:0;margin:0;padding:0;accent-color:#111;" />
+      style="width:16px;height:16px;cursor:pointer;" />
     <span style="font-size:0.82rem;font-weight:600;color:var(--text);">Custom rate / hr. needed? (₹)</span>
   </div>
 
