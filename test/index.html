@@ -768,8 +768,9 @@ function checkClash() {
   const box  = document.getElementById('clashBox');
   const msg  = document.getElementById('clashMsg');
   if (!date || !from || !to) { box.classList.remove('show'); return false; }
-  const nF = timeToMins(from), nT = timeToMins(to);
-  if (nT <= nF) { msg.textContent = '"To" must be after "From".'; box.classList.add('show'); return true; }
+  const nF = timeToMins(from);
+  let   nT = timeToMins(to);
+  if (nT <= nF) nT += 24 * 60; // overnight booking — add 24hrs
   const editingId = document.getElementById('editingId').value;
   const clash = bookings.find(b => b.id !== editingId && b.date === date && nF < timeToMins(b.to) && nT > timeToMins(b.from));
   if (clash) { msg.textContent = `Clashes with ${clash.band} (${clash.from}–${clash.to})`; box.classList.add('show'); return true; }
