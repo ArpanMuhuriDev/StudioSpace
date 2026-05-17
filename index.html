@@ -337,6 +337,37 @@
     </div>
   </div>
   <div class="clash-box" id="clashBox"><span>⚠️</span><span id="clashMsg"></span></div>
+
+  <!-- Custom rate toggle -->
+  <div class="field" style="margin-bottom:10px;">
+    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;letter-spacing:0;font-size:0.82rem;font-weight:600;color:var(--text);text-transform:none;">
+      <input type="checkbox" id="customRateEnabled" onchange="toggleCustomRate()"
+        style="width:18px;height:18px;border-radius:4px;cursor:pointer;flex-shrink:0;margin:0;padding:0;accent-color:#111;" />
+      Custom rate / hr. needed? (₹)
+    </label>
+  </div>
+
+  <!-- Custom rate fields (hidden by default) -->
+  <div id="customRateFields" style="display:none;background:var(--surface);border:1.5px solid var(--border);border-radius:13px;padding:14px;margin-bottom:14px;">
+    <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:12px;">CUSTOM RATES (₹/hr)</div>
+    <div class="time-row">
+      <div class="field" style="margin-bottom:0;">
+        <label>Day rate</label>
+        <div class="amount-wrap">
+          <span class="currency-sign">₹</span>
+          <input type="number" id="customDayRate" placeholder="0" inputmode="numeric" min="0" oninput="calcAmount()" />
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label>Night rate</label>
+        <div class="amount-wrap">
+          <span class="currency-sign">₹</span>
+          <input type="number" id="customNightRate" placeholder="0" inputmode="numeric" min="0" oninput="calcAmount()" />
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="field">
     <label>Amount (₹) <span style="color:var(--red)">★</span></label>
     <div class="amount-wrap">
@@ -873,11 +904,27 @@ function computeAmount(from, to, rates) {
   return Math.round((dayMins / 60) * rates.dayRate + (nightMins / 60) * rates.nightRate);
 }
 
+// ── CUSTOM RATE TOGGLE ──
+function toggleCustomRate() {
+  const enabled = document.getElementById('customRateEnabled').checked;
+  document.getElementById('customRateFields').style.display = enabled ? 'block' : 'none';
+  calcAmount();
+}
+
 function calcAmount() {
   const from = document.getElementById('fromTime').value;
   const to   = document.getElementById('toTime').value;
   if (!from || !to) return;
-  const amount = computeAmount(from, to, getRates());
+  const globalRates = getRates();
+  const useCustom   = document.getElementById('customRateEnabled').checked;
+  let rates = { ...globalRates };
+  if (useCustom) {
+    const cDay   = parseFloat(document.getElementById('customDayRate').value);
+    const cNight = parseFloat(document.getElementById('customNightRate').value);
+    if (cDay   > 0) rates.dayRate   = cDay;
+    if (cNight > 0) rates.nightRate = cNight;
+  }
+  const amount = computeAmount(from, to, rates);
   if (amount > 0) {
     document.getElementById('amount').value = amount;
     calcAmountDue();
@@ -941,6 +988,12 @@ function editBooking(id) {
   document.getElementById('amountDue').value       = b.amountDue  || 0;
   document.getElementById('status').value          = b.status     || 'Attending';
   document.getElementById('notes').value           = b.notes      || '';
+  // Restore custom rates if they were set
+  const hasCustom = (b.customDayRate > 0 || b.customNightRate > 0);
+  document.getElementById('customRateEnabled').checked = hasCustom;
+  document.getElementById('customRateFields').style.display = hasCustom ? 'block' : 'none';
+  document.getElementById('customDayRate').value   = hasCustom ? (b.customDayRate   || '') : '';
+  document.getElementById('customNightRate').value = hasCustom ? (b.customNightRate || '') : '';
   document.getElementById('formTitle').innerHTML   = 'Edit <span>Booking</span>';
   document.getElementById('submitBtnText').textContent = 'UPDATE BOOKING';
 
@@ -958,7 +1011,11 @@ function resetForm() {
   document.getElementById('fromTimeLabel').className   = 'tp-placeholder';
   document.getElementById('toTimeLabel').textContent   = 'Select time';
   document.getElementById('toTimeLabel').className     = 'tp-placeholder';
-  document.getElementById('amountDue').value  = '';
+  document.getElementById('customRateEnabled').checked        = false;
+  document.getElementById('customRateFields').style.display   = 'none';
+  document.getElementById('customDayRate').value               = '';
+  document.getElementById('customNightRate').value             = '';
+  document.getElementById('amountDue').value                   = '';
   document.getElementById('status').value     = 'Attending';
   document.getElementById('bookDate').value   = todayStr();
   document.getElementById('clashBox').classList.remove('show');
@@ -985,11 +1042,14 @@ async function addBooking() {
   const amountDue   = parseFloat(document.getElementById('amountDue').value)   || 0;
   const status      = document.getElementById('status').value;
   const notes       = document.getElementById('notes').value.trim();
+  const useCustom    = document.getElementById('customRateEnabled').checked;
+  const customDayRate   = useCustom ? (parseFloat(document.getElementById('customDayRate').value) || 0) : 0;
+  const customNightRate = useCustom ? (parseFloat(document.getElementById('customNightRate').value) || 0) : 0;
   if (!band || !date || !from || !to || !amount) { showToast('Fill all required fields', 'error'); return; }
   if (checkClash()) { showToast('Fix the slot clash first', 'error'); return; }
   const btn = document.getElementById('submitBtn');
   btn.classList.add('loading'); btn.disabled = true;
-  const booking = { id: Date.now().toString(), band, date, from, to, amount: parseFloat(amount), advancePaid, amountDue, status, notes, createdAt: new Date().toISOString() };
+  const booking = { id: Date.now().toString(), band, date, from, to, amount: parseFloat(amount), advancePaid, amountDue, status, notes, customDayRate, customNightRate, createdAt: new Date().toISOString() };
   const ok = await pushToSheets(booking);
   if (ok) {
     bookings.push(booking); saveLocal(bookings);
@@ -1016,11 +1076,14 @@ async function updateBooking(id) {
   const amountDue   = parseFloat(document.getElementById('amountDue').value)   || 0;
   const status      = document.getElementById('status').value;
   const notes       = document.getElementById('notes').value.trim();
+  const useCustom      = document.getElementById('customRateEnabled').checked;
+  const customDayRate   = useCustom ? (parseFloat(document.getElementById('customDayRate').value) || 0) : 0;
+  const customNightRate = useCustom ? (parseFloat(document.getElementById('customNightRate').value) || 0) : 0;
   if (!band || !date || !from || !to || !amount) { showToast('Fill all required fields', 'error'); return; }
   const btn = document.getElementById('submitBtn');
   btn.classList.add('loading'); btn.disabled = true;
   const original  = bookings.find(b => b.id === id);
-  const updated   = { ...original, band, date, from, to, amount: parseFloat(amount), advancePaid, amountDue, status, notes };
+  const updated   = { ...original, band, date, from, to, amount: parseFloat(amount), advancePaid, amountDue, status, notes, customDayRate, customNightRate };
   const ok = await updateInSheets(updated);
   if (ok) {
     const idx = bookings.findIndex(b => b.id === id);
