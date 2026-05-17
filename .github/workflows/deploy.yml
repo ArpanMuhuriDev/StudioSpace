@@ -14,6 +14,7 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+
       - name: Inject Script URL into index.html
         env:
           SCRIPT_URL: ${{ vars.SCRIPT_URL }}
@@ -28,11 +29,14 @@ jobs:
               f.write(content)
           print('SCRIPT_URL starts with:', url[:40])
           "
+
       - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./
           destination_dir: .
+          keep_files: true
+          exclude_assets: '.github,Code.gs,*.md'
 
   deploy-test:
     if: github.ref == 'refs/heads/Develop'
@@ -41,6 +45,7 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+
       - name: Inject Script URL into index.html
         env:
           SCRIPT_URL: ${{ vars.SCRIPT_URL }}
@@ -55,8 +60,11 @@ jobs:
               f.write(content)
           print('SCRIPT_URL starts with:', url[:40])
           "
+
       - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./
           destination_dir: test
+          keep_files: true
+          exclude_assets: '.github,Code.gs,*.md'
