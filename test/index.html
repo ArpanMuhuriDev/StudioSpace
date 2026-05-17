@@ -337,14 +337,15 @@
     </div>
   </div>
   <div class="clash-box" id="clashBox"><span>⚠️</span><span id="clashMsg"></span></div>
-
-  <!-- Custom rate toggle -->
-  <div class="field" style="margin-bottom:10px;">
-    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;letter-spacing:0;font-size:0.82rem;font-weight:600;color:var(--text);text-transform:none;">
-      <input type="checkbox" id="customRateEnabled" onchange="toggleCustomRate()"
-        style="width:18px;height:18px;border-radius:4px;cursor:pointer;flex-shrink:0;margin:0;padding:0;accent-color:#111;" />
-      Custom rate / hr. needed? (₹)
-    </label>
+  <div class="field">
+    <label>Total Hours</label>
+    <input type="text" id="totalHours" placeholder="—" readonly
+      style="background:var(--surface2);color:var(--muted);cursor:not-allowed;" />
+  </div>
+  <div class="field" style="margin-bottom:10px;display:flex;align-items:center;gap:10px;">
+    <input type="checkbox" id="customRateEnabled" onchange="toggleCustomRate()"
+      style="width:18px;height:18px;border-radius:4px;cursor:pointer;flex-shrink:0;margin:0;padding:0;accent-color:#111;" />
+    <span style="font-size:0.82rem;font-weight:600;color:var(--text);">Custom rate / hr. needed? (₹)</span>
   </div>
 
   <!-- Custom rate fields (hidden by default) -->
@@ -915,7 +916,20 @@ function toggleCustomRate() {
 function calcAmount() {
   const from = document.getElementById('fromTime').value;
   const to   = document.getElementById('toTime').value;
-  if (!from || !to) return;
+  if (!from || !to) {
+    document.getElementById('totalHours').value = '—';
+    return;
+  }
+  const fMins = timeToMins(from);
+  let   tMins = timeToMins(to);
+  if (tMins <= fMins) tMins += 24 * 60; // overnight
+  const diff = tMins - fMins;
+  const hrs  = Math.floor(diff / 60);
+  const mins = diff % 60;
+  document.getElementById('totalHours').value =
+    hrs > 0 && mins > 0 ? `${hrs}hrs ${mins}mins` :
+    hrs > 0              ? `${hrs}hrs` :
+                           `${mins}mins`;
   const globalRates = getRates();
   const useCustom   = document.getElementById('customRateEnabled').checked;
   let rates = { ...globalRates };
@@ -984,6 +998,7 @@ function editBooking(id) {
   document.getElementById('toTime').value          = b.to;
   setTimePickerValue('from', b.from);
   setTimePickerValue('to',   b.to);
+  calcAmount(); // populate total hours
   document.getElementById('amount').value          = b.amount;
   document.getElementById('advancePaid').value     = b.advancePaid || 0;
   document.getElementById('amountDue').value       = b.amountDue  || 0;
@@ -1016,7 +1031,7 @@ function resetForm() {
   document.getElementById('customRateFields').style.display   = 'none';
   document.getElementById('customDayRate').value               = '';
   document.getElementById('customNightRate').value             = '';
-  document.getElementById('amountDue').value                   = '';
+  document.getElementById('totalHours').value             = '—';
   document.getElementById('status').value     = 'Attending';
   document.getElementById('bookDate').value   = todayStr();
   document.getElementById('clashBox').classList.remove('show');
