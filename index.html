@@ -392,6 +392,17 @@
     </div>
   </div>
 
+  <!-- Add-ons checklist (populated dynamically) -->
+  <div id="addonsBookingSection" style="display:none;margin-bottom:14px;">
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:13px;padding:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);">ADD-ONS</div>
+        <div style="font-size:0.68rem;color:var(--muted);" id="addonHrsLabel">₹/hr</div>
+      </div>
+      <div id="addonBookingList"></div>
+    </div>
+  </div>
+
   <div class="field">
     <label>Amount (₹) <span style="color:var(--red)">★</span></label>
     <div class="amount-wrap">
@@ -482,61 +493,84 @@
 <div class="page" id="page-settings">
   <p class="section-title" style="margin-top:18px">Studio <span>Rates</span></p>
 
-  <!-- Rate table header -->
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 4px;margin-bottom:6px;">
-    <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);">START TIME</div>
-    <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);">END TIME</div>
-    <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);">RATE (₹/hr)</div>
+  <!-- Inner tabs -->
+  <div style="display:flex;gap:6px;background:var(--surface);border-radius:12px;padding:3px;margin-bottom:16px;border:1px solid var(--border);">
+    <button id="stab-rates" onclick="switchSettingsTab('rates')"
+      style="flex:1;padding:9px;border-radius:10px;border:none;background:#111;color:#fff;font-family:var(--font-body);font-size:0.78rem;font-weight:700;cursor:pointer;">Rehearsal Rates</button>
+    <button id="stab-addons" onclick="switchSettingsTab('addons')"
+      style="flex:1;padding:9px;border-radius:10px;border:none;background:transparent;color:var(--muted);font-family:var(--font-body);font-size:0.78rem;font-weight:700;cursor:pointer;">Add-ons</button>
   </div>
 
-  <!-- Day Rate Row -->
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;">
-    <div style="font-size:0.7rem;font-weight:700;color:var(--muted);margin-bottom:10px;letter-spacing:1px;">DAY RATE</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:center;">
-      <div class="time-picker-wrap">
-        <div class="time-picker-input" id="dayStartTimeDisplay" onclick="toggleTimePicker('dayStart')">
-          <span id="dayStartTimeLabel" class="tp-placeholder">Select</span><span class="tp-arrow">▼</span>
+  <!-- ── REHEARSAL RATES TAB ── -->
+  <div id="sview-rates">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 4px;margin-bottom:6px;">
+      <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);">START TIME</div>
+      <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);">END TIME</div>
+      <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);">RATE (₹/hr)</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;">
+      <div style="font-size:0.7rem;font-weight:700;color:var(--muted);margin-bottom:10px;letter-spacing:1px;">DAY RATE</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:center;">
+        <div class="time-picker-wrap">
+          <div class="time-picker-input" id="dayStartTimeDisplay" onclick="toggleTimePicker('dayStart')">
+            <span id="dayStartTimeLabel" class="tp-placeholder">Select</span><span class="tp-arrow">▼</span>
+          </div>
+          <div class="time-picker-dropdown" id="dayStartTimeDropdown"></div>
+          <input type="hidden" id="dayStartTime" value="10:00" />
         </div>
-        <div class="time-picker-dropdown" id="dayStartTimeDropdown"></div>
-        <input type="hidden" id="dayStartTime" value="10:00" />
-      </div>
-      <div class="time-picker-wrap">
-        <div class="time-picker-input" id="dayEndTimeDisplay" onclick="toggleTimePicker('dayEnd')">
-          <span id="dayEndTimeLabel" class="tp-placeholder">Select</span><span class="tp-arrow">▼</span>
+        <div class="time-picker-wrap">
+          <div class="time-picker-input" id="dayEndTimeDisplay" onclick="toggleTimePicker('dayEnd')">
+            <span id="dayEndTimeLabel" class="tp-placeholder">Select</span><span class="tp-arrow">▼</span>
+          </div>
+          <div class="time-picker-dropdown" id="dayEndTimeDropdown"></div>
+          <input type="hidden" id="dayEndTime" value="22:00" />
         </div>
-        <div class="time-picker-dropdown" id="dayEndTimeDropdown"></div>
-        <input type="hidden" id="dayEndTime" value="22:00" />
-      </div>
-      <div class="amount-wrap">
-        <span class="currency-sign">₹</span>
-        <input type="number" id="dayRate" value="250" min="0" inputmode="numeric" style="padding-left:28px;" />
+        <div class="amount-wrap">
+          <span class="currency-sign">₹</span>
+          <input type="number" id="dayRate" value="250" min="0" inputmode="numeric" style="padding-left:28px;" />
+        </div>
       </div>
     </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:20px;">
+      <div style="font-size:0.7rem;font-weight:700;color:var(--muted);margin-bottom:10px;letter-spacing:1px;">NIGHT RATE</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:center;">
+        <div style="font-size:0.85rem;font-weight:600;color:var(--muted);padding:13px 0;" id="nightStartLabel">10:00 PM</div>
+        <div style="font-size:0.85rem;font-weight:600;color:var(--muted);padding:13px 0;" id="nightEndLabel">10:00 AM</div>
+        <div class="amount-wrap">
+          <span class="currency-sign">₹</span>
+          <input type="number" id="nightRate" value="350" min="0" inputmode="numeric" style="padding-left:28px;" />
+        </div>
+      </div>
+      <div style="font-size:0.72rem;color:var(--muted2);margin-top:8px;">Night times are automatically set as the inverse of day rate hours.</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;">
+      <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:10px;">PREVIEW</div>
+      <div id="ratePreview" style="font-size:0.85rem;color:var(--text);line-height:1.8;"></div>
+    </div>
+    <button class="submit-btn" onclick="saveRates()"><span>SAVE RATES</span></button>
   </div>
 
-  <!-- Night Rate Row -->
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:20px;">
-    <div style="font-size:0.7rem;font-weight:700;color:var(--muted);margin-bottom:10px;letter-spacing:1px;">NIGHT RATE</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:center;">
-      <div style="font-size:0.85rem;font-weight:600;color:var(--muted);padding:13px 0;" id="nightStartLabel">10:00 PM</div>
-      <div style="font-size:0.85rem;font-weight:600;color:var(--muted);padding:13px 0;" id="nightEndLabel">10:00 AM</div>
-      <div class="amount-wrap">
-        <span class="currency-sign">₹</span>
-        <input type="number" id="nightRate" value="350" min="0" inputmode="numeric" style="padding-left:28px;" />
+  <!-- ── ADD-ONS TAB ── -->
+  <div id="sview-addons" style="display:none;">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);">ADD-ONS</div>
+        <button onclick="addAddonRow()" style="display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:9px;border:1.5px solid var(--border);background:transparent;font-family:var(--font-body);font-size:0.75rem;font-weight:700;cursor:pointer;color:var(--text);">
+          + Add
+        </button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 100px 36px;gap:8px;padding:0 2px;margin-bottom:8px;">
+        <div style="font-size:0.65rem;font-weight:700;letter-spacing:1px;color:var(--muted);">NAME</div>
+        <div style="font-size:0.65rem;font-weight:700;letter-spacing:1px;color:var(--muted);">₹/hr</div>
+        <div></div>
+      </div>
+      <div id="addonSettingsList"></div>
+      <div id="addonEmptyMsg" style="font-size:0.82rem;color:var(--muted);text-align:center;padding:16px 0;display:none;">
+        No add-ons yet. Tap "+ Add" to create one.
       </div>
     </div>
-    <div style="font-size:0.72rem;color:var(--muted2);margin-top:8px;">Night times are automatically set as the inverse of day rate hours.</div>
+    <button class="submit-btn" onclick="saveAddons()"><span>SAVE ADD-ONS</span></button>
   </div>
-
-  <!-- Preview -->
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;">
-    <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:10px;">PREVIEW</div>
-    <div id="ratePreview" style="font-size:0.85rem;color:var(--text);line-height:1.8;"></div>
-  </div>
-
-  <button class="submit-btn" onclick="saveRates()">
-    <span>SAVE RATES</span>
-  </button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -766,6 +800,8 @@ async function loadFromSheets() {
   } finally {
     setSpin(false);
     await loadRatesFromSheets();
+    await loadAddonsFromSheets();
+    renderAddonBookingList();
     renderSchedule(); renderStats(); renderCalendar();
   }
 }
@@ -879,7 +915,179 @@ document.addEventListener('click', e => {
   if (!e.target.closest('.time-picker-wrap')) closeAllTimePickers();
 });
 
-// ── RATES ──
+// ── ADD-ONS ──
+const ADDONS_KEY = 'studiospace_addons';
+
+function getAddonsConfig() {
+  const stored = localStorage.getItem(ADDONS_KEY);
+  return stored ? JSON.parse(stored) : [];
+}
+
+async function loadAddonsFromSheets() {
+  try {
+    const data = await xhrGet(`${SCRIPT_URL}?action=getAddons`);
+    if (data.status === 'ok' && data.addons) {
+      localStorage.setItem(ADDONS_KEY, JSON.stringify(data.addons));
+    }
+  } catch(err) {
+    console.error('loadAddonsFromSheets error:', err.message);
+  }
+}
+
+async function saveAddons() {
+  const rows = document.querySelectorAll('.addon-setting-row');
+  const addons = [];
+  rows.forEach(row => {
+    const name = row.querySelector('.addon-name-input').value.trim();
+    const rate = parseFloat(row.querySelector('.addon-rate-input').value) || 0;
+    if (name) addons.push({ name, rate });
+  });
+  localStorage.setItem(ADDONS_KEY, JSON.stringify(addons));
+  renderAddonBookingList();
+  setSpin(true);
+  try {
+    const data = await xhrGet(`${SCRIPT_URL}?action=saveAddons&data=${encodeURIComponent(JSON.stringify(addons))}`);
+    showToast(data.status === 'ok' ? '✅ Add-ons saved!' : 'Saved locally — sync failed', data.status === 'ok' ? 'success' : '');
+  } catch {
+    showToast('Saved locally — offline', '');
+  } finally {
+    setSpin(false);
+  }
+}
+
+function renderAddonSettingsList() {
+  const addons = getAddonsConfig();
+  const list   = document.getElementById('addonSettingsList');
+  const empty  = document.getElementById('addonEmptyMsg');
+  if (!addons.length) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  list.innerHTML = addons.map((a, i) => `
+    <div class="addon-setting-row" style="display:grid;grid-template-columns:1fr 100px 36px;gap:8px;align-items:center;margin-bottom:8px;">
+      <input class="addon-name-input" value="${a.name}" placeholder="Add-on name"
+        style="padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.88rem;background:var(--bg);color:var(--text);outline:none;" />
+      <div class="amount-wrap">
+        <span class="currency-sign" style="font-size:0.82rem;">₹</span>
+        <input type="number" class="addon-rate-input" value="${a.rate}" placeholder="0" min="0" inputmode="numeric"
+          style="padding:10px 10px 10px 26px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.88rem;background:var(--bg);color:var(--text);outline:none;width:100%;" />
+      </div>
+      <button onclick="removeAddonRow(this)"
+        style="width:36px;height:36px;border-radius:9px;border:1.5px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1rem;">✕</button>
+    </div>`).join('');
+}
+
+function addAddonRow() {
+  const empty = document.getElementById('addonEmptyMsg');
+  empty.style.display = 'none';
+  const list = document.getElementById('addonSettingsList');
+  const div  = document.createElement('div');
+  div.className = 'addon-setting-row';
+  div.style.cssText = 'display:grid;grid-template-columns:1fr 100px 36px;gap:8px;align-items:center;margin-bottom:8px;';
+  div.innerHTML = `
+    <input class="addon-name-input" value="" placeholder="Add-on name"
+      style="padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.88rem;background:var(--bg);color:var(--text);outline:none;" />
+    <div class="amount-wrap">
+      <span class="currency-sign" style="font-size:0.82rem;">₹</span>
+      <input type="number" class="addon-rate-input" value="" placeholder="0" min="0" inputmode="numeric"
+        style="padding:10px 10px 10px 26px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.88rem;background:var(--bg);color:var(--text);outline:none;width:100%;" />
+    </div>
+    <button onclick="removeAddonRow(this)"
+      style="width:36px;height:36px;border-radius:9px;border:1.5px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1rem;">✕</button>`;
+  list.appendChild(div);
+  div.querySelector('.addon-name-input').focus();
+}
+
+function removeAddonRow(btn) {
+  btn.closest('.addon-setting-row').remove();
+  const list = document.getElementById('addonSettingsList');
+  if (!list.querySelectorAll('.addon-setting-row').length) {
+    document.getElementById('addonEmptyMsg').style.display = 'block';
+  }
+}
+
+// ── ADD-ONS IN BOOKING FORM ──
+function renderAddonBookingList() {
+  const addons = getAddonsConfig();
+  const section = document.getElementById('addonsBookingSection');
+  const list    = document.getElementById('addonBookingList');
+  if (!addons.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  const from = document.getElementById('fromTime').value;
+  const to   = document.getElementById('toTime').value;
+  let hrs = 0;
+  if (from && to) {
+    let fM = timeToMins(from), tM = timeToMins(to);
+    if (tM <= fM) tM += 24 * 60;
+    hrs = (tM - fM) / 60;
+  }
+  document.getElementById('addonHrsLabel').textContent = hrs > 0 ? `₹/hr × ${hrs % 1 === 0 ? hrs : hrs.toFixed(1)}hrs` : '₹/hr';
+  // Preserve existing checked state
+  const prevChecked = {};
+  list.querySelectorAll('.addon-booking-cb').forEach(cb => { prevChecked[cb.dataset.name] = cb.checked; });
+  list.innerHTML = addons.map(a => {
+    const amt    = hrs > 0 ? Math.round(a.rate * hrs) : 0;
+    const wasChk = prevChecked[a.name] || false;
+    return `
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border);" class="addon-booking-row">
+      <input type="checkbox" class="addon-booking-cb" data-name="${a.name}" data-rate="${a.rate}"
+        onchange="calcAmount()" ${wasChk ? 'checked' : ''}
+        style="width:16px;height:16px;cursor:pointer;flex-shrink:0;" />
+      <div style="flex:1;">
+        <div style="font-size:0.88rem;font-weight:600;color:var(--text);">${a.name}</div>
+        <div style="font-size:0.7rem;color:var(--muted);">₹${a.rate.toLocaleString('en-IN')} / hr</div>
+      </div>
+      <span style="font-size:0.88rem;font-weight:700;color:${wasChk ? 'var(--text)' : 'var(--muted2)'};" class="addon-amt-label">
+        ${wasChk && amt > 0 ? '₹' + amt.toLocaleString('en-IN') : '—'}
+      </span>
+    </div>`;
+  }).join('');
+  // Style checked amounts after render
+  list.querySelectorAll('.addon-booking-cb').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const row  = cb.closest('.addon-booking-row');
+      const lbl  = row.querySelector('.addon-amt-label');
+      const rate = parseFloat(cb.dataset.rate) || 0;
+      const amt  = hrs > 0 ? Math.round(rate * hrs) : 0;
+      lbl.textContent = cb.checked && amt > 0 ? '₹' + amt.toLocaleString('en-IN') : '—';
+      lbl.style.color = cb.checked ? 'var(--text)' : 'var(--muted2)';
+    });
+  });
+}
+
+function getSelectedAddons() {
+  const addons = [];
+  document.querySelectorAll('.addon-booking-cb:checked').forEach(cb => {
+    const from = document.getElementById('fromTime').value;
+    const to   = document.getElementById('toTime').value;
+    let hrs = 0;
+    if (from && to) {
+      let fM = timeToMins(from), tM = timeToMins(to);
+      if (tM <= fM) tM += 24 * 60;
+      hrs = (tM - fM) / 60;
+    }
+    const rate   = parseFloat(cb.dataset.rate) || 0;
+    const amount = Math.round(rate * hrs);
+    addons.push({ name: cb.dataset.name, rate, amount });
+  });
+  return addons;
+}
+
+function restoreAddonSelection(selectedAddons) {
+  if (!selectedAddons || !selectedAddons.length) return;
+  document.querySelectorAll('.addon-booking-cb').forEach(cb => {
+    const match = selectedAddons.find(a => a.name === cb.dataset.name);
+    if (match) {
+      cb.checked = true;
+      const row = cb.closest('.addon-booking-row');
+      const lbl = row.querySelector('.addon-amt-label');
+      lbl.textContent = match.amount > 0 ? '₹' + match.amount.toLocaleString('en-IN') : '—';
+      lbl.style.color = 'var(--text)';
+    }
+  });
+}
 const RATES_KEY     = 'studiospace_rates';
 const DEFAULT_RATES = { dayStart: '10:00', dayEnd: '22:00', dayRate: 250, nightRate: 350 };
 
@@ -951,7 +1159,7 @@ function calcAmount() {
   }
   const fMins = timeToMins(from);
   let   tMins = timeToMins(to);
-  if (tMins <= fMins) tMins += 24 * 60; // overnight
+  if (tMins <= fMins) tMins += 24 * 60;
   const diff = tMins - fMins;
   const hrs  = Math.floor(diff / 60);
   const mins = diff % 60;
@@ -959,6 +1167,9 @@ function calcAmount() {
     hrs > 0 && mins > 0 ? `${hrs}hrs ${mins}mins` :
     hrs > 0              ? `${hrs}hrs` :
                            `${mins}mins`;
+  // Refresh add-ons list to update calculated amounts
+  renderAddonBookingList();
+  // Rehearsal cost
   const globalRates = getRates();
   const useCustom   = document.getElementById('customRateEnabled').checked;
   let rates = { ...globalRates };
@@ -968,25 +1179,29 @@ function calcAmount() {
     if (cDay   > 0) rates.dayRate   = cDay;
     if (cNight > 0) rates.nightRate = cNight;
   }
-  const amount = computeAmount(from, to, rates);
-  if (amount > 0) {
-    document.getElementById('amount').value = amount;
+  const rehearsalAmt = computeAmount(from, to, rates);
+  // Add-ons cost
+  const addonsAmt = getSelectedAddons().reduce((s, a) => s + a.amount, 0);
+  const total = rehearsalAmt + addonsAmt;
+  if (total > 0) {
+    document.getElementById('amount').value = total;
     calcAmountDue();
   }
 }
 
 async function initSettingsTab() {
-  // Always fetch fresh from Sheets before showing
   await loadRatesFromSheets();
+  await loadAddonsFromSheets();
   const rates = getRates();
-  document.getElementById('dayRate').value   = rates.dayRate;
-  document.getElementById('nightRate').value = rates.nightRate;
+  document.getElementById('dayRate').value      = rates.dayRate;
+  document.getElementById('nightRate').value    = rates.nightRate;
   document.getElementById('dayStartTime').value = rates.dayStart;
   document.getElementById('dayEndTime').value   = rates.dayEnd;
   setTimePickerValue('dayStart', rates.dayStart);
   setTimePickerValue('dayEnd',   rates.dayEnd);
   syncNightLabels();
   updateRatePreview();
+  renderAddonSettingsList();
 }
 
 function syncNightLabels() {
@@ -1027,7 +1242,8 @@ function editBooking(id) {
   document.getElementById('toTime').value          = b.to;
   setTimePickerValue('from', b.from);
   setTimePickerValue('to',   b.to);
-  calcAmount(); // populate total hours
+  calcAmount(); // populate total hours + refresh add-ons
+  setTimeout(() => restoreAddonSelection(b.selectedAddons || []), 50);
   document.getElementById('amount').value          = b.amount;
   document.getElementById('advancePaid').value     = b.advancePaid || 0;
   document.getElementById('amountDue').value       = b.amountDue  || 0;
@@ -1061,6 +1277,15 @@ function resetForm() {
   document.getElementById('customDayRate').value               = '';
   document.getElementById('customNightRate').value             = '';
   document.getElementById('totalHours').value             = '—';
+  // Uncheck all add-ons
+  document.querySelectorAll('.addon-booking-cb').forEach(cb => {
+    cb.checked = false;
+    const row = cb.closest('.addon-booking-row');
+    if (row) {
+      const lbl = row.querySelector('.addon-amt-label');
+      if (lbl) { lbl.textContent = '—'; lbl.style.color = 'var(--muted2)'; }
+    }
+  });
   document.getElementById('status').value     = 'Attending';
   document.getElementById('bookDate').value   = todayStr();
   document.getElementById('clashBox').classList.remove('show');
@@ -1087,14 +1312,15 @@ async function addBooking() {
   const amountDue   = parseFloat(document.getElementById('amountDue').value)   || 0;
   const status      = document.getElementById('status').value;
   const notes       = document.getElementById('notes').value.trim();
-  const useCustom    = document.getElementById('customRateEnabled').checked;
+  const useCustom      = document.getElementById('customRateEnabled').checked;
   const customDayRate   = useCustom ? (parseFloat(document.getElementById('customDayRate').value) || 0) : 0;
   const customNightRate = useCustom ? (parseFloat(document.getElementById('customNightRate').value) || 0) : 0;
+  const selectedAddons  = getSelectedAddons();
   if (!band || !date || !from || !to || !amount) { showToast('Fill all required fields', 'error'); return; }
   if (checkClash()) { showToast('Fix the slot clash first', 'error'); return; }
   const btn = document.getElementById('submitBtn');
   btn.classList.add('loading'); btn.disabled = true;
-  const booking = { id: Date.now().toString(), band, date, from, to, amount: parseFloat(amount), advancePaid, amountDue, status, notes, customDayRate, customNightRate, createdAt: new Date().toISOString() };
+  const booking = { id: Date.now().toString(), band, date, from, to, amount: parseFloat(amount), advancePaid, amountDue, status, notes, customDayRate, customNightRate, selectedAddons, createdAt: new Date().toISOString() };
   const ok = await pushToSheets(booking);
   if (ok) {
     bookings.push(booking); saveLocal(bookings);
@@ -1124,11 +1350,12 @@ async function updateBooking(id) {
   const useCustom      = document.getElementById('customRateEnabled').checked;
   const customDayRate   = useCustom ? (parseFloat(document.getElementById('customDayRate').value) || 0) : 0;
   const customNightRate = useCustom ? (parseFloat(document.getElementById('customNightRate').value) || 0) : 0;
+  const selectedAddons  = getSelectedAddons();
   if (!band || !date || !from || !to || !amount) { showToast('Fill all required fields', 'error'); return; }
   const btn = document.getElementById('submitBtn');
   btn.classList.add('loading'); btn.disabled = true;
   const original  = bookings.find(b => b.id === id);
-  const updated   = { ...original, band, date, from, to, amount: parseFloat(amount), advancePaid, amountDue, status, notes, customDayRate, customNightRate };
+  const updated   = { ...original, band, date, from, to, amount: parseFloat(amount), advancePaid, amountDue, status, notes, customDayRate, customNightRate, selectedAddons };
   const ok = await updateInSheets(updated);
   if (ok) {
     const idx = bookings.findIndex(b => b.id === id);
@@ -1247,6 +1474,15 @@ function switchTab(tab) {
   if (tab === 'stats')    renderStats();
   if (tab === 'calendar') renderCalendar();
   if (tab === 'settings') initSettingsTab();
+}
+
+function switchSettingsTab(tab) {
+  document.getElementById('sview-rates').style.display  = tab === 'rates'  ? 'block' : 'none';
+  document.getElementById('sview-addons').style.display = tab === 'addons' ? 'block' : 'none';
+  document.getElementById('stab-rates').style.background  = tab === 'rates'  ? '#111' : 'transparent';
+  document.getElementById('stab-rates').style.color       = tab === 'rates'  ? '#fff'  : 'var(--muted)';
+  document.getElementById('stab-addons').style.background = tab === 'addons' ? '#111' : 'transparent';
+  document.getElementById('stab-addons').style.color      = tab === 'addons' ? '#fff'  : 'var(--muted)';
 }
 
 function toggleProfileMenu() {
