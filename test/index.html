@@ -594,7 +594,7 @@ const provider = new firebase.auth.GoogleAuthProvider();
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
 // ── APP CONFIG — injected by GitHub Actions ──
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxzlsMkaccRKll6tL6Jz5jIa7pdoLzYUvPEbfqFKBu1H_CIr8PXY6-b0KWbGgHPy2b0cw/exec'.trim().replace(/[?&]+$/, '');
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwH3vI-pf8CYRsiWAo5-F3QavJL4_TqDMdaLQM7wQffYRNLZXQOVVkU40sLCQHFAc5svw/exec'.trim().replace(/[?&]+$/, '');
 
 const LOCAL_KEY    = 'studiospace_local';
 const ICONS        = ['🎸','🥁','🎹','🎺','🎻','🎷','🎤','🪗'];
@@ -1075,16 +1075,16 @@ function getSelectedAddons() {
   return addons;
 }
 
-function restoreAddonSelection(selectedAddons) {
-  if (!selectedAddons || !selectedAddons.length) return;
+function restoreAddonSelection(addonsText) {
+  if (!addonsText) return;
+  // Parse "Video recording - Rs. 800, In ears - Rs. 200" to get names
+  const selectedNames = addonsText.split(',').map(s => s.split(' - Rs.')[0].trim().toLowerCase());
   document.querySelectorAll('.addon-booking-cb').forEach(cb => {
-    const match = selectedAddons.find(a => a.name === cb.dataset.name);
-    if (match) {
+    if (selectedNames.includes(cb.dataset.name.toLowerCase())) {
       cb.checked = true;
       const row = cb.closest('.addon-booking-row');
-      const lbl = row.querySelector('.addon-amt-label');
-      lbl.textContent = match.amount > 0 ? '₹' + match.amount.toLocaleString('en-IN') : '—';
-      lbl.style.color = 'var(--text)';
+      const lbl = row ? row.querySelector('.addon-amt-label') : null;
+      if (lbl) { lbl.textContent = ''; lbl.style.color = 'var(--text)'; }
     }
   });
 }
@@ -1239,8 +1239,8 @@ function editBooking(id) {
   document.getElementById('toTime').value          = b.to;
   setTimePickerValue('from', b.from);
   setTimePickerValue('to',   b.to);
-  calcAmount(); // populate total hours + refresh add-ons
-  setTimeout(() => restoreAddonSelection(b.selectedAddons || []), 50);
+  calcAmount();
+  setTimeout(() => restoreAddonSelection(b.addons || ''), 50);
   document.getElementById('amount').value          = b.amount;
   document.getElementById('advancePaid').value     = b.advancePaid || 0;
   document.getElementById('amountDue').value       = b.amountDue  || 0;
