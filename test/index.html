@@ -599,6 +599,8 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxzlsMkaccRKll6tL6Jz
 const LOCAL_KEY    = 'studiospace_local';
 const ICONS        = ['🎸','🥁','🎹','🎺','🎻','🎷','🎤','🪗'];
 let bookings       = [];
+let appRates       = null; // loaded on startup, used everywhere
+let appAddons      = [];   // loaded on startup, used everywhere
 let currentFilter  = 'day';
 let isSyncing      = false;
 let calWeekOffset  = 0;
@@ -916,18 +918,16 @@ document.addEventListener('click', e => {
 });
 
 // ── ADD-ONS ──
-const ADDONS_KEY = 'studiospace_addons';
 
 function getAddonsConfig() {
-  const stored = localStorage.getItem(ADDONS_KEY);
-  return stored ? JSON.parse(stored) : [];
+  return appAddons;
 }
 
 async function loadAddonsFromSheets() {
   try {
     const data = await xhrGet(`${SCRIPT_URL}?action=getAddons`);
     if (data.status === 'ok' && data.addons) {
-      localStorage.setItem(ADDONS_KEY, JSON.stringify(data.addons));
+      appAddons = data.addons;
     }
   } catch(err) {
     console.error('loadAddonsFromSheets error:', err.message);
@@ -942,7 +942,7 @@ async function saveAddons() {
     const rate = parseFloat(row.querySelector('.addon-rate-input').value) || 0;
     if (name) addons.push({ name, rate });
   });
-  localStorage.setItem(ADDONS_KEY, JSON.stringify(addons));
+  appAddons = addons; // update in-memory immediately
   renderAddonBookingList();
   setSpin(true);
   try {
@@ -1088,12 +1088,10 @@ function restoreAddonSelection(selectedAddons) {
     }
   });
 }
-const RATES_KEY     = 'studiospace_rates';
 const DEFAULT_RATES = { dayStart: '10:00', dayEnd: '22:00', dayRate: 250, nightRate: 350 };
 
 function getRates() {
-  const stored = localStorage.getItem(RATES_KEY);
-  return stored ? JSON.parse(stored) : DEFAULT_RATES;
+  return appRates || DEFAULT_RATES;
 }
 
 async function saveRates() {
@@ -1103,7 +1101,7 @@ async function saveRates() {
     dayRate:   parseFloat(document.getElementById('dayRate').value)   || 250,
     nightRate: parseFloat(document.getElementById('nightRate').value) || 350
   };
-  localStorage.setItem(RATES_KEY, JSON.stringify(rates));
+  appRates = rates; // update in-memory immediately
   syncNightLabels();
   updateRatePreview();
   setSpin(true);
@@ -1111,7 +1109,7 @@ async function saveRates() {
     const data = await xhrGet(`${SCRIPT_URL}?action=saveRates&data=${encodeURIComponent(JSON.stringify(rates))}`);
     showToast(data.status === 'ok' ? '✅ Rates saved & synced!' : 'Saved locally — sheet sync failed', data.status === 'ok' ? 'success' : '');
   } catch {
-    showToast('Saved locally — offline', '');
+    showToast('Saved — offline', '');
   } finally {
     setSpin(false);
   }
@@ -1121,7 +1119,7 @@ async function loadRatesFromSheets() {
   try {
     const data = await xhrGet(`${SCRIPT_URL}?action=getRates`);
     if (data.status === 'ok' && data.rates) {
-      localStorage.setItem(RATES_KEY, JSON.stringify(data.rates));
+      appRates = data.rates;
     }
   } catch(err) {
     console.error('loadRatesFromSheets error:', err.message);
@@ -1190,8 +1188,7 @@ function calcAmount() {
 }
 
 async function initSettingsTab() {
-  await loadRatesFromSheets();
-  await loadAddonsFromSheets();
+  // Data already loaded on app startup — just read from localStorage
   const rates = getRates();
   document.getElementById('dayRate').value      = rates.dayRate;
   document.getElementById('nightRate').value    = rates.nightRate;
