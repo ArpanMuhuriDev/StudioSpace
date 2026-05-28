@@ -599,8 +599,9 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwH3vI-pf8CYRsiWAo5-
 const LOCAL_KEY    = 'studiospace_local';
 const ICONS        = ['🎸','🥁','🎹','🎺','🎻','🎷','🎤','🪗'];
 let bookings       = [];
-let appRates       = null; // loaded on startup, used everywhere
-let appAddons      = [];   // loaded on startup, used everywhere
+let appRates       = null;
+let appAddons      = [];
+let editingAddons  = ''; // add-ons string for the booking being edited
 let currentFilter  = 'day';
 let isSyncing      = false;
 let calWeekOffset  = 0;
@@ -1009,8 +1010,8 @@ function removeAddonRow(btn) {
 }
 
 // ── ADD-ONS IN BOOKING FORM ──
-function renderAddonBookingList(preSelectedAddons) {
-  const addons = getAddonsConfig();
+function renderAddonBookingList() {
+  const addons  = getAddonsConfig();
   const section = document.getElementById('addonsBookingSection');
   const list    = document.getElementById('addonBookingList');
   if (!addons.length) { section.style.display = 'none'; return; }
@@ -1025,18 +1026,16 @@ function renderAddonBookingList(preSelectedAddons) {
   }
   document.getElementById('addonHrsLabel').textContent = hrs > 0 ? `₹/hr × ${hrs % 1 === 0 ? hrs : hrs.toFixed(1)}hrs` : '₹/hr';
 
-  // Build set of pre-selected names (from editing) or currently checked names
+  // Determine which add-ons should be checked
   let selectedNames = new Set();
-  if (preSelectedAddons !== undefined) {
-    // Restoring from existing booking
-    if (preSelectedAddons) {
-      preSelectedAddons.split(',').forEach(s => {
-        const name = s.split(' - Rs.')[0].trim().toLowerCase();
-        if (name) selectedNames.add(name);
-      });
-    }
+  if (editingAddons) {
+    // Restoring from an existing booking being edited
+    editingAddons.split(',').forEach(s => {
+      const name = s.split(' - Rs.')[0].trim().toLowerCase();
+      if (name) selectedNames.add(name);
+    });
   } else {
-    // Preserve currently checked state
+    // Preserve currently checked state (user is interacting with form)
     list.querySelectorAll('.addon-booking-cb').forEach(cb => {
       if (cb.checked) selectedNames.add(cb.dataset.name.toLowerCase());
     });
@@ -1139,7 +1138,7 @@ function toggleCustomRate() {
   calcAmount();
 }
 
-function calcAmount(preSelectedAddons) {
+function calcAmount() {
   const from = document.getElementById('fromTime').value;
   const to   = document.getElementById('toTime').value;
   if (!from || !to) {
@@ -1156,9 +1155,7 @@ function calcAmount(preSelectedAddons) {
     hrs > 0 && mins > 0 ? `${hrs}hrs ${mins}mins` :
     hrs > 0              ? `${hrs}hrs` :
                            `${mins}mins`;
-  // Refresh add-ons list — pass preSelectedAddons only when restoring from edit
-  renderAddonBookingList(preSelectedAddons);
-  // Rehearsal cost
+  renderAddonBookingList();
   const globalRates = getRates();
   const useCustom   = document.getElementById('customRateEnabled').checked;
   let rates = { ...globalRates };
@@ -1169,8 +1166,7 @@ function calcAmount(preSelectedAddons) {
     if (cNight > 0) rates.nightRate = cNight;
   }
   const rehearsalAmt = computeAmount(from, to, rates);
-  // Add-ons cost
-  const addonsAmt = getSelectedAddons().reduce((s, a) => s + a.amount, 0);
+  const addonsAmt    = getSelectedAddons().reduce((s, a) => s + a.amount, 0);
   const total = rehearsalAmt + addonsAmt;
   if (total > 0) {
     document.getElementById('amount').value = total;
@@ -1230,7 +1226,10 @@ function editBooking(id) {
   document.getElementById('toTime').value          = b.to;
   setTimePickerValue('from', b.from);
   setTimePickerValue('to',   b.to);
-  calcAmount(b.addons || '');
+  editingAddons = b.addons || '';
+  console.log('editBooking — addons string:', JSON.stringify(editingAddons));
+  calcAmount();
+  editingAddons = '';
   document.getElementById('amount').value          = b.amount;
   document.getElementById('advancePaid').value     = b.advancePaid || 0;
   document.getElementById('amountDue').value       = b.amountDue  || 0;
@@ -1263,7 +1262,8 @@ function resetForm() {
   document.getElementById('customRateFields').style.display   = 'none';
   document.getElementById('customDayRate').value               = '';
   document.getElementById('customNightRate').value             = '';
-  document.getElementById('totalHours').value             = '—';
+  editingAddons = '';
+  document.getElementById('totalHours').value = '—';
   // Uncheck all add-ons
   document.querySelectorAll('.addon-booking-cb').forEach(cb => {
     cb.checked = false;
