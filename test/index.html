@@ -243,9 +243,9 @@
 <!-- SPLASH SCREEN (shown while Firebase restores session) -->
 <div class="auth-screen" id="splashScreen">
   <img src="Logos/IMG_20241026_104514_243.webp" alt="Studio Space" style="width:180px;height:auto;object-fit:contain;margin-bottom:32px;" />
-  <div style="display:flex;align-items:center;gap:8px;font-size:0.9rem;font-weight:600;color:#555;">
+  <div style="display:flex;align-items:baseline;gap:8px;font-size:0.9rem;font-weight:600;color:#555;font-family:system-ui,sans-serif;overflow:visible;padding:4px 0;">
     Signing in
-    <div style="display:flex;gap:4px;align-items:center;">
+    <div style="display:flex;gap:4px;align-items:center;margin-bottom:1px;">
       <span style="width:6px;height:6px;border-radius:50%;background:#555;display:inline-block;animation:dotBounce 1.2s ease-in-out infinite;animation-delay:0s;"></span>
       <span style="width:6px;height:6px;border-radius:50%;background:#555;display:inline-block;animation:dotBounce 1.2s ease-in-out infinite;animation-delay:0.2s;"></span>
       <span style="width:6px;height:6px;border-radius:50%;background:#555;display:inline-block;animation:dotBounce 1.2s ease-in-out infinite;animation-delay:0.4s;"></span>
@@ -1009,7 +1009,7 @@ function removeAddonRow(btn) {
 }
 
 // ── ADD-ONS IN BOOKING FORM ──
-function renderAddonBookingList() {
+function renderAddonBookingList(preSelectedAddons) {
   const addons = getAddonsConfig();
   const section = document.getElementById('addonsBookingSection');
   const list    = document.getElementById('addonBookingList');
@@ -1024,37 +1024,41 @@ function renderAddonBookingList() {
     hrs = (tM - fM) / 60;
   }
   document.getElementById('addonHrsLabel').textContent = hrs > 0 ? `₹/hr × ${hrs % 1 === 0 ? hrs : hrs.toFixed(1)}hrs` : '₹/hr';
-  // Preserve existing checked state
-  const prevChecked = {};
-  list.querySelectorAll('.addon-booking-cb').forEach(cb => { prevChecked[cb.dataset.name] = cb.checked; });
+
+  // Build set of pre-selected names (from editing) or currently checked names
+  let selectedNames = new Set();
+  if (preSelectedAddons !== undefined) {
+    // Restoring from existing booking
+    if (preSelectedAddons) {
+      preSelectedAddons.split(',').forEach(s => {
+        const name = s.split(' - Rs.')[0].trim().toLowerCase();
+        if (name) selectedNames.add(name);
+      });
+    }
+  } else {
+    // Preserve currently checked state
+    list.querySelectorAll('.addon-booking-cb').forEach(cb => {
+      if (cb.checked) selectedNames.add(cb.dataset.name.toLowerCase());
+    });
+  }
+
   list.innerHTML = addons.map(a => {
-    const amt    = hrs > 0 ? Math.round(a.rate * hrs) : 0;
-    const wasChk = prevChecked[a.name] || false;
+    const amt     = hrs > 0 ? Math.round(a.rate * hrs) : 0;
+    const checked = selectedNames.has(a.name.toLowerCase());
     return `
     <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border);" class="addon-booking-row">
       <input type="checkbox" class="addon-booking-cb" data-name="${a.name}" data-rate="${a.rate}"
-        onchange="calcAmount()" ${wasChk ? 'checked' : ''}
+        onchange="calcAmount()" ${checked ? 'checked' : ''}
         style="width:16px;height:16px;cursor:pointer;flex-shrink:0;" />
       <div style="flex:1;">
         <div style="font-size:0.88rem;font-weight:600;color:var(--text);">${a.name}</div>
         <div style="font-size:0.7rem;color:var(--muted);">₹${a.rate.toLocaleString('en-IN')} / hr</div>
       </div>
-      <span style="font-size:0.88rem;font-weight:700;color:${wasChk ? 'var(--text)' : 'var(--muted2)'};" class="addon-amt-label">
-        ${wasChk && amt > 0 ? '₹' + amt.toLocaleString('en-IN') : '—'}
+      <span style="font-size:0.88rem;font-weight:700;color:${checked && amt > 0 ? 'var(--text)' : 'var(--muted2)'};" class="addon-amt-label">
+        ${checked && amt > 0 ? '₹' + amt.toLocaleString('en-IN') : '—'}
       </span>
     </div>`;
   }).join('');
-  // Style checked amounts after render
-  list.querySelectorAll('.addon-booking-cb').forEach(cb => {
-    cb.addEventListener('change', () => {
-      const row  = cb.closest('.addon-booking-row');
-      const lbl  = row.querySelector('.addon-amt-label');
-      const rate = parseFloat(cb.dataset.rate) || 0;
-      const amt  = hrs > 0 ? Math.round(rate * hrs) : 0;
-      lbl.textContent = cb.checked && amt > 0 ? '₹' + amt.toLocaleString('en-IN') : '—';
-      lbl.style.color = cb.checked ? 'var(--text)' : 'var(--muted2)';
-    });
-  });
 }
 
 function getSelectedAddons() {
@@ -1075,19 +1079,6 @@ function getSelectedAddons() {
   return addons;
 }
 
-function restoreAddonSelection(addonsText) {
-  if (!addonsText) return;
-  // Parse "Video recording - Rs. 800, In ears - Rs. 200" to get names
-  const selectedNames = addonsText.split(',').map(s => s.split(' - Rs.')[0].trim().toLowerCase());
-  document.querySelectorAll('.addon-booking-cb').forEach(cb => {
-    if (selectedNames.includes(cb.dataset.name.toLowerCase())) {
-      cb.checked = true;
-      const row = cb.closest('.addon-booking-row');
-      const lbl = row ? row.querySelector('.addon-amt-label') : null;
-      if (lbl) { lbl.textContent = ''; lbl.style.color = 'var(--text)'; }
-    }
-  });
-}
 const DEFAULT_RATES = { dayStart: '10:00', dayEnd: '22:00', dayRate: 250, nightRate: 350 };
 
 function getRates() {
@@ -1148,7 +1139,7 @@ function toggleCustomRate() {
   calcAmount();
 }
 
-function calcAmount() {
+function calcAmount(preSelectedAddons) {
   const from = document.getElementById('fromTime').value;
   const to   = document.getElementById('toTime').value;
   if (!from || !to) {
@@ -1165,8 +1156,8 @@ function calcAmount() {
     hrs > 0 && mins > 0 ? `${hrs}hrs ${mins}mins` :
     hrs > 0              ? `${hrs}hrs` :
                            `${mins}mins`;
-  // Refresh add-ons list to update calculated amounts
-  renderAddonBookingList();
+  // Refresh add-ons list — pass preSelectedAddons only when restoring from edit
+  renderAddonBookingList(preSelectedAddons);
   // Rehearsal cost
   const globalRates = getRates();
   const useCustom   = document.getElementById('customRateEnabled').checked;
@@ -1239,8 +1230,7 @@ function editBooking(id) {
   document.getElementById('toTime').value          = b.to;
   setTimePickerValue('from', b.from);
   setTimePickerValue('to',   b.to);
-  calcAmount();
-  setTimeout(() => restoreAddonSelection(b.addons || ''), 50);
+  calcAmount(b.addons || '');
   document.getElementById('amount').value          = b.amount;
   document.getElementById('advancePaid').value     = b.advancePaid || 0;
   document.getElementById('amountDue').value       = b.amountDue  || 0;
