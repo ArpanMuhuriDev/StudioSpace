@@ -601,7 +601,7 @@ const ICONS        = ['🎸','🥁','🎹','🎺','🎻','🎷','🎤','🪗'];
 let bookings       = [];
 let appRates       = null;
 let appAddons      = [];
-let editingAddons  = ''; // add-ons string for the booking being edited
+let editingAddons  = null; // null = normal mode, '' or string = edit mode
 let currentFilter  = 'day';
 let isSyncing      = false;
 let calWeekOffset  = 0;
@@ -1028,12 +1028,15 @@ function renderAddonBookingList() {
 
   // Determine which add-ons should be checked
   let selectedNames = new Set();
-  if (editingAddons) {
-    // Restoring from an existing booking being edited
-    editingAddons.split(',').forEach(s => {
-      const name = s.split(' - Rs.')[0].trim().toLowerCase();
-      if (name) selectedNames.add(name);
-    });
+  if (editingAddons !== null) {
+    // Edit mode — restore from saved addons string (even if empty = no add-ons selected)
+    if (editingAddons) {
+      editingAddons.split(',').forEach(s => {
+        const name = s.split(' - Rs.')[0].trim().toLowerCase();
+        if (name) selectedNames.add(name);
+      });
+    }
+    // if editingAddons === '' → selectedNames stays empty → all unchecked
   } else {
     // Preserve currently checked state (user is interacting with form)
     list.querySelectorAll('.addon-booking-cb').forEach(cb => {
@@ -1229,7 +1232,7 @@ function editBooking(id) {
   editingAddons = b.addons || '';
   console.log('editBooking — addons string:', JSON.stringify(editingAddons));
   calcAmount();
-  editingAddons = '';
+  editingAddons = null;
   document.getElementById('amount').value          = b.amount;
   document.getElementById('advancePaid').value     = b.advancePaid || 0;
   document.getElementById('amountDue').value       = b.amountDue  || 0;
@@ -1262,7 +1265,7 @@ function resetForm() {
   document.getElementById('customRateFields').style.display   = 'none';
   document.getElementById('customDayRate').value               = '';
   document.getElementById('customNightRate').value             = '';
-  editingAddons = '';
+  editingAddons = null;
   document.getElementById('totalHours').value = '—';
   // Uncheck all add-ons
   document.querySelectorAll('.addon-booking-cb').forEach(cb => {
