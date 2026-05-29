@@ -1229,9 +1229,12 @@ function editBooking(id) {
   document.getElementById('toTime').value          = b.to;
   setTimePickerValue('from', b.from);
   setTimePickerValue('to',   b.to);
+  calcAmount(); // calculate amounts (no add-on restore yet)
+  switchTab('book');
+  window.scrollTo(0, 0);
+  // Restore add-on checkboxes AFTER tab is visible
   editingAddons = b.addons || '';
-  console.log('editBooking — addons string:', JSON.stringify(editingAddons));
-  calcAmount();
+  renderAddonBookingList();
   editingAddons = null;
   document.getElementById('amount').value          = b.amount;
   document.getElementById('advancePaid').value     = b.advancePaid || 0;
