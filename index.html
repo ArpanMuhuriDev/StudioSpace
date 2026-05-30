@@ -1222,36 +1222,43 @@ function calcAmountDue() {
 function editBooking(id) {
   const b = bookings.find(b => b.id === id);
   if (!b) return;
-  document.getElementById('editingId').value       = id;
-  document.getElementById('bandName').value        = b.band;
-  document.getElementById('bookDate').value        = b.date;
-  document.getElementById('fromTime').value        = b.from;
-  document.getElementById('toTime').value          = b.to;
+  document.getElementById('editingId').value  = id;
+  document.getElementById('bandName').value   = b.band;
+  document.getElementById('bookDate').value   = b.date;
+  document.getElementById('fromTime').value   = b.from;
+  document.getElementById('toTime').value     = b.to;
   setTimePickerValue('from', b.from);
   setTimePickerValue('to',   b.to);
-  calcAmount(); // calculate amounts (no add-on restore yet)
+  document.getElementById('amount').value     = b.amount;
+  document.getElementById('advancePaid').value= b.advancePaid || 0;
+  document.getElementById('amountDue').value  = b.amountDue  || 0;
+  document.getElementById('status').value     = b.status     || 'Attending';
+  document.getElementById('notes').value      = b.notes      || '';
+
+  // Custom rate — only check if rate is a positive number
+  const customDay   = parseFloat(b.customDayRate)   || 0;
+  const customNight = parseFloat(b.customNightRate) || 0;
+  const hasCustom   = customDay > 0 || customNight > 0;
+  document.getElementById('customRateEnabled').checked          = hasCustom;
+  document.getElementById('customRateFields').style.display     = hasCustom ? 'block' : 'none';
+  document.getElementById('customDayRate').value                = hasCustom ? customDay   : '';
+  document.getElementById('customNightRate').value              = hasCustom ? customNight : '';
+
+  document.getElementById('formTitle').innerHTML                = 'Edit <span>Booking</span>';
+  document.getElementById('submitBtnText').textContent          = 'UPDATE BOOKING';
+
+  // Switch tab first so DOM is visible before rendering add-ons
   switchTab('book');
   window.scrollTo(0, 0);
-  // Restore add-on checkboxes AFTER tab is visible
-  editingAddons = b.addons || '';
+
+  // Calculate hours display
+  calcAmount();
+
+  // Restore add-on checkboxes using the addons text string
+  const addonsText = b.addons || '';
+  editingAddons = addonsText;
   renderAddonBookingList();
   editingAddons = null;
-  document.getElementById('amount').value          = b.amount;
-  document.getElementById('advancePaid').value     = b.advancePaid || 0;
-  document.getElementById('amountDue').value       = b.amountDue  || 0;
-  document.getElementById('status').value          = b.status     || 'Attending';
-  document.getElementById('notes').value           = b.notes      || '';
-  // Restore custom rates if they were set
-  const hasCustom = (b.customDayRate > 0 || b.customNightRate > 0);
-  document.getElementById('customRateEnabled').checked = hasCustom;
-  document.getElementById('customRateFields').style.display = hasCustom ? 'block' : 'none';
-  document.getElementById('customDayRate').value   = hasCustom ? (b.customDayRate   || '') : '';
-  document.getElementById('customNightRate').value = hasCustom ? (b.customNightRate || '') : '';
-  document.getElementById('formTitle').innerHTML   = 'Edit <span>Booking</span>';
-  document.getElementById('submitBtnText').textContent = 'UPDATE BOOKING';
-
-  switchTab('book');
-  window.scrollTo(0, 0);
 }
 
 
