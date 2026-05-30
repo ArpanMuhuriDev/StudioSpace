@@ -1222,41 +1222,50 @@ function calcAmountDue() {
 function editBooking(id) {
   const b = bookings.find(b => b.id === id);
   if (!b) return;
-  document.getElementById('editingId').value  = id;
-  document.getElementById('bandName').value   = b.band;
-  document.getElementById('bookDate').value   = b.date;
-  document.getElementById('fromTime').value   = b.from;
-  document.getElementById('toTime').value     = b.to;
+  document.getElementById('editingId').value   = id;
+  document.getElementById('bandName').value    = b.band;
+  document.getElementById('bookDate').value    = b.date;
+  document.getElementById('fromTime').value    = b.from;
+  document.getElementById('toTime').value      = b.to;
   setTimePickerValue('from', b.from);
   setTimePickerValue('to',   b.to);
-  document.getElementById('amount').value     = b.amount;
-  document.getElementById('advancePaid').value= b.advancePaid || 0;
-  document.getElementById('amountDue').value  = b.amountDue  || 0;
-  document.getElementById('status').value     = b.status     || 'Attending';
-  document.getElementById('notes').value      = b.notes      || '';
 
-  // Custom rate — only check if rate is a positive number
+  // Total hours display — calculated from stored times, no recalculation of amount
+  const fMins = timeToMins(b.from);
+  let   tMins = timeToMins(b.to);
+  if (tMins <= fMins) tMins += 24 * 60;
+  const diff = tMins - fMins;
+  const hrs  = Math.floor(diff / 60);
+  const mins = diff % 60;
+  document.getElementById('totalHours').value =
+    hrs > 0 && mins > 0 ? `${hrs}hrs ${mins}mins` :
+    hrs > 0              ? `${hrs}hrs` : `${mins}mins`;
+
+  // Restore all amounts directly from database
+  document.getElementById('amount').value      = b.amount;
+  document.getElementById('advancePaid').value = b.advancePaid || 0;
+  document.getElementById('amountDue').value   = b.amountDue  || 0;
+
+  document.getElementById('status').value = b.status || 'Attending';
+  document.getElementById('notes').value  = b.notes  || '';
+
+  // Custom rate
   const customDay   = parseFloat(b.customDayRate)   || 0;
   const customNight = parseFloat(b.customNightRate) || 0;
   const hasCustom   = customDay > 0 || customNight > 0;
-  document.getElementById('customRateEnabled').checked          = hasCustom;
-  document.getElementById('customRateFields').style.display     = hasCustom ? 'block' : 'none';
-  document.getElementById('customDayRate').value                = hasCustom ? customDay   : '';
-  document.getElementById('customNightRate').value              = hasCustom ? customNight : '';
+  document.getElementById('customRateEnabled').checked      = hasCustom;
+  document.getElementById('customRateFields').style.display = hasCustom ? 'block' : 'none';
+  document.getElementById('customDayRate').value            = hasCustom ? customDay   : '';
+  document.getElementById('customNightRate').value          = hasCustom ? customNight : '';
 
-  document.getElementById('formTitle').innerHTML                = 'Edit <span>Booking</span>';
-  document.getElementById('submitBtnText').textContent          = 'UPDATE BOOKING';
+  document.getElementById('formTitle').innerHTML       = 'Edit <span>Booking</span>';
+  document.getElementById('submitBtnText').textContent = 'UPDATE BOOKING';
 
-  // Switch tab first so DOM is visible before rendering add-ons
   switchTab('book');
   window.scrollTo(0, 0);
 
-  // Calculate hours display
-  calcAmount();
-
-  // Restore add-on checkboxes using the addons text string
-  const addonsText = b.addons || '';
-  editingAddons = addonsText;
+  // Restore add-on checkboxes from stored text
+  editingAddons = b.addons || '';
   renderAddonBookingList();
   editingAddons = null;
 }
