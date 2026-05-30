@@ -594,7 +594,7 @@ const provider = new firebase.auth.GoogleAuthProvider();
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
 // ── APP CONFIG — injected by GitHub Actions ──
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwH3vI-pf8CYRsiWAo5-F3QavJL4_TqDMdaLQM7wQffYRNLZXQOVVkU40sLCQHFAc5svw/exec'.trim().replace(/[?&]+$/, '');
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzwMSvnqAW1l8yKVZgxti_oBIHjNJu4Yp9aFe8giKYdQUvis9JuKVK0i_CBscrqxF6JJg/exec'.trim().replace(/[?&]+$/, '');
 
 const LOCAL_KEY    = 'studiospace_local';
 const ICONS        = ['🎸','🥁','🎹','🎺','🎻','🎷','🎤','🪗'];
@@ -1322,8 +1322,10 @@ async function addBooking() {
   const status      = document.getElementById('status').value;
   const notes       = document.getElementById('notes').value.trim();
   const useCustom      = document.getElementById('customRateEnabled').checked;
-  const customDayRate   = useCustom ? (parseFloat(document.getElementById('customDayRate').value) || 0) : 0;
-  const customNightRate = useCustom ? (parseFloat(document.getElementById('customNightRate').value) || 0) : 0;
+  const globalRates    = getRates();
+  // Always save the applicable rate — custom if set, otherwise global
+  const customDayRate   = useCustom ? (parseFloat(document.getElementById('customDayRate').value)   || globalRates.dayRate)   : globalRates.dayRate;
+  const customNightRate = useCustom ? (parseFloat(document.getElementById('customNightRate').value) || globalRates.nightRate) : globalRates.nightRate;
   const selectedAddons  = getSelectedAddons();
   if (!band || !date || !from || !to || !amount) { showToast('Fill all required fields', 'error'); return; }
   if (checkClash()) { showToast('Fix the slot clash first', 'error'); return; }
@@ -1357,8 +1359,10 @@ async function updateBooking(id) {
   const status      = document.getElementById('status').value;
   const notes       = document.getElementById('notes').value.trim();
   const useCustom      = document.getElementById('customRateEnabled').checked;
-  const customDayRate   = useCustom ? (parseFloat(document.getElementById('customDayRate').value) || 0) : 0;
-  const customNightRate = useCustom ? (parseFloat(document.getElementById('customNightRate').value) || 0) : 0;
+  const globalRates    = getRates();
+  // Always save the applicable rate — custom if set, otherwise global
+  const customDayRate   = useCustom ? (parseFloat(document.getElementById('customDayRate').value)   || globalRates.dayRate)   : globalRates.dayRate;
+  const customNightRate = useCustom ? (parseFloat(document.getElementById('customNightRate').value) || globalRates.nightRate) : globalRates.nightRate;
   const selectedAddons  = getSelectedAddons();
   if (!band || !date || !from || !to || !amount) { showToast('Fill all required fields', 'error'); return; }
   const btn = document.getElementById('submitBtn');
