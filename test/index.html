@@ -1120,13 +1120,16 @@ async function loadRatesFromSheets() {
 }
 
 function computeAmount(from, to, rates) {
-  const fMins = timeToMins(from);
-  let   tMins = timeToMins(to);
-  if (tMins <= fMins) tMins += 24 * 60; // overnight booking
-  const dayS = timeToMins(rates.dayStart);
-  const dayE = timeToMins(rates.dayEnd);
+  const fMins  = timeToMins(from);
+  let   tMins  = timeToMins(to);
+  if (tMins <= fMins) tMins += 24 * 60; // overnight
+  const actualMins = tMins - fMins;
+  // Round up to nearest full hour — 1hr 30mins billed as 2hrs
+  const billedMins = Math.ceil(actualMins / 60) * 60;
+  const dayS  = timeToMins(rates.dayStart);
+  const dayE  = timeToMins(rates.dayEnd);
   let dayMins = 0, nightMins = 0;
-  for (let t = fMins; t < tMins; t += 30) {
+  for (let t = fMins; t < fMins + billedMins; t += 30) {
     const tNorm = t % (24 * 60);
     if (tNorm >= dayS && tNorm < dayE) dayMins += 30;
     else nightMins += 30;
@@ -1151,13 +1154,12 @@ function calcAmount() {
   const fMins = timeToMins(from);
   let   tMins = timeToMins(to);
   if (tMins <= fMins) tMins += 24 * 60;
-  const diff = tMins - fMins;
-  const hrs  = Math.floor(diff / 60);
-  const mins = diff % 60;
-  document.getElementById('totalHours').value =
-    hrs > 0 && mins > 0 ? `${hrs}hrs ${mins}mins` :
-    hrs > 0              ? `${hrs}hrs` :
-                           `${mins}mins`;
+  const diff    = tMins - fMins;
+  const hrs     = Math.floor(diff / 60);
+  const mins    = diff % 60;
+  const billed  = Math.ceil(diff / 60);
+  const actualLabel = hrs > 0 && mins > 0 ? `${hrs}hrs ${mins}mins` : hrs > 0 ? `${hrs}hrs` : `${mins}mins`;
+  document.getElementById('totalHours').value = mins > 0 ? `${actualLabel} (billed as ${billed}hrs)` : actualLabel;
   renderAddonBookingList();
   const globalRates = getRates();
   const useCustom   = document.getElementById('customRateEnabled').checked;
@@ -1234,12 +1236,12 @@ function editBooking(id) {
   const fMins = timeToMins(b.from);
   let   tMins = timeToMins(b.to);
   if (tMins <= fMins) tMins += 24 * 60;
-  const diff = tMins - fMins;
-  const hrs  = Math.floor(diff / 60);
-  const mins = diff % 60;
-  document.getElementById('totalHours').value =
-    hrs > 0 && mins > 0 ? `${hrs}hrs ${mins}mins` :
-    hrs > 0              ? `${hrs}hrs` : `${mins}mins`;
+  const diff   = tMins - fMins;
+  const hrs    = Math.floor(diff / 60);
+  const mins   = diff % 60;
+  const billed = Math.ceil(diff / 60);
+  const actualLabel = hrs > 0 && mins > 0 ? `${hrs}hrs ${mins}mins` : hrs > 0 ? `${hrs}hrs` : `${mins}mins`;
+  document.getElementById('totalHours').value = mins > 0 ? `${actualLabel} (billed as ${billed}hrs)` : actualLabel;
 
   // Restore all amounts directly from database
   document.getElementById('amount').value      = b.amount;
