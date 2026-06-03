@@ -1022,9 +1022,9 @@ function renderAddonBookingList() {
   if (from && to) {
     let fM = timeToMins(from), tM = timeToMins(to);
     if (tM <= fM) tM += 24 * 60;
-    hrs = (tM - fM) / 60;
+    hrs = Math.ceil((tM - fM) / 60); // round up to nearest hour — same as rate calculation
   }
-  document.getElementById('addonHrsLabel').textContent = hrs > 0 ? `₹/hr × ${hrs % 1 === 0 ? hrs : hrs.toFixed(1)}hrs` : '₹/hr';
+  document.getElementById('addonHrsLabel').textContent = hrs > 0 ? `₹/hr × ${hrs}hrs` : '₹/hr';
 
   // Determine which add-ons should be checked
   let selectedNames = new Set();
@@ -1072,7 +1072,7 @@ function getSelectedAddons() {
     if (from && to) {
       let fM = timeToMins(from), tM = timeToMins(to);
       if (tM <= fM) tM += 24 * 60;
-      hrs = (tM - fM) / 60;
+      hrs = Math.ceil((tM - fM) / 60); // round up to nearest hour
     }
     const rate   = parseFloat(cb.dataset.rate) || 0;
     const amount = Math.round(rate * hrs);
