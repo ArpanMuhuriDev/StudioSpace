@@ -721,10 +721,18 @@
       <label>Notes <span style="font-size:0.62rem;color:var(--muted);font-weight:400;letter-spacing:0;text-transform:none;">(optional)</span></label>
       <input type="text" id="edit-notes" placeholder="e.g. needs drum kit" autocomplete="off" />
     </div>
-    <button class="submit-btn" id="edit-submitBtn" onclick="submitEditBooking()">
-      <span class="btn-text">UPDATE BOOKING</span>
-      <span class="btn-spinner">SAVING…</span>
-    </button>
+    <div style="display:flex;gap:12px;margin-top:6px;">
+      <button class="submit-btn" id="edit-submitBtn" onclick="submitEditBooking()" style="flex:1;">
+        <span class="btn-text">UPDATE BOOKING</span>
+        <span class="btn-spinner">SAVING…</span>
+      </button>
+      <button onclick="closeEditOverlay()"
+        style="flex:0 0 auto;padding:15px 24px;border-radius:14px;border:1.5px solid var(--border);background:transparent;font-family:var(--font-body);font-size:0.9rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all 0.2s;"
+        onmouseover="this.style.borderColor='#111';this.style.color='#111'"
+        onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+        Cancel
+      </button>
+    </div>
   </div>
 </div>
 
