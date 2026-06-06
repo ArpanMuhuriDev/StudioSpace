@@ -98,6 +98,8 @@
     .card-amount { font-family: var(--font-display); font-size: 1.25rem; color: #111; letter-spacing: 1px; }
     .card-edit { background: transparent; border: 1px solid var(--border); color: var(--muted); font-size: 0.78rem; cursor: pointer; padding: 4px 7px; border-radius: 7px; transition: all 0.2s; margin-top: 2px; }
     .card-edit:hover { border-color: #111; color: #111; }
+    .card-paid-btn { background: var(--green); border: none; color: #fff; font-size: 0.72rem; font-weight: 700; cursor: pointer; padding: 4px 10px; border-radius: 7px; transition: opacity 0.2s; margin-top: 2px; font-family: var(--font-body); }
+    .card-paid-btn:hover { opacity: 0.85; }
     .empty-state { text-align: center; padding: 56px 20px; color: var(--muted); }
     .empty-icon { font-size: 3rem; margin-bottom: 12px; }
     .empty-state p { font-size: 0.88rem; line-height: 1.7; }
@@ -330,6 +332,10 @@
   <div class="field">
     <label>Band Name <span style="color:var(--red)">★</span></label>
     <input type="text" id="bandName" placeholder="e.g. XYZ Rockers" autocomplete="off" />
+  </div>
+  <div class="field">
+    <label>Mobile</label>
+    <input type="tel" id="bandMobile" placeholder="e.g. 9876543210" inputmode="numeric" autocomplete="off" />
   </div>
   <div class="field">
     <label>Date <span style="color:var(--red)">★</span></label>
@@ -1226,6 +1232,7 @@ function editBooking(id) {
   if (!b) return;
   document.getElementById('editingId').value   = id;
   document.getElementById('bandName').value    = b.band;
+  document.getElementById('bandMobile').value  = b.mobile || '';
   document.getElementById('bookDate').value    = b.date;
   document.getElementById('fromTime').value    = b.from;
   document.getElementById('toTime').value      = b.to;
@@ -1277,7 +1284,7 @@ function resetForm() {
   document.getElementById('editingId').value = '';
   document.getElementById('formTitle').innerHTML = 'New <span>Booking</span>';
   document.getElementById('submitBtnText').textContent = 'CONFIRM BOOKING';
-  ['bandName','fromTime','toTime','amount','advancePaid','notes'].forEach(id => document.getElementById(id).value = '');
+  ['bandName','bandMobile','fromTime','toTime','amount','advancePaid','notes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('fromTimeLabel').textContent = 'Select time';
   document.getElementById('fromTimeLabel').className   = 'tp-placeholder';
   document.getElementById('toTimeLabel').textContent   = 'Select time';
@@ -1315,6 +1322,7 @@ async function saveBooking() {
 // ── ADD BOOKING ──
 async function addBooking() {
   const band        = document.getElementById('bandName').value.trim();
+  const mobile      = document.getElementById('bandMobile').value.trim();
   const date        = document.getElementById('bookDate').value;
   const from        = document.getElementById('fromTime').value;
   const to          = document.getElementById('toTime').value;
@@ -1333,7 +1341,7 @@ async function addBooking() {
   if (checkClash()) { showToast('Fix the slot clash first', 'error'); return; }
   const btn = document.getElementById('submitBtn');
   btn.classList.add('loading'); btn.disabled = true;
-  const booking = { id: Date.now().toString(), band, date, from, to, amount: parseFloat(amount), advancePaid, amountDue, status, notes, customDayRate, customNightRate, selectedAddons, createdAt: new Date().toISOString() };
+  const booking = { id: Date.now().toString(), band, mobile, date, from, to, amount: parseFloat(amount), advancePaid, amountDue, status, notes, customDayRate, customNightRate, selectedAddons, createdAt: new Date().toISOString() };
   const ok = await pushToSheets(booking);
   if (ok) {
     bookings.push(booking); saveLocal(bookings);
@@ -1352,6 +1360,7 @@ async function addBooking() {
 // ── UPDATE BOOKING ──
 async function updateBooking(id) {
   const band        = document.getElementById('bandName').value.trim();
+  const mobile      = document.getElementById('bandMobile').value.trim();
   const date        = document.getElementById('bookDate').value;
   const from        = document.getElementById('fromTime').value;
   const to          = document.getElementById('toTime').value;
@@ -1370,7 +1379,7 @@ async function updateBooking(id) {
   const btn = document.getElementById('submitBtn');
   btn.classList.add('loading'); btn.disabled = true;
   const original  = bookings.find(b => b.id === id);
-  const updated   = { ...original, band, date, from, to, amount: parseFloat(amount), advancePaid, amountDue, status, notes, customDayRate, customNightRate, selectedAddons };
+  const updated   = { ...original, band, mobile, date, from, to, amount: parseFloat(amount), advancePaid, amountDue, status, notes, customDayRate, customNightRate, selectedAddons };
   const ok = await updateInSheets(updated);
   if (ok) {
     const idx = bookings.findIndex(b => b.id === id);
@@ -1384,6 +1393,25 @@ async function updateBooking(id) {
   btn.classList.remove('loading'); btn.disabled = false;
   resetForm();
   switchTab('schedule');
+}
+
+// ── MARK AS PAID ──
+async function markAsPaid(id) {
+  const b = bookings.find(b => b.id === id);
+  if (!b) return;
+  const updated = { ...b, advancePaid: b.amount, amountDue: 0, status: 'Attended' };
+  setSpin(true);
+  const ok = await updateInSheets(updated);
+  setSpin(false);
+  if (ok) {
+    const idx = bookings.findIndex(b => b.id === id);
+    if (idx !== -1) bookings[idx] = updated;
+    saveLocal(bookings);
+    showToast('✅ Booking updated!', 'success');
+    renderSchedule();
+  } else {
+    showToast('Update failed — check connection', 'error');
+  }
 }
 
 // ── SCHEDULE ──
@@ -1416,6 +1444,8 @@ function renderSchedule() {
   if (!filtered.length) { list.innerHTML = `<div class="empty-state"><div class="empty-icon">🎸</div><p>No bookings here.<br/>Use the Book tab to add one!</p></div>`; return; }
   list.innerHTML = filtered.map((b,i) => {
     const statusColor = b.status === 'Cancelled' ? 'var(--red)' : b.status === 'Attended' ? 'var(--green)' : '#f0a500';
+    const isAttended  = (b.status || '') === 'Attended';
+    const showPaid    = !isAttended && (parseFloat(b.amountDue) > 0 || parseFloat(b.advancePaid) < parseFloat(b.amount));
     return `
     <div class="booking-card ${b.date < today ? 'past' : ''}">
       <div class="card-icon">${ICONS[i % ICONS.length]}</div>
@@ -1427,7 +1457,10 @@ function renderSchedule() {
       <div class="card-right">
         <div class="card-amount">₹${b.amount.toLocaleString('en-IN')}</div>
         <div style="font-size:0.65rem;font-weight:700;color:${statusColor};text-align:right;">${b.status || 'Attending'}</div>
-        <button class="card-edit" onclick="editBooking('${b.id}')" style="${(b.status || '') === 'Attended' ? 'display:none;' : ''}">✏️</button>
+        <div style="display:flex;gap:4px;margin-top:2px;">
+          ${showPaid    ? `<button class="card-paid-btn" onclick="markAsPaid('${b.id}')">✓ Paid</button>` : ''}
+          ${!isAttended ? `<button class="card-edit"     onclick="editBooking('${b.id}')">✏️</button>`    : ''}
+        </div>
       </div>
     </div>`}).join('');
 }
