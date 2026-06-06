@@ -1511,6 +1511,18 @@ function editCalcAmount() {
   const from = document.getElementById('edit-fromTime').value;
   const to   = document.getElementById('edit-toTime').value;
   if (!from || !to) return;
+
+  // Update total hours display
+  const fMins = timeToMins(from);
+  let   tMins = timeToMins(to);
+  if (tMins <= fMins) tMins += 24 * 60;
+  const diff   = tMins - fMins;
+  const hrs    = Math.floor(diff / 60);
+  const mins   = diff % 60;
+  const billed = Math.ceil(diff / 60);
+  const label  = hrs > 0 && mins > 0 ? `${hrs}hrs ${mins}mins` : hrs > 0 ? `${hrs}hrs` : `${mins}mins`;
+  document.getElementById('edit-totalHours').value = mins > 0 ? `${label} (billed as ${billed}hrs)` : label;
+
   renderEditAddonList('__preserve__');
   const globalRates = getRates();
   let rates = { ...globalRates };
