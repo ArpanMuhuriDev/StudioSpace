@@ -385,14 +385,14 @@
         <label>Day rate</label>
         <div class="amount-wrap">
           <span class="currency-sign">₹</span>
-          <input type="number" id="customDayRate" placeholder="0" inputmode="numeric" min="0" oninput="calcAmount()" />
+          <input type="number" id="customDayRate" placeholder="0" inputmode="numeric" min="0" onblur="calcAmount()" />
         </div>
       </div>
       <div class="field" style="margin-bottom:0;">
         <label>Night rate</label>
         <div class="amount-wrap">
           <span class="currency-sign">₹</span>
-          <input type="number" id="customNightRate" placeholder="0" inputmode="numeric" min="0" oninput="calcAmount()" />
+          <input type="number" id="customNightRate" placeholder="0" inputmode="numeric" min="0" onblur="calcAmount()" />
         </div>
       </div>
     </div>
@@ -1273,8 +1273,9 @@ function editBooking(id) {
   switchTab('book');
   window.scrollTo(0, 0);
 
-  // Restore add-on checkboxes from stored text
-  renderAddonBookingList(b.addons !== undefined ? b.addons : '');
+  // Use requestAnimationFrame to restore add-ons AFTER browser finishes rendering the tab
+  const addonsToRestore = b.addons !== undefined ? b.addons : '';
+  requestAnimationFrame(() => renderAddonBookingList(addonsToRestore));
 }
 
 
