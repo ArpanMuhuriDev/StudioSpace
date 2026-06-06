@@ -721,16 +721,17 @@
       <label>Notes <span style="font-size:0.62rem;color:var(--muted);font-weight:400;letter-spacing:0;text-transform:none;">(optional)</span></label>
       <input type="text" id="edit-notes" placeholder="e.g. needs drum kit" autocomplete="off" />
     </div>
-    <div style="display:flex;gap:12px;margin-top:6px;">
-      <button class="submit-btn" id="edit-submitBtn" onclick="submitEditBooking()" style="flex:1;">
-        <span class="btn-text">UPDATE BOOKING</span>
-        <span class="btn-spinner">SAVING…</span>
-      </button>
+    <div style="display:flex;justify-content:center;gap:12px;margin-top:6px;">
       <button onclick="closeEditOverlay()"
-        style="flex:0 0 auto;padding:15px 24px;border-radius:14px;border:1.5px solid var(--border);background:transparent;font-family:var(--font-body);font-size:0.9rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all 0.2s;"
+        style="padding:15px 32px;border-radius:14px;border:1.5px solid var(--border);background:transparent;font-family:var(--font-body);font-size:1rem;font-weight:700;color:var(--muted);cursor:pointer;min-width:140px;transition:all 0.2s;"
         onmouseover="this.style.borderColor='#111';this.style.color='#111'"
         onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
         Cancel
+      </button>
+      <button id="edit-submitBtn" onclick="submitEditBooking()"
+        style="padding:15px 32px;border-radius:14px;border:none;background:#111;color:#fff;font-family:var(--font-display);font-size:1rem;letter-spacing:2px;cursor:pointer;min-width:140px;transition:opacity 0.15s;box-shadow:0 4px 16px rgba(0,0,0,0.15);">
+        <span class="btn-text">UPDATE</span>
+        <span class="btn-spinner">SAVING…</span>
       </button>
     </div>
   </div>
@@ -1561,7 +1562,9 @@ async function submitEditBooking() {
   const selectedAddons  = getEditSelectedAddons();
   if (!band || !date || !from || !to || !amount) { showToast('Fill all required fields', 'error'); return; }
   const btn = document.getElementById('edit-submitBtn');
-  btn.classList.add('loading'); btn.disabled = true;
+  btn.disabled = true;
+  btn.querySelector('.btn-text').style.display = 'none';
+  btn.querySelector('.btn-spinner').style.display = 'inline';
   const original = bookings.find(b => b.id === id);
   const updated  = { ...original, band, mobile, date, from, to,
     amount: parseFloat(amount), advancePaid, amountDue, status, notes,
@@ -1578,7 +1581,7 @@ async function submitEditBooking() {
   } else {
     showToast('Update failed — check connection', 'error');
   }
-  btn.classList.remove('loading'); btn.disabled = false;
+  btn.disabled = false; btn.querySelector('.btn-text').style.display = 'inline'; btn.querySelector('.btn-spinner').style.display = 'none';
 }
 
 
