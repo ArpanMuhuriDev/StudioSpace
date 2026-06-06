@@ -1430,8 +1430,10 @@ function editBooking(id) {
   document.getElementById('editOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 
-  // Render add-ons after overlay is visible
-  requestAnimationFrame(() => renderEditAddonList(b.addons || ''));
+  // Render add-ons immediately, then retry after brief delay as fallback
+  const _addons = b.addons || '';
+  renderEditAddonList(_addons);
+  setTimeout(() => renderEditAddonList(_addons), 200);
 }
 
 function closeEditOverlay() {
