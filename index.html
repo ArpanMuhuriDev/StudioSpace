@@ -607,7 +607,6 @@ const ICONS        = ['🎸','🥁','🎹','🎺','🎻','🎷','🎤','🪗'];
 let bookings       = [];
 let appRates       = null;
 let appAddons      = [];
-let editingAddons  = null; // null = normal mode, '' or string = edit mode
 let currentFilter  = 'day';
 let isSyncing      = false;
 let calWeekOffset  = 0;
@@ -1016,7 +1015,8 @@ function removeAddonRow(btn) {
 }
 
 // ── ADD-ONS IN BOOKING FORM ──
-function renderAddonBookingList() {
+function renderAddonBookingList(addonsText) {
+  // addonsText: undefined = preserve current, string = restore from edit (even '' = clear all)
   const addons  = getAddonsConfig();
   const section = document.getElementById('addonsBookingSection');
   const list    = document.getElementById('addonBookingList');
@@ -1028,23 +1028,23 @@ function renderAddonBookingList() {
   if (from && to) {
     let fM = timeToMins(from), tM = timeToMins(to);
     if (tM <= fM) tM += 24 * 60;
-    hrs = Math.ceil((tM - fM) / 60); // round up to nearest hour — same as rate calculation
+    hrs = Math.ceil((tM - fM) / 60);
   }
   document.getElementById('addonHrsLabel').textContent = hrs > 0 ? `₹/hr × ${hrs}hrs` : '₹/hr';
 
   // Determine which add-ons should be checked
   let selectedNames = new Set();
-  if (editingAddons !== null) {
-    // Edit mode — restore from saved addons string (even if empty = no add-ons selected)
-    if (editingAddons) {
-      editingAddons.split(',').forEach(s => {
+  if (addonsText !== undefined) {
+    // Edit mode — restore from saved addons string
+    if (addonsText) {
+      addonsText.split(',').forEach(s => {
         const name = s.split(' - Rs.')[0].trim().toLowerCase();
         if (name) selectedNames.add(name);
       });
     }
-    // if editingAddons === '' → selectedNames stays empty → all unchecked
+    // addonsText === '' → selectedNames stays empty → all unchecked
   } else {
-    // Preserve currently checked state (user is interacting with form)
+    // Normal mode — preserve currently checked state
     list.querySelectorAll('.addon-booking-cb').forEach(cb => {
       if (cb.checked) selectedNames.add(cb.dataset.name.toLowerCase());
     });
@@ -1274,9 +1274,7 @@ function editBooking(id) {
   window.scrollTo(0, 0);
 
   // Restore add-on checkboxes from stored text
-  editingAddons = b.addons || '';
-  renderAddonBookingList();
-  editingAddons = null;
+  renderAddonBookingList(b.addons !== undefined ? b.addons : '');
 }
 
 
@@ -1293,7 +1291,6 @@ function resetForm() {
   document.getElementById('customRateFields').style.display   = 'none';
   document.getElementById('customDayRate').value               = '';
   document.getElementById('customNightRate').value             = '';
-  editingAddons = null;
   document.getElementById('totalHours').value = '—';
   // Uncheck all add-ons
   document.querySelectorAll('.addon-booking-cb').forEach(cb => {
