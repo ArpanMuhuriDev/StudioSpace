@@ -806,6 +806,9 @@ async function checkAndShowApp(user) {
     const email = user.email.toLowerCase().trim();
     const doc   = await db.collection('allowedUsers').doc(email).get();
     if (doc.exists) {
+      // Load rates and add-ons BEFORE showing UI
+      // User sees splash screen during this — no interaction possible yet
+      await Promise.all([loadRatesFromSheets(), loadAddonsFromSheets()]);
       showApp(user);
     } else {
       showDenied(user);
@@ -848,7 +851,7 @@ function showApp(user) {
   document.getElementById('scheduleDate').value = today;
   calSelectedDay = today;
   document.getElementById('bookDate').addEventListener('change', checkClash);
-  setTimeout(() => loadFromSheets(), 300);
+  loadFromSheets();
 }
 
 function showDenied(user) {
@@ -965,8 +968,6 @@ async function loadFromSheets() {
     setStatus('warn', '⚠ Offline — ' + err.message);
   } finally {
     setSpin(false);
-    await loadRatesFromSheets();
-    await loadAddonsFromSheets();
     renderAddonBookingList();
     renderSchedule(); renderStats(); renderCalendar();
   }
@@ -1430,10 +1431,8 @@ function editBooking(id) {
   document.getElementById('editOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 
-  // Render add-ons immediately, then retry after brief delay as fallback
-  const _addons = b.addons || '';
-  renderEditAddonList(_addons);
-  setTimeout(() => renderEditAddonList(_addons), 200);
+  // appAddons is guaranteed loaded before UI shows — render immediately
+  renderEditAddonList(b.addons || '');
 }
 
 function closeEditOverlay() {
