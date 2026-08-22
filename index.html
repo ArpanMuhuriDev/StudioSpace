@@ -1427,9 +1427,10 @@ function editBooking(id) {
   document.getElementById('edit-customDayRate').value            = hasCustom ? customDay   : '';
   document.getElementById('edit-customNightRate').value          = hasCustom ? customNight : '';
 
-  // Open overlay
+  // Open overlay — push history so back button closes it
   document.getElementById('editOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+  history.pushState({ tab: currentActiveTab(), overlay: 'edit' }, '', '#edit');
 
   // appAddons is guaranteed loaded before UI shows — render immediately
   renderEditAddonList(b.addons || '');
@@ -1438,6 +1439,10 @@ function editBooking(id) {
 function closeEditOverlay() {
   document.getElementById('editOverlay').classList.remove('open');
   document.body.style.overflow = '';
+  // Go back in history if we pushed an overlay state
+  if (history.state?.overlay === 'edit') {
+    history.back();
+  }
 }
 
 function setEditTimePickerValue(which, val) {
@@ -1797,6 +1802,34 @@ function switchTab(tab) {
   if (tab === 'stats')    renderStats();
   if (tab === 'calendar') renderCalendar();
   if (tab === 'settings') initSettingsTab();
+  // Push history entry so back button navigates within app
+  if (history.state?.tab !== tab) {
+    history.pushState({ tab }, '', '#' + tab);
+  }
+}
+
+// Handle browser back/forward buttons
+window.addEventListener('popstate', e => {
+  const tab = e.state?.tab || 'book';
+  // If edit overlay is open, just close it (popstate already consumed the history entry)
+  if (document.getElementById('editOverlay').classList.contains('open')) {
+    document.getElementById('editOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    return;
+  }
+  const tabs = ['book','schedule','calendar','stats','settings'];
+  document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', tabs[i] === tab));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+tab).classList.add('active');
+  if (tab === 'schedule') renderSchedule();
+  if (tab === 'stats')    renderStats();
+  if (tab === 'calendar') renderCalendar();
+  if (tab === 'settings') initSettingsTab();
+});
+
+function currentActiveTab() {
+  const active = document.querySelector('.page.active');
+  return active ? active.id.replace('page-','') : 'book';
 }
 
 function switchSettingsTab(tab) {
