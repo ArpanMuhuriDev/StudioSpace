@@ -959,7 +959,6 @@ async function loadFromSheets() {
   setSpin(true);
   setStatus('info', 'Connecting…');
   const url = `${SCRIPT_URL}?action=getAll`;
-  console.log('Calling:', url);
   try {
     const data = await xhrGet(url);
     if (data.status === 'ok') {
@@ -1809,18 +1808,13 @@ function switchTab(tab) {
   if (tab === 'calendar') renderCalendar();
   if (tab === 'settings') initSettingsTab();
   // Push history entry so back button navigates within app
-  console.log('switchTab:', tab, '| current history.state:', JSON.stringify(history.state));
   if (history.state?.tab !== tab) {
     history.pushState({ tab }, '', '#' + tab);
-    console.log('  → pushed state:', tab, '| new history.state:', JSON.stringify(history.state));
-  } else {
-    console.log('  → skipped push (same tab)');
   }
 }
 
 // Handle browser back/forward buttons
 window.addEventListener('popstate', e => {
-  console.log('POPSTATE fired | e.state:', JSON.stringify(e.state));
   const tab = e.state?.tab || 'book';
   // If edit overlay is open, just close it (popstate already consumed the history entry)
   if (document.getElementById('editOverlay').classList.contains('open')) {
