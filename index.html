@@ -851,6 +851,12 @@ function showApp(user) {
   document.getElementById('scheduleDate').value = today;
   calSelectedDay = today;
   document.getElementById('bookDate').addEventListener('change', checkClash);
+
+  // Establish baseline history so back button navigates within the app
+  // instead of exiting. Replace current entry as 'book', then the app
+  // has a proper base to push subsequent tabs onto.
+  history.replaceState({ tab: 'book' }, '', '#book');
+
   loadFromSheets();
 }
 
@@ -1803,13 +1809,18 @@ function switchTab(tab) {
   if (tab === 'calendar') renderCalendar();
   if (tab === 'settings') initSettingsTab();
   // Push history entry so back button navigates within app
+  console.log('switchTab:', tab, '| current history.state:', JSON.stringify(history.state));
   if (history.state?.tab !== tab) {
     history.pushState({ tab }, '', '#' + tab);
+    console.log('  → pushed state:', tab, '| new history.state:', JSON.stringify(history.state));
+  } else {
+    console.log('  → skipped push (same tab)');
   }
 }
 
 // Handle browser back/forward buttons
 window.addEventListener('popstate', e => {
+  console.log('POPSTATE fired | e.state:', JSON.stringify(e.state));
   const tab = e.state?.tab || 'book';
   // If edit overlay is open, just close it (popstate already consumed the history entry)
   if (document.getElementById('editOverlay').classList.contains('open')) {
