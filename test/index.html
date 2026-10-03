@@ -772,8 +772,8 @@ let currentFilter  = 'day';
 let isSyncing      = false;
 let calWeekOffset  = 0;
 let calSelectedDay = null;
-const CAL_START_HOUR = 8;
-const CAL_END_HOUR   = 22;
+const CAL_START_HOUR = 0;
+const CAL_END_HOUR   = 24;
 const HOUR_PX        = 48;
 const DAY_NAMES      = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
@@ -2087,7 +2087,13 @@ function renderCalendar() {
     });
     wrap.appendChild(row);
   }
-  wrap.scrollTop = calWeekOffset === 0 ? Math.max(0, ((nowMins - startMins - 60) / 60) * HOUR_PX) : 0;
+  // Scroll to current time when viewing this week, otherwise default to ~7am
+  // (early-morning bookings remain reachable by scrolling up)
+  if (calWeekOffset === 0 && nowMins >= startMins) {
+    wrap.scrollTop = Math.max(0, ((nowMins - startMins - 60) / 60) * HOUR_PX);
+  } else {
+    wrap.scrollTop = 7 * HOUR_PX; // default view starts around 7am
+  }
   if (calSelectedDay) showDayDetail(calSelectedDay);
 }
 
