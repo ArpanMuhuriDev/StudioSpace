@@ -1102,8 +1102,10 @@ function getAddonsConfig() {
 async function loadAddonsFromSheets() {
   try {
     const data = await xhrGet(`${SCRIPT_URL}?action=getAddons`);
+    console.log('getAddons response:', JSON.stringify(data));
     if (data.status === 'ok' && data.addons) {
       appAddons = data.addons;
+      console.log('appAddons set to:', JSON.stringify(appAddons));
     }
   } catch(err) {
     console.error('loadAddonsFromSheets error:', err.message);
@@ -1123,9 +1125,13 @@ async function saveAddons() {
   renderAddonBookingList();
   setSpin(true);
   try {
-    const data = await xhrGet(`${SCRIPT_URL}?action=saveAddons&data=${encodeURIComponent(JSON.stringify(addons))}`);
+    const url = `${SCRIPT_URL}?action=saveAddons&data=${encodeURIComponent(JSON.stringify(addons))}`;
+    console.log('saveAddons URL:', url);
+    const data = await xhrGet(url);
+    console.log('saveAddons response:', JSON.stringify(data));
     showToast(data.status === 'ok' ? '✅ Add-ons saved!' : 'Saved locally — sync failed', data.status === 'ok' ? 'success' : '');
-  } catch {
+  } catch(err) {
+    console.error('saveAddons error:', err.message);
     showToast('Saved locally — offline', '');
   } finally {
     setSpin(false);
