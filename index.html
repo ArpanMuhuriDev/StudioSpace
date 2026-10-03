@@ -6,6 +6,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#ffffff" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="Logos/IMG_20241026_104514_243.webp" />
   <title>Studio Space</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
@@ -428,7 +430,7 @@
     <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:13px;padding:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
         <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);">ADD-ONS</div>
-        <div style="font-size:0.68rem;color:var(--muted);" id="addonHrsLabel">₹/hr</div>
+        <div style="font-size:0.68rem;color:var(--muted);" id="addonHrsLabel"></div>
       </div>
       <div id="addonBookingList"></div>
     </div>
@@ -590,9 +592,10 @@
           + Add
         </button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 100px 36px;gap:8px;padding:0 2px;margin-bottom:8px;">
-        <div style="font-size:0.65rem;font-weight:700;letter-spacing:1px;color:var(--muted);">NAME</div>
-        <div style="font-size:0.65rem;font-weight:700;letter-spacing:1px;color:var(--muted);">₹/hr</div>
+      <div style="display:grid;grid-template-columns:1fr 84px 92px 34px;gap:6px;padding:0 2px;margin-bottom:8px;">
+        <div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;color:var(--muted);">NAME</div>
+        <div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;color:var(--muted);">RATE</div>
+        <div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;color:var(--muted);">TYPE</div>
         <div></div>
       </div>
       <div id="addonSettingsList"></div>
@@ -683,7 +686,7 @@
       <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:13px;padding:14px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
           <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);">ADD-ONS</div>
-          <div style="font-size:0.68rem;color:var(--muted);" id="edit-addonHrsLabel">₹/hr</div>
+          <div style="font-size:0.68rem;color:var(--muted);" id="edit-addonHrsLabel"></div>
         </div>
         <div id="edit-addonBookingList"></div>
       </div>
@@ -959,6 +962,7 @@ async function loadFromSheets() {
   setSpin(true);
   setStatus('info', 'Connecting…');
   const url = `${SCRIPT_URL}?action=getAll`;
+  console.log('Calling:', url);
   try {
     const data = await xhrGet(url);
     if (data.status === 'ok') {
@@ -1112,7 +1116,8 @@ async function saveAddons() {
   rows.forEach(row => {
     const name = row.querySelector('.addon-name-input').value.trim();
     const rate = parseFloat(row.querySelector('.addon-rate-input').value) || 0;
-    if (name) addons.push({ name, rate });
+    const type = row.querySelector('.addon-type-select').value; // 'hour' or 'qty'
+    if (name) addons.push({ name, rate, type });
   });
   appAddons = addons; // update in-memory immediately
   renderAddonBookingList();
@@ -1137,18 +1142,26 @@ function renderAddonSettingsList() {
     return;
   }
   empty.style.display = 'none';
-  list.innerHTML = addons.map((a, i) => `
-    <div class="addon-setting-row" style="display:grid;grid-template-columns:1fr 100px 36px;gap:8px;align-items:center;margin-bottom:8px;">
-      <input class="addon-name-input" value="${a.name}" placeholder="Add-on name"
-        style="padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.88rem;background:var(--bg);color:var(--text);outline:none;" />
+  list.innerHTML = addons.map((a, i) => {
+    const t = a.type || 'hour';
+    return `
+    <div class="addon-setting-row" style="display:grid;grid-template-columns:1fr 84px 92px 34px;gap:6px;align-items:center;margin-bottom:8px;">
+      <input class="addon-name-input" value="${a.name}" placeholder="Name"
+        style="padding:10px 10px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.85rem;background:var(--bg);color:var(--text);outline:none;" />
       <div class="amount-wrap">
-        <span class="currency-sign" style="font-size:0.82rem;">₹</span>
+        <span class="currency-sign" style="font-size:0.8rem;left:10px;">₹</span>
         <input type="number" class="addon-rate-input" value="${a.rate}" placeholder="0" min="0" inputmode="numeric"
-          style="padding:10px 10px 10px 26px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.88rem;background:var(--bg);color:var(--text);outline:none;width:100%;" />
+          style="padding:10px 6px 10px 22px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.85rem;background:var(--bg);color:var(--text);outline:none;width:100%;" />
       </div>
+      <select class="addon-type-select"
+        style="padding:10px 6px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.8rem;background:var(--bg);color:var(--text);outline:none;cursor:pointer;">
+        <option value="hour" ${t === 'hour' ? 'selected' : ''}>Per hour</option>
+        <option value="qty"  ${t === 'qty'  ? 'selected' : ''}>Per qty</option>
+      </select>
       <button onclick="removeAddonRow(this)"
-        style="width:36px;height:36px;border-radius:9px;border:1.5px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1rem;">✕</button>
-    </div>`).join('');
+        style="width:34px;height:36px;border-radius:9px;border:1.5px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:0.95rem;">✕</button>
+    </div>`;
+  }).join('');
 }
 
 function addAddonRow() {
@@ -1157,17 +1170,22 @@ function addAddonRow() {
   const list = document.getElementById('addonSettingsList');
   const div  = document.createElement('div');
   div.className = 'addon-setting-row';
-  div.style.cssText = 'display:grid;grid-template-columns:1fr 100px 36px;gap:8px;align-items:center;margin-bottom:8px;';
+  div.style.cssText = 'display:grid;grid-template-columns:1fr 84px 92px 34px;gap:6px;align-items:center;margin-bottom:8px;';
   div.innerHTML = `
-    <input class="addon-name-input" value="" placeholder="Add-on name"
-      style="padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.88rem;background:var(--bg);color:var(--text);outline:none;" />
+    <input class="addon-name-input" value="" placeholder="Name"
+      style="padding:10px 10px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.85rem;background:var(--bg);color:var(--text);outline:none;" />
     <div class="amount-wrap">
-      <span class="currency-sign" style="font-size:0.82rem;">₹</span>
+      <span class="currency-sign" style="font-size:0.8rem;left:10px;">₹</span>
       <input type="number" class="addon-rate-input" value="" placeholder="0" min="0" inputmode="numeric"
-        style="padding:10px 10px 10px 26px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.88rem;background:var(--bg);color:var(--text);outline:none;width:100%;" />
+        style="padding:10px 6px 10px 22px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.85rem;background:var(--bg);color:var(--text);outline:none;width:100%;" />
     </div>
+    <select class="addon-type-select"
+      style="padding:10px 6px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.8rem;background:var(--bg);color:var(--text);outline:none;cursor:pointer;">
+      <option value="hour" selected>Per hour</option>
+      <option value="qty">Per qty</option>
+    </select>
     <button onclick="removeAddonRow(this)"
-      style="width:36px;height:36px;border-radius:9px;border:1.5px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1rem;">✕</button>`;
+      style="width:34px;height:36px;border-radius:9px;border:1.5px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:0.95rem;">✕</button>`;
   list.appendChild(div);
   div.querySelector('.addon-name-input').focus();
 }
@@ -1181,74 +1199,134 @@ function removeAddonRow(btn) {
 }
 
 // ── ADD-ONS IN BOOKING FORM ──
+// Parses stored addons text "Video Recording x2 - Rs. 1000, In ears x3 - Rs. 300"
+// into a map of { lowercaseName: quantity }
+function parseAddonsText(text) {
+  const map = {};
+  if (!text) return map;
+  text.split(',').forEach(s => {
+    const part = s.trim();
+    const dashIdx = part.lastIndexOf(' - Rs.');
+    if (dashIdx === -1) return;
+    const namePart = part.substring(0, dashIdx).trim();
+    // Extract quantity from "Name xN"
+    const m = namePart.match(/^(.*?)\s+x(\d+)$/i);
+    if (m) {
+      map[m[1].trim().toLowerCase()] = parseInt(m[2], 10);
+    } else {
+      map[namePart.toLowerCase()] = 1;
+    }
+  });
+  return map;
+}
+
 function renderAddonBookingList(addonsText) {
-  // addonsText: undefined = preserve current, string = restore from edit (even '' = clear all)
   const addons  = getAddonsConfig();
   const section = document.getElementById('addonsBookingSection');
   const list    = document.getElementById('addonBookingList');
   if (!addons.length) { section.style.display = 'none'; return; }
   section.style.display = 'block';
-  const from = document.getElementById('fromTime').value;
-  const to   = document.getElementById('toTime').value;
-  let hrs = 0;
-  if (from && to) {
-    let fM = timeToMins(from), tM = timeToMins(to);
-    if (tM <= fM) tM += 24 * 60;
-    hrs = Math.ceil((tM - fM) / 60);
-  }
-  document.getElementById('addonHrsLabel').textContent = hrs > 0 ? `₹/hr × ${hrs}hrs` : '₹/hr';
+  document.getElementById('addonHrsLabel').textContent = '';
 
-  // Determine which add-ons should be checked
-  let selectedNames = new Set();
+  // Determine quantities for each add-on
+  let qtyMap = {};
   if (addonsText !== undefined) {
-    // Edit mode — restore from saved addons string
-    if (addonsText) {
-      addonsText.split(',').forEach(s => {
-        const name = s.split(' - Rs.')[0].trim().toLowerCase();
-        if (name) selectedNames.add(name);
-      });
-    }
-    // addonsText === '' → selectedNames stays empty → all unchecked
+    // Edit/restore mode — parse from stored text
+    qtyMap = parseAddonsText(addonsText);
   } else {
-    // Normal mode — preserve currently checked state
+    // Normal mode — preserve current checkbox + stepper state
     list.querySelectorAll('.addon-booking-cb').forEach(cb => {
-      if (cb.checked) selectedNames.add(cb.dataset.name.toLowerCase());
+      if (cb.checked) {
+        const n = parseInt(cb.closest('.addon-booking-row').querySelector('.addon-qty-val').textContent, 10) || 1;
+        qtyMap[cb.dataset.name.toLowerCase()] = n;
+      }
     });
   }
 
   list.innerHTML = addons.map(a => {
-    const amt     = hrs > 0 ? Math.round(a.rate * hrs) : 0;
-    const checked = selectedNames.has(a.name.toLowerCase());
+    const type    = a.type || 'hour';
+    const unit    = type === 'hour' ? 'hrs' : 'qty';
+    const rateLbl = type === 'hour' ? `₹${a.rate.toLocaleString('en-IN')} / hr` : `₹${a.rate.toLocaleString('en-IN')} each`;
+    const qty     = qtyMap[a.name.toLowerCase()] || 0;
+    const checked = qty > 0;
+    const n       = checked ? qty : 1;
+    const amt     = checked ? Math.round(a.rate * n) : 0;
     return `
-    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border);" class="addon-booking-row">
-      <input type="checkbox" class="addon-booking-cb" data-name="${a.name}" data-rate="${a.rate}"
-        onchange="calcAmount()" ${checked ? 'checked' : ''}
+    <div class="addon-booking-row" data-type="${type}"
+      style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:0.5px solid var(--border);">
+      <input type="checkbox" class="addon-booking-cb" data-name="${a.name}" data-rate="${a.rate}" data-type="${type}"
+        onchange="toggleAddon(this)" ${checked ? 'checked' : ''}
         style="width:16px;height:16px;cursor:pointer;flex-shrink:0;" />
-      <div style="flex:1;">
+      <div style="flex:1;min-width:0;">
         <div style="font-size:0.88rem;font-weight:600;color:var(--text);">${a.name}</div>
-        <div style="font-size:0.7rem;color:var(--muted);">₹${a.rate.toLocaleString('en-IN')} / hr</div>
+        <div style="font-size:0.7rem;color:var(--muted);">${rateLbl}</div>
       </div>
-      <span style="font-size:0.88rem;font-weight:700;color:${checked && amt > 0 ? 'var(--text)' : 'var(--muted2)'};" class="addon-amt-label">
-        ${checked && amt > 0 ? '₹' + amt.toLocaleString('en-IN') : '—'}
+      <div class="addon-stepper" style="display:${checked ? 'flex' : 'none'};align-items:center;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg);">
+        <button type="button" onclick="stepAddon(this,-1)" style="width:28px;height:30px;border:none;background:var(--bg);cursor:pointer;color:var(--text);font-size:1rem;line-height:1;">−</button>
+        <span class="addon-qty-val" style="font-size:0.85rem;font-weight:700;color:var(--text);width:28px;text-align:center;border-left:1px solid var(--border);border-right:1px solid var(--border);line-height:30px;">${n}</span>
+        <button type="button" onclick="stepAddon(this,1)" style="width:28px;height:30px;border:none;background:var(--bg);cursor:pointer;color:var(--text);font-size:1rem;line-height:1;">+</button>
+      </div>
+      <span class="addon-unit-lbl" style="font-size:0.62rem;color:var(--muted);width:20px;display:${checked ? 'inline' : 'none'};">${unit}</span>
+      <span class="addon-amt-label" style="font-size:0.88rem;font-weight:700;color:${checked ? 'var(--text)' : 'var(--muted2)'};min-width:56px;text-align:right;">
+        ${checked ? '₹' + amt.toLocaleString('en-IN') : '—'}
       </span>
     </div>`;
   }).join('');
 }
 
+// Toggle checkbox — show/hide stepper, set qty to 1 when checked
+function toggleAddon(cb) {
+  const row     = cb.closest('.addon-booking-row');
+  const stepper = row.querySelector('.addon-stepper');
+  const unitLbl = row.querySelector('.addon-unit-lbl');
+  const valEl   = row.querySelector('.addon-qty-val');
+  if (cb.checked) {
+    valEl.textContent = '1';
+    stepper.style.display = 'flex';
+    unitLbl.style.display = 'inline';
+  } else {
+    stepper.style.display = 'none';
+    unitLbl.style.display = 'none';
+  }
+  calcAmount();
+}
+
+// Stepper +/- for booking form add-ons
+function stepAddon(btn, delta) {
+  const row   = btn.closest('.addon-booking-row');
+  const valEl = row.querySelector('.addon-qty-val');
+  let n = parseInt(valEl.textContent, 10) || 1;
+  n = Math.max(1, n + delta);
+  valEl.textContent = n;
+  calcAmount();
+}
+
+// Refresh each add-on row's displayed amount (without re-rendering the list)
+function updateAddonAmounts() {
+  document.querySelectorAll('.addon-booking-row').forEach(row => {
+    const cb    = row.querySelector('.addon-booking-cb');
+    const amtEl = row.querySelector('.addon-amt-label');
+    if (!cb || !amtEl) return;
+    if (cb.checked) {
+      const n    = parseInt(row.querySelector('.addon-qty-val').textContent, 10) || 1;
+      const rate = parseFloat(cb.dataset.rate) || 0;
+      amtEl.textContent = '₹' + Math.round(rate * n).toLocaleString('en-IN');
+      amtEl.style.color = 'var(--text)';
+    } else {
+      amtEl.textContent = '—';
+      amtEl.style.color = 'var(--muted2)';
+    }
+  });
+}
+
 function getSelectedAddons() {
   const addons = [];
   document.querySelectorAll('.addon-booking-cb:checked').forEach(cb => {
-    const from = document.getElementById('fromTime').value;
-    const to   = document.getElementById('toTime').value;
-    let hrs = 0;
-    if (from && to) {
-      let fM = timeToMins(from), tM = timeToMins(to);
-      if (tM <= fM) tM += 24 * 60;
-      hrs = Math.ceil((tM - fM) / 60); // round up to nearest hour
-    }
-    const rate   = parseFloat(cb.dataset.rate) || 0;
-    const amount = Math.round(rate * hrs);
-    addons.push({ name: cb.dataset.name, rate, amount });
+    const row  = cb.closest('.addon-booking-row');
+    const n    = parseInt(row.querySelector('.addon-qty-val').textContent, 10) || 1;
+    const rate = parseFloat(cb.dataset.rate) || 0;
+    const type = cb.dataset.type || 'hour';
+    addons.push({ name: cb.dataset.name, rate, type, qty: n, amount: Math.round(rate * n) });
   });
   return addons;
 }
@@ -1332,7 +1410,9 @@ function calcAmount() {
   const billed  = Math.ceil(diff / 60);
   const actualLabel = hrs > 0 && mins > 0 ? `${hrs}hrs ${mins}mins` : hrs > 0 ? `${hrs}hrs` : `${mins}mins`;
   document.getElementById('totalHours').value = mins > 0 ? `${actualLabel} (billed as ${billed}hrs)` : actualLabel;
-  renderAddonBookingList();
+  // Note: add-on list is NOT re-rendered here — steppers manage their own state.
+  // Only update each add-on's displayed amount based on its current quantity.
+  updateAddonAmounts();
   const globalRates = getRates();
   const useCustom   = document.getElementById('customRateEnabled').checked;
   let rates = { ...globalRates };
@@ -1469,45 +1549,92 @@ function renderEditAddonList(addonsText) {
   const list    = document.getElementById('edit-addonBookingList');
   if (!addons.length) { section.style.display = 'none'; return; }
   section.style.display = 'block';
-  const from = document.getElementById('edit-fromTime').value;
-  const to   = document.getElementById('edit-toTime').value;
-  let hrs = 0;
-  if (from && to) {
-    let fM = timeToMins(from), tM = timeToMins(to);
-    if (tM <= fM) tM += 24 * 60;
-    hrs = Math.ceil((tM - fM) / 60);
-  }
-  document.getElementById('edit-addonHrsLabel').textContent = hrs > 0 ? `₹/hr × ${hrs}hrs` : '₹/hr';
+  document.getElementById('edit-addonHrsLabel').textContent = '';
 
-  // Build selected names — if addonsText is '__preserve__' keep current checked state
-  let selectedNames = new Set();
+  // Build quantity map
+  let qtyMap = {};
   if (addonsText === '__preserve__') {
     list.querySelectorAll('.edit-addon-cb').forEach(cb => {
-      if (cb.checked) selectedNames.add(cb.dataset.name.toLowerCase());
+      if (cb.checked) {
+        const n = parseInt(cb.closest('.edit-addon-row').querySelector('.edit-addon-qty-val').textContent, 10) || 1;
+        qtyMap[cb.dataset.name.toLowerCase()] = n;
+      }
     });
-  } else if (addonsText) {
-    addonsText.split(',').forEach(s => {
-      const name = s.split(' - Rs.')[0].trim().toLowerCase();
-      if (name) selectedNames.add(name);
-    });
+  } else {
+    qtyMap = parseAddonsText(addonsText);
   }
 
   list.innerHTML = addons.map(a => {
-    const amt     = hrs > 0 ? Math.round(a.rate * hrs) : 0;
-    const checked = selectedNames.has(a.name.toLowerCase());
-    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border);" class="edit-addon-row">
-      <input type="checkbox" class="edit-addon-cb" data-name="${a.name}" data-rate="${a.rate}"
-        onchange="editCalcAmount()" ${checked ? 'checked' : ''}
+    const type    = a.type || 'hour';
+    const unit    = type === 'hour' ? 'hrs' : 'qty';
+    const rateLbl = type === 'hour' ? `₹${a.rate.toLocaleString('en-IN')} / hr` : `₹${a.rate.toLocaleString('en-IN')} each`;
+    const qty     = qtyMap[a.name.toLowerCase()] || 0;
+    const checked = qty > 0;
+    const n       = checked ? qty : 1;
+    const amt     = checked ? Math.round(a.rate * n) : 0;
+    return `
+    <div class="edit-addon-row" data-type="${type}"
+      style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:0.5px solid var(--border);">
+      <input type="checkbox" class="edit-addon-cb" data-name="${a.name}" data-rate="${a.rate}" data-type="${type}"
+        onchange="toggleEditAddon(this)" ${checked ? 'checked' : ''}
         style="width:16px;height:16px;cursor:pointer;flex-shrink:0;" />
-      <div style="flex:1;">
+      <div style="flex:1;min-width:0;">
         <div style="font-size:0.88rem;font-weight:600;color:var(--text);">${a.name}</div>
-        <div style="font-size:0.7rem;color:var(--muted);">₹${a.rate.toLocaleString('en-IN')} / hr</div>
+        <div style="font-size:0.7rem;color:var(--muted);">${rateLbl}</div>
       </div>
-      <span style="font-size:0.88rem;font-weight:700;color:${checked && amt > 0 ? 'var(--text)' : 'var(--muted2)'};" class="edit-addon-amt">
-        ${checked && amt > 0 ? '₹' + amt.toLocaleString('en-IN') : '—'}
+      <div class="edit-addon-stepper" style="display:${checked ? 'flex' : 'none'};align-items:center;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg);">
+        <button type="button" onclick="stepEditAddon(this,-1)" style="width:28px;height:30px;border:none;background:var(--bg);cursor:pointer;color:var(--text);font-size:1rem;line-height:1;">−</button>
+        <span class="edit-addon-qty-val" style="font-size:0.85rem;font-weight:700;color:var(--text);width:28px;text-align:center;border-left:1px solid var(--border);border-right:1px solid var(--border);line-height:30px;">${n}</span>
+        <button type="button" onclick="stepEditAddon(this,1)" style="width:28px;height:30px;border:none;background:var(--bg);cursor:pointer;color:var(--text);font-size:1rem;line-height:1;">+</button>
+      </div>
+      <span class="edit-addon-unit-lbl" style="font-size:0.62rem;color:var(--muted);width:20px;display:${checked ? 'inline' : 'none'};">${unit}</span>
+      <span class="edit-addon-amt" style="font-size:0.88rem;font-weight:700;color:${checked ? 'var(--text)' : 'var(--muted2)'};min-width:56px;text-align:right;">
+        ${checked ? '₹' + amt.toLocaleString('en-IN') : '—'}
       </span>
     </div>`;
   }).join('');
+}
+
+function toggleEditAddon(cb) {
+  const row     = cb.closest('.edit-addon-row');
+  const stepper = row.querySelector('.edit-addon-stepper');
+  const unitLbl = row.querySelector('.edit-addon-unit-lbl');
+  const valEl   = row.querySelector('.edit-addon-qty-val');
+  if (cb.checked) {
+    valEl.textContent = '1';
+    stepper.style.display = 'flex';
+    unitLbl.style.display = 'inline';
+  } else {
+    stepper.style.display = 'none';
+    unitLbl.style.display = 'none';
+  }
+  editCalcAmount();
+}
+
+function stepEditAddon(btn, delta) {
+  const row   = btn.closest('.edit-addon-row');
+  const valEl = row.querySelector('.edit-addon-qty-val');
+  let n = parseInt(valEl.textContent, 10) || 1;
+  n = Math.max(1, n + delta);
+  valEl.textContent = n;
+  editCalcAmount();
+}
+
+function updateEditAddonAmounts() {
+  document.querySelectorAll('.edit-addon-row').forEach(row => {
+    const cb    = row.querySelector('.edit-addon-cb');
+    const amtEl = row.querySelector('.edit-addon-amt');
+    if (!cb || !amtEl) return;
+    if (cb.checked) {
+      const n    = parseInt(row.querySelector('.edit-addon-qty-val').textContent, 10) || 1;
+      const rate = parseFloat(cb.dataset.rate) || 0;
+      amtEl.textContent = '₹' + Math.round(rate * n).toLocaleString('en-IN');
+      amtEl.style.color = 'var(--text)';
+    } else {
+      amtEl.textContent = '—';
+      amtEl.style.color = 'var(--muted2)';
+    }
+  });
 }
 
 function editCalcAmountDue() {
@@ -1534,7 +1661,7 @@ function editCalcAmount() {
   const label  = hrs > 0 && mins > 0 ? `${hrs}hrs ${mins}mins` : hrs > 0 ? `${hrs}hrs` : `${mins}mins`;
   document.getElementById('edit-totalHours').value = mins > 0 ? `${label} (billed as ${billed}hrs)` : label;
 
-  renderEditAddonList('__preserve__');
+  updateEditAddonAmounts();
   const globalRates = getRates();
   let rates = { ...globalRates };
   if (useCustom) {
@@ -1552,16 +1679,11 @@ function editCalcAmount() {
 function getEditSelectedAddons() {
   const addons = [];
   document.querySelectorAll('.edit-addon-cb:checked').forEach(cb => {
-    const from = document.getElementById('edit-fromTime').value;
-    const to   = document.getElementById('edit-toTime').value;
-    let hrs = 0;
-    if (from && to) {
-      let fM = timeToMins(from), tM = timeToMins(to);
-      if (tM <= fM) tM += 24 * 60;
-      hrs = Math.ceil((tM - fM) / 60);
-    }
+    const row  = cb.closest('.edit-addon-row');
+    const n    = parseInt(row.querySelector('.edit-addon-qty-val').textContent, 10) || 1;
     const rate = parseFloat(cb.dataset.rate) || 0;
-    addons.push({ name: cb.dataset.name, rate, amount: Math.round(rate * hrs) });
+    const type = cb.dataset.type || 'hour';
+    addons.push({ name: cb.dataset.name, rate, type, qty: n, amount: Math.round(rate * n) });
   });
   return addons;
 }
@@ -1622,12 +1744,16 @@ function resetForm() {
   document.getElementById('customDayRate').value               = '';
   document.getElementById('customNightRate').value             = '';
   document.getElementById('totalHours').value = '—';
-  // Uncheck all add-ons
+  // Uncheck all add-ons, hide steppers, reset amounts
   document.querySelectorAll('.addon-booking-cb').forEach(cb => {
     cb.checked = false;
     const row = cb.closest('.addon-booking-row');
     if (row) {
-      const lbl = row.querySelector('.addon-amt-label');
+      const stepper = row.querySelector('.addon-stepper');
+      const unitLbl = row.querySelector('.addon-unit-lbl');
+      const lbl     = row.querySelector('.addon-amt-label');
+      if (stepper) stepper.style.display = 'none';
+      if (unitLbl) unitLbl.style.display = 'none';
       if (lbl) { lbl.textContent = '—'; lbl.style.color = 'var(--muted2)'; }
     }
   });
@@ -1974,6 +2100,15 @@ function showDayDetail(ds) {
           <div class="cal-slot-amt">₹${b.amount.toLocaleString('en-IN')}</div>
         </div>`).join('');
   detail.classList.add('show');
+}
+
+// ── PWA: Register service worker ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(reg => console.log('Service worker registered'))
+      .catch(err => console.log('Service worker registration failed:', err));
+  });
 }
 </script>
 </body>
