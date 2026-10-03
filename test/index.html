@@ -214,9 +214,9 @@
     .cal-day-header.selected .day-num { background: #555; color: #fff; }
     .cal-day-header .dot-row { display: flex; justify-content: center; gap: 2px; margin-top: 3px; height: 5px; }
     .cal-day-header .booking-dot { width: 4px; height: 4px; border-radius: 50%; background: #111; }
-    .cal-grid-wrap { overflow-y: auto; max-height: calc(100dvh - 310px); scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+    .cal-grid-wrap { overflow-y: auto; max-height: calc(100dvh - 310px); scrollbar-color: var(--border) transparent; }
     .cal-hour-row { display: grid; grid-template-columns: 40px repeat(7, 1fr); min-height: 48px; }
-    .cal-time-label { font-size: 0.6rem; color: var(--muted); text-align: right; padding: 0 6px 0 0; margin-top: -7px; user-select: none; min-height: 48px; }
+    .cal-time-label { font-size: 0.6rem; color: var(--muted); text-align: right; padding: 0 6px 0 0; user-select: none; min-height: 48px; background-color: #e0e0e0}
     .cal-col { border-left: 1px solid var(--border); border-bottom: 1px solid var(--border); min-height: 48px; position: relative; cursor: pointer; }
     .cal-col:hover { background: var(--surface); }
     .cal-booking { position: absolute; left: 2px; right: 2px; top: 0; background: #111; color: #fff; border-radius: 6px; padding: 3px 5px; font-size: 0.67rem; font-weight: 700; overflow: hidden; cursor: pointer; z-index: 10; line-height: 1.3; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
