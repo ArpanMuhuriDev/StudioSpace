@@ -10,7 +10,7 @@
   <link rel="apple-touch-icon" href="Logos/IMG_20241026_104514_243.webp" />
   <title>Studio Space</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Josefin+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -22,7 +22,7 @@
       --red: #e03030; --red-dim: rgba(224,48,48,0.08);
       --green: #1a9e5c; --text: #111111; --muted: #888888; --muted2: #bbbbbb;
       --border: #e0e0e0; --radius: 18px;
-      --scroll: #000000 ; --radius: 18px;
+      --scroll: #000000;
       --font-display: 'Bebas Neue', sans-serif; --font-body: 'Josefin Sans', sans-serif;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -51,12 +51,8 @@
     input:not([type="checkbox"]), select { width: 100%; background: var(--surface); border: 1.5px solid var(--border); border-radius: 13px; padding: 13px 15px; color: var(--text); font-family: var(--font-body); font-size: 0.95rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; accent-color: #111; }
     select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
     input:not([type="checkbox"]):focus, select:focus { border-color: #111; box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
-    input[type="checkbox"] {
-      width: 18px; height: 18px; cursor: pointer;
-      accent-color: #111;
-      -webkit-appearance: checkbox;
-      appearance: checkbox;
-    } filter: invert(0); cursor: pointer; }
+    input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #111; -webkit-appearance: checkbox; appearance: checkbox; }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0); cursor: pointer; }
     input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0); cursor: pointer; }
     input[type="time"]::-webkit-datetime-edit-ampm-field:focus,
     input[type="time"]::-webkit-datetime-edit-hours-field:focus,
@@ -111,98 +107,38 @@
     .toast.show { transform: translateX(-50%) translateY(0); }
     .toast.success { border-color: var(--green); color: var(--green); }
     .toast.error { border-color: var(--red); color: var(--red); }
-    /* ── PROFILE DROPDOWN ── */
     .profile-wrap { position: relative; }
-    .profile-btn {
-      display: flex; align-items: center; gap: 8px;
-      background: var(--surface); border: 1.5px solid var(--border);
-      border-radius: 100px; padding: 4px 10px 4px 4px;
-      cursor: pointer; transition: border-color 0.2s;
-    }
+    .profile-btn { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1.5px solid var(--border); border-radius: 100px; padding: 4px 10px 4px 4px; cursor: pointer; transition: border-color 0.2s; }
     .profile-btn:hover { border-color: #111; }
-    .profile-btn img, .profile-btn .profile-initial {
-      width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
-    }
-    .profile-btn .profile-initial {
-      background: #111; color: #fff; display: flex; align-items: center;
-      justify-content: center; font-size: 0.78rem; font-weight: 700;
-    }
-    .profile-btn .profile-name {
-      font-size: 0.78rem; font-weight: 700; color: var(--text);
-      max-width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .profile-dropdown {
-      position: absolute; top: calc(100% + 8px); right: 0;
-      background: #fff; border: 1.5px solid var(--border); border-radius: 14px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1); min-width: 170px;
-      z-index: 300; display: none; overflow: hidden;
-      animation: fadeUp 0.15s ease;
-    }
+    .profile-btn img, .profile-btn .profile-initial { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .profile-btn .profile-initial { background: #111; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 700; }
+    .profile-btn .profile-name { font-size: 0.78rem; font-weight: 700; color: var(--text); max-width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .profile-dropdown { position: absolute; top: calc(100% + 8px); right: 0; background: #fff; border: 1.5px solid var(--border); border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); min-width: 170px; z-index: 300; display: none; overflow: hidden; animation: fadeUp 0.15s ease; }
     .profile-dropdown.open { display: block; }
-    .profile-dropdown-header {
-      padding: 12px 14px; border-bottom: 1px solid var(--border);
-      font-size: 0.72rem; color: var(--muted); line-height: 1.4;
-    }
+    .profile-dropdown-header { padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 0.72rem; color: var(--muted); line-height: 1.4; }
     .profile-dropdown-header strong { display: block; color: var(--text); font-size: 0.82rem; }
-    .dropdown-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 11px 14px; font-size: 0.85rem; font-weight: 600;
-      color: var(--text); cursor: pointer; transition: background 0.15s;
-    }
+    .dropdown-item { display: flex; align-items: center; gap: 10px; padding: 11px 14px; font-size: 0.85rem; font-weight: 600; color: var(--text); cursor: pointer; transition: background 0.15s; }
     .dropdown-item:hover { background: var(--surface); }
     .dropdown-item.danger { color: var(--red); }
     .dropdown-item .di-icon { font-size: 1rem; width: 20px; text-align: center; }
     .time-picker-wrap { position: relative; }
-    .time-picker-input {
-      width: 100%; background: var(--surface); border: 1.5px solid var(--border);
-      border-radius: 13px; padding: 13px 15px; color: var(--text);
-      font-family: var(--font-body); font-size: 0.95rem; cursor: pointer;
-      display: flex; align-items: center; justify-content: space-between;
-      user-select: none; transition: border-color 0.2s, box-shadow 0.2s;
-    }
+    .time-picker-input { width: 100%; background: var(--surface); border: 1.5px solid var(--border); border-radius: 13px; padding: 13px 15px; color: var(--text); font-family: var(--font-body); font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: space-between; user-select: none; transition: border-color 0.2s, box-shadow 0.2s; }
     .time-picker-input.open { border-color: #111; box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
     .time-picker-input .tp-placeholder { color: var(--muted2); }
     .time-picker-input .tp-arrow { font-size: 0.65rem; color: var(--muted); }
-    .time-picker-dropdown {
-      position: absolute; top: calc(100% + 6px); left: 0; right: 0;
-      background: #fff; border: 1.5px solid var(--border); border-radius: 13px;
-      overflow-y: auto; z-index: 200;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      max-height: 220px; display: none;
-      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
-    }
+    .time-picker-dropdown { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: #fff; border: 1.5px solid var(--border); border-radius: 13px; overflow-y: auto; z-index: 200; box-shadow: 0 8px 24px rgba(0,0,0,0.1); max-height: 220px; display: none; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
     .time-picker-dropdown.open { display: block; }
-    .time-option {
-      padding: 10px 15px; font-family: var(--font-body); font-size: 0.92rem;
-      cursor: pointer; color: var(--text); transition: background 0.1s;
-    }
+    .time-option { padding: 10px 15px; font-family: var(--font-body); font-size: 0.92rem; cursor: pointer; color: var(--text); transition: background 0.1s; }
     .time-option:hover { background: var(--surface); }
     .time-option.selected { background: #111; color: #fff; font-weight: 700; }
-
-    /* ── EDIT OVERLAY ── */
-    .edit-overlay {
-      position: fixed; inset: 0; z-index: 800;
-      background: var(--bg);
-      display: flex; flex-direction: column;
-      transform: translateY(100%);
-      transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
-    }
+    .edit-overlay { position: fixed; inset: 0; z-index: 800; background: var(--bg); display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1); }
     .edit-overlay.open { transform: translateY(0); }
-    .edit-overlay-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 20px 12px; background: var(--bg);
-      border-bottom: 1px solid var(--border);
-    }
+    .edit-overlay-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 12px; background: var(--bg); border-bottom: 1px solid var(--border); }
     .edit-overlay-title { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: 2px; }
     .edit-overlay-title span { color: #111; }
-    .edit-close-btn {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: var(--surface2); border: none; font-size: 1.1rem;
-      cursor: pointer; color: var(--text); transition: background 0.2s;
-    }
+    .edit-close-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--surface2); border: none; font-size: 1.1rem; cursor: pointer; color: var(--text); transition: background 0.2s; }
     .edit-close-btn:hover { background: var(--surface3); }
     .edit-overlay-body { flex: 1; overflow-y: auto; padding: 20px 20px 60px; }
-
     .cal-week-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
     .cal-week-nav .date-nav-btn { width: 36px; height: 36px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .cal-week-label { flex: 1; text-align: center; font-weight: 700; font-size: 0.85rem; color: var(--text); }
@@ -217,7 +153,7 @@
     .cal-day-header .booking-dot { width: 4px; height: 4px; border-radius: 50%; background: #111; }
     .cal-grid-wrap { overflow-y: auto; max-height: calc(100dvh - 310px); scrollbar-color: var(--scroll) transparent; }
     .cal-hour-row { display: grid; grid-template-columns: 40px repeat(7, 1fr); min-height: 48px; }
-    .cal-time-label { font-size: 0.6rem; color: var(--muted); text-align: right; padding: 0 6px 0 0; user-select: none; min-height: 48px; background-color: #f7f7f7; border-bottom: 1px solid var(--border);}
+    .cal-time-label { font-size: 0.6rem; color: var(--muted); text-align: right; padding: 0 6px 0 0; user-select: none; min-height: 48px; background-color: #f7f7f7; border-bottom: 1px solid var(--border); }
     .cal-col { border-left: 1px solid var(--border); border-bottom: 1px solid var(--border); min-height: 48px; position: relative; cursor: pointer; }
     .cal-col:hover { background: var(--surface); }
     .cal-booking { position: absolute; left: 2px; right: 2px; top: 0; background: #111; color: #fff; border-radius: 6px; padding: 3px 5px; font-size: 0.67rem; font-weight: 700; overflow: hidden; cursor: pointer; z-index: 10; line-height: 1.3; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
@@ -235,42 +171,23 @@
     .cal-slot-band { font-size: 0.85rem; font-weight: 700; flex: 1; }
     .cal-slot-amt { font-family: var(--font-display); font-size: 1rem; color: #111; }
     .cal-free-msg { font-size: 0.82rem; color: var(--muted); text-align: center; padding: 16px 0; }
-
-    /* ── AUTH SCREENS ── */
-    .auth-screen {
-      position: fixed; inset: 0; background: #fff;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      z-index: 9000; padding: 40px 24px; text-align: center;
-    }
+    .auth-screen { position: fixed; inset: 0; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9000; padding: 40px 24px; text-align: center; }
     .auth-screen.hidden { display: none; }
     .auth-subtitle { font-size: 0.85rem; color: var(--muted); margin-bottom: 40px; line-height: 1.6; }
-    .google-btn {
-      display: flex; align-items: center; gap: 12px;
-      background: #fff; border: 1.5px solid var(--border);
-      border-radius: 14px; padding: 14px 24px;
-      font-family: var(--font-body); font-size: 0.95rem;
-      font-weight: 600; color: #111; cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      transition: box-shadow 0.2s, transform 0.15s;
-    }
+    .google-btn { display: flex; align-items: center; gap: 12px; background: #fff; border: 1.5px solid var(--border); border-radius: 14px; padding: 14px 24px; font-family: var(--font-body); font-size: 0.95rem; font-weight: 600; color: #111; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: box-shadow 0.2s, transform 0.15s; }
     .google-btn:active { transform: scale(0.97); }
     .google-btn:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
     .google-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
     .auth-loading { font-size: 0.85rem; color: var(--muted); margin-top: 20px; }
-
     .denied-icon { font-size: 3rem; margin-bottom: 16px; }
     .denied-title { font-family: var(--font-body); font-size: 1.3rem; font-weight: 800; color: #000; margin-bottom: 8px; }
     .denied-msg { font-size: 0.85rem; color: var(--muted); margin-bottom: 8px; line-height: 1.6; }
     .denied-email { font-size: 0.8rem; color: #111; font-weight: 600; background: var(--surface); padding: 6px 14px; border-radius: 100px; display: inline-block; margin-bottom: 28px; }
     .signout-btn { background: #111; color: #fff; border: none; border-radius: 12px; padding: 12px 28px; font-family: var(--font-body); font-size: 0.9rem; font-weight: 700; cursor: pointer; }
-
-    /* User avatar in header */
   </style>
 </head>
 <body>
-
-<!-- SPLASH SCREEN (shown while Firebase restores session) -->
+<!-- SPLASH SCREEN -->
 <div class="auth-screen" id="splashScreen">
   <img src="Logos/IMG_20241026_104514_243.webp" alt="Studio Space" style="width:180px;height:auto;object-fit:contain;margin-bottom:32px;" />
   <div style="display:flex;align-items:baseline;gap:8px;font-size:0.9rem;font-weight:600;color:#555;font-family:system-ui,sans-serif;overflow:visible;padding:4px 0;">
@@ -282,10 +199,7 @@
     </div>
   </div>
   <style>
-    @keyframes dotBounce {
-      0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
-      40%            { transform: scale(1.0); opacity: 1; }
-    }
+    @keyframes dotBounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; } 40% { transform: scale(1.0); opacity: 1; } }
   </style>
 </div>
 
@@ -314,7 +228,7 @@
   <div class="denied-email" id="deniedEmail"></div>
   <div class="denied-msg" style="font-size:0.78rem;">Contact the studio admin to get access.</div>
   <br/>
-  <button class="signout-btn" onclick="signOut()">Sign Out & Try Another Account</button>
+  <button class="signout-btn" onclick="signOut()">Sign Out &amp; Try Another Account</button>
 </div>
 
 <header class="app-header" id="appHeader" style="display:none;">
@@ -396,16 +310,12 @@
   <div class="clash-box" id="clashBox"><span>⚠️</span><span id="clashMsg"></span></div>
   <div class="field">
     <label>Total Hours</label>
-    <input type="text" id="totalHours" placeholder="—" readonly
-      style="background:var(--surface2);color:var(--muted);cursor:not-allowed;" />
+    <input type="text" id="totalHours" placeholder="—" readonly style="background:var(--surface2);color:var(--muted);cursor:not-allowed;" />
   </div>
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-    <input type="checkbox" id="customRateEnabled" onchange="toggleCustomRate()"
-      style="width:16px;height:16px;cursor:pointer;" />
+    <input type="checkbox" id="customRateEnabled" onchange="toggleCustomRate()" style="width:16px;height:16px;cursor:pointer;" />
     <span style="font-size:0.82rem;font-weight:600;color:var(--text);">Custom rate / hr. needed? (₹)</span>
   </div>
-
-  <!-- Custom rate fields (hidden by default) -->
   <div id="customRateFields" style="display:none;background:var(--surface);border:1.5px solid var(--border);border-radius:13px;padding:14px;margin-bottom:14px;">
     <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-bottom:12px;">CUSTOM RATES (₹/hr)</div>
     <div class="time-row">
@@ -425,8 +335,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Add-ons checklist (populated dynamically) -->
   <div id="addonsBookingSection" style="display:none;margin-bottom:14px;">
     <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:13px;padding:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
@@ -436,7 +344,6 @@
       <div id="addonBookingList"></div>
     </div>
   </div>
-
   <div class="field">
     <label>Amount (₹) <span style="color:var(--red)">★</span></label>
     <div class="amount-wrap">
@@ -526,16 +433,10 @@
 <!-- SETTINGS -->
 <div class="page" id="page-settings">
   <p class="section-title" style="margin-top:18px">Studio <span>Rates</span></p>
-
-  <!-- Inner tabs -->
   <div style="display:flex;gap:6px;background:var(--surface);border-radius:12px;padding:3px;margin-bottom:16px;border:1px solid var(--border);">
-    <button id="stab-rates" onclick="switchSettingsTab('rates')"
-      style="flex:1;padding:9px;border-radius:10px;border:none;background:#111;color:#fff;font-family:var(--font-body);font-size:0.78rem;font-weight:700;cursor:pointer;">Rehearsal Rates</button>
-    <button id="stab-addons" onclick="switchSettingsTab('addons')"
-      style="flex:1;padding:9px;border-radius:10px;border:none;background:transparent;color:var(--muted);font-family:var(--font-body);font-size:0.78rem;font-weight:700;cursor:pointer;">Add-ons</button>
+    <button id="stab-rates" onclick="switchSettingsTab('rates')" style="flex:1;padding:9px;border-radius:10px;border:none;background:#111;color:#fff;font-family:var(--font-body);font-size:0.78rem;font-weight:700;cursor:pointer;">Rehearsal Rates</button>
+    <button id="stab-addons" onclick="switchSettingsTab('addons')" style="flex:1;padding:9px;border-radius:10px;border:none;background:transparent;color:var(--muted);font-family:var(--font-body);font-size:0.78rem;font-weight:700;cursor:pointer;">Add-ons</button>
   </div>
-
-  <!-- ── REHEARSAL RATES TAB ── -->
   <div id="sview-rates">
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 4px;margin-bottom:6px;">
       <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);">START TIME</div>
@@ -583,15 +484,11 @@
     </div>
     <button class="submit-btn" onclick="saveRates()"><span>SAVE RATES</span></button>
   </div>
-
-  <!-- ── ADD-ONS TAB ── -->
   <div id="sview-addons" style="display:none;">
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:16px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div style="font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--muted);">ADD-ONS</div>
-        <button onclick="addAddonRow()" style="display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:9px;border:1.5px solid var(--border);background:transparent;font-family:var(--font-body);font-size:0.75rem;font-weight:700;cursor:pointer;color:var(--text);">
-          + Add
-        </button>
+        <button onclick="addAddonRow()" style="display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:9px;border:1.5px solid var(--border);background:transparent;font-family:var(--font-body);font-size:0.75rem;font-weight:700;cursor:pointer;color:var(--text);">+ Add</button>
       </div>
       <div style="display:grid;grid-template-columns:1fr 84px 92px 34px;gap:6px;padding:0 2px;margin-bottom:8px;">
         <div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;color:var(--muted);">NAME</div>
@@ -600,14 +497,11 @@
         <div></div>
       </div>
       <div id="addonSettingsList"></div>
-      <div id="addonEmptyMsg" style="font-size:0.82rem;color:var(--muted);text-align:center;padding:16px 0;display:none;">
-        No add-ons yet. Tap "+ Add" to create one.
-      </div>
+      <div id="addonEmptyMsg" style="font-size:0.82rem;color:var(--muted);text-align:center;padding:16px 0;display:none;">No add-ons yet. Tap "+ Add" to create one.</div>
     </div>
     <button class="submit-btn" onclick="saveAddons()"><span>SAVE ADD-ONS</span></button>
   </div>
 </div>
-
 <!-- EDIT BOOKING OVERLAY -->
 <div class="edit-overlay" id="editOverlay">
   <div class="edit-overlay-header">
@@ -655,12 +549,10 @@
     <div class="clash-box" id="edit-clashBox"><span>⚠️</span><span id="edit-clashMsg"></span></div>
     <div class="field">
       <label>Total Hours</label>
-      <input type="text" id="edit-totalHours" placeholder="—" readonly
-        style="background:var(--surface2);color:var(--muted);cursor:not-allowed;" />
+      <input type="text" id="edit-totalHours" placeholder="—" readonly style="background:var(--surface2);color:var(--muted);cursor:not-allowed;" />
     </div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <input type="checkbox" id="edit-customRateEnabled" onchange="editCalcAmount()"
-        style="width:16px;height:16px;cursor:pointer;" />
+      <input type="checkbox" id="edit-customRateEnabled" onchange="editCalcAmount()" style="width:16px;height:16px;cursor:pointer;" />
       <span style="font-size:0.82rem;font-weight:600;color:var(--text);">Custom rate / hr. needed? (₹)</span>
     </div>
     <div id="edit-customRateFields" style="display:none;background:var(--surface);border:1.5px solid var(--border);border-radius:13px;padding:14px;margin-bottom:14px;">
@@ -682,7 +574,6 @@
         </div>
       </div>
     </div>
-    <!-- Add-ons -->
     <div id="edit-addonsSection" style="display:none;margin-bottom:14px;">
       <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:13px;padding:14px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
@@ -726,14 +617,8 @@
       <input type="text" id="edit-notes" placeholder="e.g. needs drum kit" autocomplete="off" />
     </div>
     <div style="display:flex;justify-content:center;gap:12px;margin-top:6px;">
-      <button onclick="closeEditOverlay()"
-        style="padding:15px 32px;border-radius:14px;border:1.5px solid var(--border);background:transparent;font-family:var(--font-body);font-size:1rem;font-weight:700;color:var(--muted);cursor:pointer;min-width:140px;transition:all 0.2s;"
-        onmouseover="this.style.borderColor='#111';this.style.color='#111'"
-        onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
-        Cancel
-      </button>
-      <button id="edit-submitBtn" onclick="submitEditBooking()"
-        style="padding:15px 32px;border-radius:14px;border:none;background:#111;color:#fff;font-family:var(--font-display);font-size:1rem;letter-spacing:2px;cursor:pointer;min-width:140px;transition:opacity 0.15s;box-shadow:0 4px 16px rgba(0,0,0,0.15);">
+      <button onclick="closeEditOverlay()" style="padding:15px 32px;border-radius:14px;border:1.5px solid var(--border);background:transparent;font-family:var(--font-body);font-size:1rem;font-weight:700;color:var(--muted);cursor:pointer;min-width:140px;transition:all 0.2s;" onmouseover="this.style.borderColor='#111';this.style.color='#111'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Cancel</button>
+      <button id="edit-submitBtn" onclick="submitEditBooking()" style="padding:15px 32px;border-radius:14px;border:none;background:#111;color:#fff;font-family:var(--font-display);font-size:1rem;letter-spacing:2px;cursor:pointer;min-width:140px;transition:opacity 0.15s;box-shadow:0 4px 16px rgba(0,0,0,0.15);">
         <span class="btn-text">UPDATE</span>
         <span class="btn-spinner">SAVING…</span>
       </button>
@@ -757,11 +642,8 @@ firebase.initializeApp(firebaseConfig);
 const auth     = firebase.auth();
 const db       = firebase.firestore();
 const provider = new firebase.auth.GoogleAuthProvider();
-
-// Store auth session on device permanently — survives browser restarts
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
-// ── APP CONFIG — injected by GitHub Actions ──
 const SCRIPT_URL = '%%SCRIPT_URL%%'.trim().replace(/[?&]+$/, '');
 
 const LOCAL_KEY    = 'studiospace_local';
@@ -786,11 +668,8 @@ function signInWithGoogle() {
   document.getElementById('googleSignInBtn').style.display = 'none';
   document.getElementById('authError').style.display = 'none';
   provider.setCustomParameters({ prompt: 'select_account' });
-  auth.signInWithPopup(provider)
-    .then(result => checkAndShowApp(result.user))
-    .catch(handleAuthError);
+  auth.signInWithPopup(provider).then(result => checkAndShowApp(result.user)).catch(handleAuthError);
 }
-
 function handleAuthError(err) {
   document.getElementById('authLoading').style.display = 'none';
   document.getElementById('googleSignInBtn').style.display = 'flex';
@@ -798,11 +677,7 @@ function handleAuthError(err) {
   document.getElementById('authError').style.display = 'block';
   console.error('Auth error:', err.code, err.message);
 }
-
-function signOut() {
-  accessDenied = false;
-  auth.signOut().then(() => showLogin());
-}
+function signOut() { accessDenied = false; auth.signOut().then(() => showLogin()); }
 
 async function checkAndShowApp(user) {
   try {
@@ -810,8 +685,6 @@ async function checkAndShowApp(user) {
     const email = user.email.toLowerCase().trim();
     const doc   = await db.collection('allowedUsers').doc(email).get();
     if (doc.exists) {
-      // Load rates and add-ons BEFORE showing UI
-      // User sees splash screen during this — no interaction possible yet
       await Promise.all([loadRatesFromSheets(), loadAddonsFromSheets()]);
       showApp(user);
     } else {
@@ -835,16 +708,13 @@ function showApp(user) {
   document.getElementById('appHeader').style.display  = 'flex';
   document.getElementById('statusBar').style.display  = 'flex';
   document.getElementById('appTabs').style.display    = 'flex';
-  document.querySelectorAll('.page').forEach(p => {
-    if (p.id === 'page-book') p.classList.add('active');
-  });
-  // Populate profile button
+  document.querySelectorAll('.page').forEach(p => { if (p.id === 'page-book') p.classList.add('active'); });
   const avatarEl = document.getElementById('profileAvatar');
   if (user.photoURL) {
-    avatarEl.innerHTML = `<img src="${user.photoURL}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" />`;
+    avatarEl.innerHTML = '<img src="' + user.photoURL + '" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" />';
   } else {
     const initial = (user.displayName || user.email).charAt(0).toUpperCase();
-    avatarEl.innerHTML = `<div class="profile-initial">${initial}</div>`;
+    avatarEl.innerHTML = '<div class="profile-initial">' + initial + '</div>';
   }
   const displayName = user.displayName || user.email.split('@')[0];
   document.getElementById('profileName').textContent     = displayName;
@@ -855,12 +725,7 @@ function showApp(user) {
   document.getElementById('scheduleDate').value = today;
   calSelectedDay = today;
   document.getElementById('bookDate').addEventListener('change', checkClash);
-
-  // Establish baseline history so back button navigates within the app
-  // instead of exiting. Replace current entry as 'book', then the app
-  // has a proper base to push subsequent tabs onto.
   history.replaceState({ tab: 'book' }, '', '#book');
-
   loadFromSheets();
 }
 
@@ -888,11 +753,8 @@ function showLogin() {
   document.getElementById('googleSignInBtn').style.display = 'flex';
 }
 
-// ── AUTH STATE LISTENER ──
-// Handles session restore on page reload (user already logged in)
 auth.onAuthStateChanged(async user => {
   if (!user) { showLogin(); return; }
-  // User already has a session — restore it
   checkAndShowApp(user);
 });
 
@@ -948,9 +810,7 @@ function xhrGet(url) {
       if (xhr.status === 200) {
         try { resolve(JSON.parse(xhr.responseText)); }
         catch { reject(new Error('Invalid JSON: ' + xhr.responseText.slice(0, 100))); }
-      } else {
-        reject(new Error('HTTP ' + xhr.status + ' — ' + xhr.statusText));
-      }
+      } else { reject(new Error('HTTP ' + xhr.status + ' — ' + xhr.statusText)); }
     };
     xhr.onerror   = () => reject(new Error('Network error — check internet connection'));
     xhr.ontimeout = () => reject(new Error('Timeout — Apps Script took too long'));
@@ -962,17 +822,14 @@ function xhrGet(url) {
 async function loadFromSheets() {
   setSpin(true);
   setStatus('info', 'Connecting…');
-  const url = `${SCRIPT_URL}?action=getAll`;
-  console.log('Calling:', url);
+  const url = SCRIPT_URL + '?action=getAll';
   try {
     const data = await xhrGet(url);
     if (data.status === 'ok') {
       bookings = (data.bookings || []).map(b => ({ ...b, date: safeDate(b.date), from: safeTime(b.from), to: safeTime(b.to) }));
       saveLocal(bookings);
       setStatus('ok', '✓ Synced · ' + bookings.length + ' bookings');
-    } else {
-      throw new Error(data.message || 'Unknown error from sheet');
-    }
+    } else { throw new Error(data.message || 'Unknown error from sheet'); }
   } catch(err) {
     bookings = getLocal();
     setStatus('warn', '⚠ Offline — ' + err.message);
@@ -983,17 +840,10 @@ async function loadFromSheets() {
   }
 }
 async function pushToSheets(booking) {
-  try {
-    const data = await xhrGet(`${SCRIPT_URL}?action=add&data=${encodeURIComponent(JSON.stringify(booking))}`);
-    return data.status === 'ok';
-  } catch { return false; }
+  try { const data = await xhrGet(SCRIPT_URL + '?action=add&data=' + encodeURIComponent(JSON.stringify(booking))); return data.status === 'ok'; } catch { return false; }
 }
-
 async function updateInSheets(booking) {
-  try {
-    const data = await xhrGet(`${SCRIPT_URL}?action=update&data=${encodeURIComponent(JSON.stringify(booking))}`);
-    return data.status === 'ok';
-  } catch { return false; }
+  try { const data = await xhrGet(SCRIPT_URL + '?action=update&data=' + encodeURIComponent(JSON.stringify(booking))); return data.status === 'ok'; } catch { return false; }
 }
 function setSpin(on) { isSyncing = on; document.getElementById('syncBtn').classList.toggle('spinning', on); }
 async function syncNow() {
@@ -1013,10 +863,10 @@ function checkClash() {
   if (!date || !from || !to) { box.classList.remove('show'); return false; }
   const nF = timeToMins(from);
   let   nT = timeToMins(to);
-  if (nT <= nF) nT += 24 * 60; // overnight booking — add 24hrs
+  if (nT <= nF) nT += 24 * 60;
   const editingId = document.getElementById('editingId').value;
   const clash = bookings.find(b => b.id !== editingId && b.date === date && nF < timeToMins(b.to) && nT > timeToMins(b.from));
-  if (clash) { msg.textContent = `Clashes with ${clash.band} (${clash.from}–${clash.to})`; box.classList.add('show'); return true; }
+  if (clash) { msg.textContent = 'Clashes with ' + clash.band + ' (' + clash.from + '–' + clash.to + ')'; box.classList.add('show'); return true; }
   box.classList.remove('show'); return false;
 }
 
@@ -1030,54 +880,34 @@ for (let h = 0; h < 24; h++) {
     TIME_SLOTS.push({ val, label: h12 + ':' + m + ' ' + ampm });
   });
 }
-
 function buildTimePicker(which) {
   const dropdown = document.getElementById(which + 'TimeDropdown');
   const current  = document.getElementById(which + 'Time').value;
-  dropdown.innerHTML = TIME_SLOTS.map(s =>
-    `<div class="time-option${s.val === current ? ' selected' : ''}"
-      onclick="selectTime('${which}','${s.val}','${s.label}')">${s.label}</div>`
-  ).join('');
-  // Scroll to selected
-  setTimeout(() => {
-    const sel = dropdown.querySelector('.selected');
-    if (sel) sel.scrollIntoView({ block: 'center' });
-  }, 30);
+  dropdown.innerHTML = TIME_SLOTS.map(s => '<div class="time-option' + (s.val === current ? ' selected' : '') + '" onclick="selectTime(\'' + which + '\',\'' + s.val + '\',\'' + s.label + '\')">' + s.label + '</div>').join('');
+  setTimeout(() => { const sel = dropdown.querySelector('.selected'); if (sel) sel.scrollIntoView({ block: 'center' }); }, 30);
 }
-
 function toggleTimePicker(which) {
   const dropdown = document.getElementById(which + 'TimeDropdown');
   const display  = document.getElementById(which + 'TimeDisplay');
   const isOpen   = dropdown.classList.contains('open');
-  // Close all pickers first
   closeAllTimePickers();
-  if (!isOpen) {
-    buildTimePicker(which);
-    dropdown.classList.add('open');
-    display.classList.add('open');
-  }
+  if (!isOpen) { buildTimePicker(which); dropdown.classList.add('open'); display.classList.add('open'); }
 }
-
 function selectTime(which, val, label) {
   document.getElementById(which + 'Time').value            = val;
   document.getElementById(which + 'TimeLabel').textContent = label;
   document.getElementById(which + 'TimeLabel').classList.remove('tp-placeholder');
   closeAllTimePickers();
-  // Book form pickers
   if (which === 'from' || which === 'to') { checkClash(); calcAmount(); }
-  // Edit overlay pickers
   if (which === 'edit-from' || which === 'edit-to') editCalcAmount();
   if (which === 'dayStart' || which === 'dayEnd') syncNightLabels();
 }
-
 function closeAllTimePickers() {
   document.querySelectorAll('.time-picker-dropdown').forEach(d => d.classList.remove('open'));
   document.querySelectorAll('.time-picker-input').forEach(d => d.classList.remove('open'));
 }
-
 function setTimePickerValue(which, val) {
   if (!val) return;
-  // Snap to nearest :00 or :30 slot in case value has other minutes
   const [h, m] = val.split(':').map(Number);
   const snappedM = m < 15 ? 0 : m < 45 ? 30 : 0;
   const snappedH = m >= 45 ? (h + 1) % 24 : h;
@@ -1088,126 +918,71 @@ function setTimePickerValue(which, val) {
   document.getElementById(which + 'TimeLabel').textContent = slot.label;
   document.getElementById(which + 'TimeLabel').classList.remove('tp-placeholder');
 }
-
-// Close pickers when clicking outside
-document.addEventListener('click', e => {
-  if (!e.target.closest('.time-picker-wrap')) closeAllTimePickers();
-});
+document.addEventListener('click', e => { if (!e.target.closest('.time-picker-wrap')) closeAllTimePickers(); });
 
 // ── ADD-ONS ──
-
-function getAddonsConfig() {
-  return appAddons;
-}
-
+function getAddonsConfig() { return appAddons; }
 async function loadAddonsFromSheets() {
   try {
-    const data = await xhrGet(`${SCRIPT_URL}?action=getAddons`);
-    console.log('getAddons response:', JSON.stringify(data));
-    if (data.status === 'ok' && data.addons) {
-      appAddons = data.addons;
-      console.log('appAddons set to:', JSON.stringify(appAddons));
-    }
-  } catch(err) {
-    console.error('loadAddonsFromSheets error:', err.message);
-  }
+    const data = await xhrGet(SCRIPT_URL + '?action=getAddons');
+    if (data.status === 'ok' && data.addons) appAddons = data.addons;
+  } catch(err) { console.error('loadAddonsFromSheets error:', err.message); }
 }
-
 async function saveAddons() {
   const rows = document.querySelectorAll('.addon-setting-row');
   const addons = [];
   rows.forEach(row => {
     const name = row.querySelector('.addon-name-input').value.trim();
     const rate = parseFloat(row.querySelector('.addon-rate-input').value) || 0;
-    const type = row.querySelector('.addon-type-select').value; // 'hour' or 'qty'
+    const type = row.querySelector('.addon-type-select').value;
     if (name) addons.push({ name, rate, type });
   });
-  appAddons = addons; // update in-memory immediately
+  appAddons = addons;
   renderAddonBookingList();
   setSpin(true);
   try {
-    const url = `${SCRIPT_URL}?action=saveAddons&data=${encodeURIComponent(JSON.stringify(addons))}`;
-    console.log('saveAddons URL:', url);
-    const data = await xhrGet(url);
-    console.log('saveAddons response:', JSON.stringify(data));
+    const data = await xhrGet(SCRIPT_URL + '?action=saveAddons&data=' + encodeURIComponent(JSON.stringify(addons)));
     showToast(data.status === 'ok' ? '✅ Add-ons saved!' : 'Saved locally — sync failed', data.status === 'ok' ? 'success' : '');
-  } catch(err) {
-    console.error('saveAddons error:', err.message);
-    showToast('Saved locally — offline', '');
-  } finally {
-    setSpin(false);
-  }
+  } catch { showToast('Saved locally — offline', ''); } finally { setSpin(false); }
 }
-
 function renderAddonSettingsList() {
   const addons = getAddonsConfig();
   const list   = document.getElementById('addonSettingsList');
   const empty  = document.getElementById('addonEmptyMsg');
-  if (!addons.length) {
-    list.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
+  if (!addons.length) { list.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
-  list.innerHTML = addons.map((a, i) => {
+  list.innerHTML = addons.map((a) => {
     const t = a.type || 'hour';
-    return `
-    <div class="addon-setting-row" style="display:grid;grid-template-columns:1fr 84px 92px 34px;gap:6px;align-items:center;margin-bottom:8px;">
-      <input class="addon-name-input" value="${a.name}" placeholder="Name"
-        style="padding:10px 10px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.85rem;background:var(--bg);color:var(--text);outline:none;" />
-      <div class="amount-wrap">
-        <span class="currency-sign" style="font-size:0.8rem;left:10px;">₹</span>
-        <input type="number" class="addon-rate-input" value="${a.rate}" placeholder="0" min="0" inputmode="numeric"
-          style="padding:10px 6px 10px 22px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.85rem;background:var(--bg);color:var(--text);outline:none;width:100%;" />
-      </div>
-      <select class="addon-type-select"
-        style="padding:10px 6px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.8rem;background:var(--bg);color:var(--text);outline:none;cursor:pointer;">
-        <option value="hour" ${t === 'hour' ? 'selected' : ''}>Per hour</option>
-        <option value="qty"  ${t === 'qty'  ? 'selected' : ''}>Per qty</option>
-      </select>
-      <button onclick="removeAddonRow(this)"
-        style="width:34px;height:36px;border-radius:9px;border:1.5px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:0.95rem;">✕</button>
-    </div>`;
+    return '<div class="addon-setting-row" style="display:grid;grid-template-columns:1fr 84px 92px 34px;gap:6px;align-items:center;margin-bottom:8px;">' +
+      '<input class="addon-name-input" value="' + a.name + '" placeholder="Name" style="padding:10px 10px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.85rem;background:var(--bg);color:var(--text);outline:none;" />' +
+      '<div class="amount-wrap"><span class="currency-sign" style="font-size:0.8rem;left:10px;">₹</span>' +
+      '<input type="number" class="addon-rate-input" value="' + a.rate + '" placeholder="0" min="0" inputmode="numeric" style="padding:10px 6px 10px 22px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.85rem;background:var(--bg);color:var(--text);outline:none;width:100%;" /></div>' +
+      '<select class="addon-type-select" style="padding:10px 6px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.8rem;background:var(--bg);color:var(--text);outline:none;cursor:pointer;">' +
+      '<option value="hour" ' + (t === 'hour' ? 'selected' : '') + '>Per hour</option>' +
+      '<option value="qty" ' + (t === 'qty' ? 'selected' : '') + '>Per qty</option></select>' +
+      '<button onclick="removeAddonRow(this)" style="width:34px;height:36px;border-radius:9px;border:1.5px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:0.95rem;">✕</button></div>';
   }).join('');
 }
-
 function addAddonRow() {
-  const empty = document.getElementById('addonEmptyMsg');
-  empty.style.display = 'none';
+  document.getElementById('addonEmptyMsg').style.display = 'none';
   const list = document.getElementById('addonSettingsList');
   const div  = document.createElement('div');
   div.className = 'addon-setting-row';
   div.style.cssText = 'display:grid;grid-template-columns:1fr 84px 92px 34px;gap:6px;align-items:center;margin-bottom:8px;';
-  div.innerHTML = `
-    <input class="addon-name-input" value="" placeholder="Name"
-      style="padding:10px 10px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.85rem;background:var(--bg);color:var(--text);outline:none;" />
-    <div class="amount-wrap">
-      <span class="currency-sign" style="font-size:0.8rem;left:10px;">₹</span>
-      <input type="number" class="addon-rate-input" value="" placeholder="0" min="0" inputmode="numeric"
-        style="padding:10px 6px 10px 22px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.85rem;background:var(--bg);color:var(--text);outline:none;width:100%;" />
-    </div>
-    <select class="addon-type-select"
-      style="padding:10px 6px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.8rem;background:var(--bg);color:var(--text);outline:none;cursor:pointer;">
-      <option value="hour" selected>Per hour</option>
-      <option value="qty">Per qty</option>
-    </select>
-    <button onclick="removeAddonRow(this)"
-      style="width:34px;height:36px;border-radius:9px;border:1.5px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:0.95rem;">✕</button>`;
+  div.innerHTML = '<input class="addon-name-input" value="" placeholder="Name" style="padding:10px 10px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.85rem;background:var(--bg);color:var(--text);outline:none;" />' +
+    '<div class="amount-wrap"><span class="currency-sign" style="font-size:0.8rem;left:10px;">₹</span>' +
+    '<input type="number" class="addon-rate-input" value="" placeholder="0" min="0" inputmode="numeric" style="padding:10px 6px 10px 22px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.85rem;background:var(--bg);color:var(--text);outline:none;width:100%;" /></div>' +
+    '<select class="addon-type-select" style="padding:10px 6px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:0.8rem;background:var(--bg);color:var(--text);outline:none;cursor:pointer;">' +
+    '<option value="hour" selected>Per hour</option><option value="qty">Per qty</option></select>' +
+    '<button onclick="removeAddonRow(this)" style="width:34px;height:36px;border-radius:9px;border:1.5px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:0.95rem;">✕</button>';
   list.appendChild(div);
   div.querySelector('.addon-name-input').focus();
 }
-
 function removeAddonRow(btn) {
   btn.closest('.addon-setting-row').remove();
   const list = document.getElementById('addonSettingsList');
-  if (!list.querySelectorAll('.addon-setting-row').length) {
-    document.getElementById('addonEmptyMsg').style.display = 'block';
-  }
+  if (!list.querySelectorAll('.addon-setting-row').length) document.getElementById('addonEmptyMsg').style.display = 'block';
 }
-
-// ── ADD-ONS IN BOOKING FORM ──
-// Parses stored addons text "Video Recording x2 - Rs. 1000, In ears x3 - Rs. 300"
-// into a map of { lowercaseName: quantity }
 function parseAddonsText(text) {
   const map = {};
   if (!text) return map;
@@ -1216,17 +991,12 @@ function parseAddonsText(text) {
     const dashIdx = part.lastIndexOf(' - Rs.');
     if (dashIdx === -1) return;
     const namePart = part.substring(0, dashIdx).trim();
-    // Extract quantity from "Name xN"
     const m = namePart.match(/^(.*?)\s+x(\d+)$/i);
-    if (m) {
-      map[m[1].trim().toLowerCase()] = parseInt(m[2], 10);
-    } else {
-      map[namePart.toLowerCase()] = 1;
-    }
+    if (m) map[m[1].trim().toLowerCase()] = parseInt(m[2], 10);
+    else map[namePart.toLowerCase()] = 1;
   });
   return map;
 }
-
 function renderAddonBookingList(addonsText) {
   const addons  = getAddonsConfig();
   const section = document.getElementById('addonsBookingSection');
@@ -1234,103 +1004,64 @@ function renderAddonBookingList(addonsText) {
   if (!addons.length) { section.style.display = 'none'; return; }
   section.style.display = 'block';
   document.getElementById('addonHrsLabel').textContent = '';
-
-  // Determine quantities for each add-on
   let qtyMap = {};
   if (addonsText !== undefined) {
-    // Edit/restore mode — parse from stored text
     qtyMap = parseAddonsText(addonsText);
   } else {
-    // Normal mode — preserve current checkbox + stepper state
     list.querySelectorAll('.addon-booking-cb').forEach(cb => {
-      if (cb.checked) {
-        const n = parseInt(cb.closest('.addon-booking-row').querySelector('.addon-qty-val').textContent, 10) || 1;
-        qtyMap[cb.dataset.name.toLowerCase()] = n;
-      }
+      if (cb.checked) { const n = parseInt(cb.closest('.addon-booking-row').querySelector('.addon-qty-val').textContent, 10) || 1; qtyMap[cb.dataset.name.toLowerCase()] = n; }
     });
   }
-
   list.innerHTML = addons.map(a => {
-    const type    = a.type || 'hour';
-    const unit    = type === 'hour' ? 'hrs' : 'qty';
-    const rateLbl = type === 'hour' ? `₹${a.rate.toLocaleString('en-IN')} / hr` : `₹${a.rate.toLocaleString('en-IN')} each`;
-    const qty     = qtyMap[a.name.toLowerCase()] || 0;
+    const type = a.type || 'hour';
+    const unit = type === 'hour' ? 'hrs' : 'qty';
+    const rateLbl = type === 'hour' ? '₹' + a.rate.toLocaleString('en-IN') + ' / hr' : '₹' + a.rate.toLocaleString('en-IN') + ' each';
+    const qty = qtyMap[a.name.toLowerCase()] || 0;
     const checked = qty > 0;
-    const n       = checked ? qty : 1;
-    const amt     = checked ? Math.round(a.rate * n) : 0;
-    return `
-    <div class="addon-booking-row" data-type="${type}"
-      style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:0.5px solid var(--border);">
-      <input type="checkbox" class="addon-booking-cb" data-name="${a.name}" data-rate="${a.rate}" data-type="${type}"
-        onchange="toggleAddon(this)" ${checked ? 'checked' : ''}
-        style="width:16px;height:16px;cursor:pointer;flex-shrink:0;" />
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:0.88rem;font-weight:600;color:var(--text);">${a.name}</div>
-        <div style="font-size:0.7rem;color:var(--muted);">${rateLbl}</div>
-      </div>
-      <div class="addon-stepper" style="display:${checked ? 'flex' : 'none'};align-items:center;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg);">
-        <button type="button" onclick="stepAddon(this,-1)" style="width:28px;height:30px;border:none;background:var(--bg);cursor:pointer;color:var(--text);font-size:1rem;line-height:1;">−</button>
-        <span class="addon-qty-val" style="font-size:0.85rem;font-weight:700;color:var(--text);width:28px;text-align:center;border-left:1px solid var(--border);border-right:1px solid var(--border);line-height:30px;">${n}</span>
-        <button type="button" onclick="stepAddon(this,1)" style="width:28px;height:30px;border:none;background:var(--bg);cursor:pointer;color:var(--text);font-size:1rem;line-height:1;">+</button>
-      </div>
-      <span class="addon-unit-lbl" style="font-size:0.62rem;color:var(--muted);width:20px;display:${checked ? 'inline' : 'none'};">${unit}</span>
-      <span class="addon-amt-label" style="font-size:0.88rem;font-weight:700;color:${checked ? 'var(--text)' : 'var(--muted2)'};min-width:56px;text-align:right;">
-        ${checked ? '₹' + amt.toLocaleString('en-IN') : '—'}
-      </span>
-    </div>`;
+    const n = checked ? qty : 1;
+    const amt = checked ? Math.round(a.rate * n) : 0;
+    return '<div class="addon-booking-row" data-type="' + type + '" style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:0.5px solid var(--border);">' +
+      '<input type="checkbox" class="addon-booking-cb" data-name="' + a.name + '" data-rate="' + a.rate + '" data-type="' + type + '" onchange="toggleAddon(this)" ' + (checked ? 'checked' : '') + ' style="width:16px;height:16px;cursor:pointer;flex-shrink:0;" />' +
+      '<div style="flex:1;min-width:0;"><div style="font-size:0.88rem;font-weight:600;color:var(--text);">' + a.name + '</div><div style="font-size:0.7rem;color:var(--muted);">' + rateLbl + '</div></div>' +
+      '<div class="addon-stepper" style="display:' + (checked ? 'flex' : 'none') + ';align-items:center;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg);">' +
+      '<button type="button" onclick="stepAddon(this,-1)" style="width:28px;height:30px;border:none;background:var(--bg);cursor:pointer;color:var(--text);font-size:1rem;line-height:1;">−</button>' +
+      '<span class="addon-qty-val" style="font-size:0.85rem;font-weight:700;color:var(--text);width:28px;text-align:center;border-left:1px solid var(--border);border-right:1px solid var(--border);line-height:30px;">' + n + '</span>' +
+      '<button type="button" onclick="stepAddon(this,1)" style="width:28px;height:30px;border:none;background:var(--bg);cursor:pointer;color:var(--text);font-size:1rem;line-height:1;">+</button></div>' +
+      '<span class="addon-unit-lbl" style="font-size:0.62rem;color:var(--muted);width:20px;display:' + (checked ? 'inline' : 'none') + ';">' + unit + '</span>' +
+      '<span class="addon-amt-label" style="font-size:0.88rem;font-weight:700;color:' + (checked ? 'var(--text)' : 'var(--muted2)') + ';min-width:56px;text-align:right;">' + (checked ? '₹' + amt.toLocaleString('en-IN') : '—') + '</span></div>';
   }).join('');
 }
-
-// Toggle checkbox — show/hide stepper, set qty to 1 when checked
 function toggleAddon(cb) {
-  const row     = cb.closest('.addon-booking-row');
+  const row = cb.closest('.addon-booking-row');
   const stepper = row.querySelector('.addon-stepper');
   const unitLbl = row.querySelector('.addon-unit-lbl');
-  const valEl   = row.querySelector('.addon-qty-val');
-  if (cb.checked) {
-    valEl.textContent = '1';
-    stepper.style.display = 'flex';
-    unitLbl.style.display = 'inline';
-  } else {
-    stepper.style.display = 'none';
-    unitLbl.style.display = 'none';
-  }
+  const valEl = row.querySelector('.addon-qty-val');
+  if (cb.checked) { valEl.textContent = '1'; stepper.style.display = 'flex'; unitLbl.style.display = 'inline'; }
+  else { stepper.style.display = 'none'; unitLbl.style.display = 'none'; }
   calcAmount();
 }
-
-// Stepper +/- for booking form add-ons
 function stepAddon(btn, delta) {
-  const row   = btn.closest('.addon-booking-row');
+  const row = btn.closest('.addon-booking-row');
   const valEl = row.querySelector('.addon-qty-val');
   let n = parseInt(valEl.textContent, 10) || 1;
   n = Math.max(1, n + delta);
   valEl.textContent = n;
   calcAmount();
 }
-
-// Refresh each add-on row's displayed amount (without re-rendering the list)
 function updateAddonAmounts() {
   document.querySelectorAll('.addon-booking-row').forEach(row => {
-    const cb    = row.querySelector('.addon-booking-cb');
+    const cb = row.querySelector('.addon-booking-cb');
     const amtEl = row.querySelector('.addon-amt-label');
     if (!cb || !amtEl) return;
-    if (cb.checked) {
-      const n    = parseInt(row.querySelector('.addon-qty-val').textContent, 10) || 1;
-      const rate = parseFloat(cb.dataset.rate) || 0;
-      amtEl.textContent = '₹' + Math.round(rate * n).toLocaleString('en-IN');
-      amtEl.style.color = 'var(--text)';
-    } else {
-      amtEl.textContent = '—';
-      amtEl.style.color = 'var(--muted2)';
-    }
+    if (cb.checked) { const n = parseInt(row.querySelector('.addon-qty-val').textContent, 10) || 1; const rate = parseFloat(cb.dataset.rate) || 0; amtEl.textContent = '₹' + Math.round(rate * n).toLocaleString('en-IN'); amtEl.style.color = 'var(--text)'; }
+    else { amtEl.textContent = '—'; amtEl.style.color = 'var(--muted2)'; }
   });
 }
-
 function getSelectedAddons() {
   const addons = [];
   document.querySelectorAll('.addon-booking-cb:checked').forEach(cb => {
-    const row  = cb.closest('.addon-booking-row');
-    const n    = parseInt(row.querySelector('.addon-qty-val').textContent, 10) || 1;
+    const row = cb.closest('.addon-booking-row');
+    const n = parseInt(row.querySelector('.addon-qty-val').textContent, 10) || 1;
     const rate = parseFloat(cb.dataset.rate) || 0;
     const type = cb.dataset.type || 'hour';
     addons.push({ name: cb.dataset.name, rate, type, qty: n, amount: Math.round(rate * n) });
@@ -1339,11 +1070,7 @@ function getSelectedAddons() {
 }
 
 const DEFAULT_RATES = { dayStart: '10:00', dayEnd: '22:00', dayRate: 250, nightRate: 350 };
-
-function getRates() {
-  return appRates || DEFAULT_RATES;
-}
-
+function getRates() { return appRates || DEFAULT_RATES; }
 async function saveRates() {
   const rates = {
     dayStart:  document.getElementById('dayStartTime').value  || '10:00',
@@ -1351,95 +1078,67 @@ async function saveRates() {
     dayRate:   parseFloat(document.getElementById('dayRate').value)   || 250,
     nightRate: parseFloat(document.getElementById('nightRate').value) || 350
   };
-  appRates = rates; // update in-memory immediately
+  appRates = rates;
   syncNightLabels();
   updateRatePreview();
   setSpin(true);
   try {
-    const data = await xhrGet(`${SCRIPT_URL}?action=saveRates&data=${encodeURIComponent(JSON.stringify(rates))}`);
+    const data = await xhrGet(SCRIPT_URL + '?action=saveRates&data=' + encodeURIComponent(JSON.stringify(rates)));
     showToast(data.status === 'ok' ? '✅ Rates saved & synced!' : 'Saved locally — sheet sync failed', data.status === 'ok' ? 'success' : '');
-  } catch {
-    showToast('Saved — offline', '');
-  } finally {
-    setSpin(false);
-  }
+  } catch { showToast('Saved — offline', ''); } finally { setSpin(false); }
 }
-
 async function loadRatesFromSheets() {
   try {
-    const data = await xhrGet(`${SCRIPT_URL}?action=getRates`);
-    if (data.status === 'ok' && data.rates) {
-      appRates = data.rates;
-    }
-  } catch(err) {
-    console.error('loadRatesFromSheets error:', err.message);
-  }
+    const data = await xhrGet(SCRIPT_URL + '?action=getRates');
+    if (data.status === 'ok' && data.rates) appRates = data.rates;
+  } catch(err) { console.error('loadRatesFromSheets error:', err.message); }
 }
-
 function computeAmount(from, to, rates) {
-  const fMins  = timeToMins(from);
-  let   tMins  = timeToMins(to);
-  if (tMins <= fMins) tMins += 24 * 60; // overnight
+  const fMins = timeToMins(from);
+  let tMins = timeToMins(to);
+  if (tMins <= fMins) tMins += 24 * 60;
   const actualMins = tMins - fMins;
-  // Round up to nearest full hour — 1hr 30mins billed as 2hrs
   const billedMins = Math.ceil(actualMins / 60) * 60;
-  const dayS  = timeToMins(rates.dayStart);
-  const dayE  = timeToMins(rates.dayEnd);
+  const dayS = timeToMins(rates.dayStart);
+  const dayE = timeToMins(rates.dayEnd);
   let dayMins = 0, nightMins = 0;
   for (let t = fMins; t < fMins + billedMins; t += 30) {
     const tNorm = t % (24 * 60);
-    if (tNorm >= dayS && tNorm < dayE) dayMins += 30;
-    else nightMins += 30;
+    if (tNorm >= dayS && tNorm < dayE) dayMins += 30; else nightMins += 30;
   }
   return Math.round((dayMins / 60) * rates.dayRate + (nightMins / 60) * rates.nightRate);
 }
-
-// ── CUSTOM RATE TOGGLE ──
 function toggleCustomRate() {
-  const enabled = document.getElementById('customRateEnabled').checked;
-  document.getElementById('customRateFields').style.display = enabled ? 'block' : 'none';
+  document.getElementById('customRateFields').style.display = document.getElementById('customRateEnabled').checked ? 'block' : 'none';
   calcAmount();
 }
-
 function calcAmount() {
   const from = document.getElementById('fromTime').value;
   const to   = document.getElementById('toTime').value;
-  if (!from || !to) {
-    document.getElementById('totalHours').value = '—';
-    return;
-  }
+  if (!from || !to) { document.getElementById('totalHours').value = '—'; return; }
   const fMins = timeToMins(from);
-  let   tMins = timeToMins(to);
+  let tMins = timeToMins(to);
   if (tMins <= fMins) tMins += 24 * 60;
-  const diff    = tMins - fMins;
-  const hrs     = Math.floor(diff / 60);
-  const mins    = diff % 60;
-  const billed  = Math.ceil(diff / 60);
-  const actualLabel = hrs > 0 && mins > 0 ? `${hrs}hrs ${mins}mins` : hrs > 0 ? `${hrs}hrs` : `${mins}mins`;
-  document.getElementById('totalHours').value = mins > 0 ? `${actualLabel} (billed as ${billed}hrs)` : actualLabel;
-  // Note: add-on list is NOT re-rendered here — steppers manage their own state.
-  // Only update each add-on's displayed amount based on its current quantity.
+  const diff = tMins - fMins;
+  const hrs = Math.floor(diff / 60), mins = diff % 60, billed = Math.ceil(diff / 60);
+  const actualLabel = hrs > 0 && mins > 0 ? hrs + 'hrs ' + mins + 'mins' : hrs > 0 ? hrs + 'hrs' : mins + 'mins';
+  document.getElementById('totalHours').value = mins > 0 ? actualLabel + ' (billed as ' + billed + 'hrs)' : actualLabel;
   updateAddonAmounts();
   const globalRates = getRates();
-  const useCustom   = document.getElementById('customRateEnabled').checked;
+  const useCustom = document.getElementById('customRateEnabled').checked;
   let rates = { ...globalRates };
   if (useCustom) {
-    const cDay   = parseFloat(document.getElementById('customDayRate').value);
+    const cDay = parseFloat(document.getElementById('customDayRate').value);
     const cNight = parseFloat(document.getElementById('customNightRate').value);
-    if (cDay   > 0) rates.dayRate   = cDay;
+    if (cDay > 0) rates.dayRate = cDay;
     if (cNight > 0) rates.nightRate = cNight;
   }
   const rehearsalAmt = computeAmount(from, to, rates);
-  const addonsAmt    = getSelectedAddons().reduce((s, a) => s + a.amount, 0);
+  const addonsAmt = getSelectedAddons().reduce((s, a) => s + a.amount, 0);
   const total = rehearsalAmt + addonsAmt;
-  if (total > 0) {
-    document.getElementById('amount').value = total;
-    calcAmountDue();
-  }
+  if (total > 0) { document.getElementById('amount').value = total; calcAmountDue(); }
 }
-
-async function initSettingsTab() {
-  // Data already loaded on app startup — just read from localStorage
+function initSettingsTab() {
   const rates = getRates();
   document.getElementById('dayRate').value      = rates.dayRate;
   document.getElementById('nightRate').value    = rates.nightRate;
@@ -1451,15 +1150,12 @@ async function initSettingsTab() {
   updateRatePreview();
   renderAddonSettingsList();
 }
-
 function syncNightLabels() {
-  // Night start = day end, Night end = day start
   const dayStartSlot = TIME_SLOTS.find(s => s.val === document.getElementById('dayStartTime').value);
   const dayEndSlot   = TIME_SLOTS.find(s => s.val === document.getElementById('dayEndTime').value);
   if (dayEndSlot)   document.getElementById('nightStartLabel').textContent = dayEndSlot.label;
   if (dayStartSlot) document.getElementById('nightEndLabel').textContent   = dayStartSlot.label;
 }
-
 function updateRatePreview() {
   const rates = getRates();
   const examples = [
@@ -1469,22 +1165,19 @@ function updateRatePreview() {
   ];
   document.getElementById('ratePreview').innerHTML = examples.map(e => {
     const amt = computeAmount(e.from, e.to, rates);
-    return `<div style="display:flex;justify-content:space-between;padding:2px 0;"><span>${e.label}</span><strong>₹${amt.toLocaleString('en-IN')}</strong></div>`;
+    return '<div style="display:flex;justify-content:space-between;padding:2px 0;"><span>' + e.label + '</span><strong>₹' + amt.toLocaleString('en-IN') + '</strong></div>';
   }).join('');
 }
-
 function calcAmountDue() {
   const amount  = parseFloat(document.getElementById('amount').value) || 0;
   const advance = parseFloat(document.getElementById('advancePaid').value) || 0;
   document.getElementById('amountDue').value = Math.max(0, amount - advance);
 }
 
-// ── EDIT BOOKING ──
 // ── EDIT OVERLAY ──
 function editBooking(id) {
   const b = bookings.find(b => b.id === id);
   if (!b) return;
-
   document.getElementById('edit-editingId').value   = id;
   document.getElementById('edit-bandName').value    = b.band;
   document.getElementById('edit-bandMobile').value  = b.mobile || '';
@@ -1494,49 +1187,34 @@ function editBooking(id) {
   document.getElementById('edit-amountDue').value   = b.amountDue  || 0;
   document.getElementById('edit-status').value      = b.status     || 'Attending';
   document.getElementById('edit-notes').value       = b.notes      || '';
-
-  // Time pickers
   document.getElementById('edit-fromTime').value = b.from;
   document.getElementById('edit-toTime').value   = b.to;
   setEditTimePickerValue('from', b.from);
   setEditTimePickerValue('to',   b.to);
-
-  // Total hours
   const fMins = timeToMins(b.from);
   let tMins = timeToMins(b.to);
   if (tMins <= fMins) tMins += 24 * 60;
   const diff = tMins - fMins;
   const hrs = Math.floor(diff / 60), mins = diff % 60, billed = Math.ceil(diff / 60);
-  const label = hrs > 0 && mins > 0 ? `${hrs}hrs ${mins}mins` : hrs > 0 ? `${hrs}hrs` : `${mins}mins`;
-  document.getElementById('edit-totalHours').value = mins > 0 ? `${label} (billed as ${billed}hrs)` : label;
-
-  // Custom rate
-  const customDay   = parseFloat(b.customDayRate)   || 0;
+  const label = hrs > 0 && mins > 0 ? hrs + 'hrs ' + mins + 'mins' : hrs > 0 ? hrs + 'hrs' : mins + 'mins';
+  document.getElementById('edit-totalHours').value = mins > 0 ? label + ' (billed as ' + billed + 'hrs)' : label;
+  const customDay = parseFloat(b.customDayRate) || 0;
   const customNight = parseFloat(b.customNightRate) || 0;
-  const hasCustom   = customDay > 0 || customNight > 0;
+  const hasCustom = customDay > 0 || customNight > 0;
   document.getElementById('edit-customRateEnabled').checked      = hasCustom;
   document.getElementById('edit-customRateFields').style.display = hasCustom ? 'block' : 'none';
   document.getElementById('edit-customDayRate').value            = hasCustom ? customDay   : '';
   document.getElementById('edit-customNightRate').value          = hasCustom ? customNight : '';
-
-  // Open overlay — push history so back button closes it
   document.getElementById('editOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
   history.pushState({ tab: currentActiveTab(), overlay: 'edit' }, '', '#edit');
-
-  // appAddons is guaranteed loaded before UI shows — render immediately
   renderEditAddonList(b.addons || '');
 }
-
 function closeEditOverlay() {
   document.getElementById('editOverlay').classList.remove('open');
   document.body.style.overflow = '';
-  // Go back in history if we pushed an overlay state
-  if (history.state?.overlay === 'edit') {
-    history.back();
-  }
+  if (history.state && history.state.overlay === 'edit') history.back();
 }
-
 function setEditTimePickerValue(which, val) {
   if (!val) return;
   const [h, m] = val.split(':').map(Number);
@@ -1549,7 +1227,6 @@ function setEditTimePickerValue(which, val) {
   document.getElementById('edit-' + which + 'TimeLabel').textContent = slot.label;
   document.getElementById('edit-' + which + 'TimeLabel').classList.remove('tp-placeholder');
 }
-
 function renderEditAddonList(addonsText) {
   const addons  = getAddonsConfig();
   const section = document.getElementById('edit-addonsSection');
@@ -1557,170 +1234,124 @@ function renderEditAddonList(addonsText) {
   if (!addons.length) { section.style.display = 'none'; return; }
   section.style.display = 'block';
   document.getElementById('edit-addonHrsLabel').textContent = '';
-
-  // Build quantity map
   let qtyMap = {};
   if (addonsText === '__preserve__') {
     list.querySelectorAll('.edit-addon-cb').forEach(cb => {
-      if (cb.checked) {
-        const n = parseInt(cb.closest('.edit-addon-row').querySelector('.edit-addon-qty-val').textContent, 10) || 1;
-        qtyMap[cb.dataset.name.toLowerCase()] = n;
-      }
+      if (cb.checked) { const n = parseInt(cb.closest('.edit-addon-row').querySelector('.edit-addon-qty-val').textContent, 10) || 1; qtyMap[cb.dataset.name.toLowerCase()] = n; }
     });
-  } else {
-    qtyMap = parseAddonsText(addonsText);
-  }
-
+  } else { qtyMap = parseAddonsText(addonsText); }
   list.innerHTML = addons.map(a => {
-    const type    = a.type || 'hour';
-    const unit    = type === 'hour' ? 'hrs' : 'qty';
-    const rateLbl = type === 'hour' ? `₹${a.rate.toLocaleString('en-IN')} / hr` : `₹${a.rate.toLocaleString('en-IN')} each`;
-    const qty     = qtyMap[a.name.toLowerCase()] || 0;
+    const type = a.type || 'hour';
+    const unit = type === 'hour' ? 'hrs' : 'qty';
+    const rateLbl = type === 'hour' ? '₹' + a.rate.toLocaleString('en-IN') + ' / hr' : '₹' + a.rate.toLocaleString('en-IN') + ' each';
+    const qty = qtyMap[a.name.toLowerCase()] || 0;
     const checked = qty > 0;
-    const n       = checked ? qty : 1;
-    const amt     = checked ? Math.round(a.rate * n) : 0;
-    return `
-    <div class="edit-addon-row" data-type="${type}"
-      style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:0.5px solid var(--border);">
-      <input type="checkbox" class="edit-addon-cb" data-name="${a.name}" data-rate="${a.rate}" data-type="${type}"
-        onchange="toggleEditAddon(this)" ${checked ? 'checked' : ''}
-        style="width:16px;height:16px;cursor:pointer;flex-shrink:0;" />
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:0.88rem;font-weight:600;color:var(--text);">${a.name}</div>
-        <div style="font-size:0.7rem;color:var(--muted);">${rateLbl}</div>
-      </div>
-      <div class="edit-addon-stepper" style="display:${checked ? 'flex' : 'none'};align-items:center;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg);">
-        <button type="button" onclick="stepEditAddon(this,-1)" style="width:28px;height:30px;border:none;background:var(--bg);cursor:pointer;color:var(--text);font-size:1rem;line-height:1;">−</button>
-        <span class="edit-addon-qty-val" style="font-size:0.85rem;font-weight:700;color:var(--text);width:28px;text-align:center;border-left:1px solid var(--border);border-right:1px solid var(--border);line-height:30px;">${n}</span>
-        <button type="button" onclick="stepEditAddon(this,1)" style="width:28px;height:30px;border:none;background:var(--bg);cursor:pointer;color:var(--text);font-size:1rem;line-height:1;">+</button>
-      </div>
-      <span class="edit-addon-unit-lbl" style="font-size:0.62rem;color:var(--muted);width:20px;display:${checked ? 'inline' : 'none'};">${unit}</span>
-      <span class="edit-addon-amt" style="font-size:0.88rem;font-weight:700;color:${checked ? 'var(--text)' : 'var(--muted2)'};min-width:56px;text-align:right;">
-        ${checked ? '₹' + amt.toLocaleString('en-IN') : '—'}
-      </span>
-    </div>`;
+    const n = checked ? qty : 1;
+    const amt = checked ? Math.round(a.rate * n) : 0;
+    return '<div class="edit-addon-row" data-type="' + type + '" style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:0.5px solid var(--border);">' +
+      '<input type="checkbox" class="edit-addon-cb" data-name="' + a.name + '" data-rate="' + a.rate + '" data-type="' + type + '" onchange="toggleEditAddon(this)" ' + (checked ? 'checked' : '') + ' style="width:16px;height:16px;cursor:pointer;flex-shrink:0;" />' +
+      '<div style="flex:1;min-width:0;"><div style="font-size:0.88rem;font-weight:600;color:var(--text);">' + a.name + '</div><div style="font-size:0.7rem;color:var(--muted);">' + rateLbl + '</div></div>' +
+      '<div class="edit-addon-stepper" style="display:' + (checked ? 'flex' : 'none') + ';align-items:center;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg);">' +
+      '<button type="button" onclick="stepEditAddon(this,-1)" style="width:28px;height:30px;border:none;background:var(--bg);cursor:pointer;color:var(--text);font-size:1rem;line-height:1;">−</button>' +
+      '<span class="edit-addon-qty-val" style="font-size:0.85rem;font-weight:700;color:var(--text);width:28px;text-align:center;border-left:1px solid var(--border);border-right:1px solid var(--border);line-height:30px;">' + n + '</span>' +
+      '<button type="button" onclick="stepEditAddon(this,1)" style="width:28px;height:30px;border:none;background:var(--bg);cursor:pointer;color:var(--text);font-size:1rem;line-height:1;">+</button></div>' +
+      '<span class="edit-addon-unit-lbl" style="font-size:0.62rem;color:var(--muted);width:20px;display:' + (checked ? 'inline' : 'none') + ';">' + unit + '</span>' +
+      '<span class="edit-addon-amt" style="font-size:0.88rem;font-weight:700;color:' + (checked ? 'var(--text)' : 'var(--muted2)') + ';min-width:56px;text-align:right;">' + (checked ? '₹' + amt.toLocaleString('en-IN') : '—') + '</span></div>';
   }).join('');
 }
-
 function toggleEditAddon(cb) {
-  const row     = cb.closest('.edit-addon-row');
+  const row = cb.closest('.edit-addon-row');
   const stepper = row.querySelector('.edit-addon-stepper');
   const unitLbl = row.querySelector('.edit-addon-unit-lbl');
-  const valEl   = row.querySelector('.edit-addon-qty-val');
-  if (cb.checked) {
-    valEl.textContent = '1';
-    stepper.style.display = 'flex';
-    unitLbl.style.display = 'inline';
-  } else {
-    stepper.style.display = 'none';
-    unitLbl.style.display = 'none';
-  }
+  const valEl = row.querySelector('.edit-addon-qty-val');
+  if (cb.checked) { valEl.textContent = '1'; stepper.style.display = 'flex'; unitLbl.style.display = 'inline'; }
+  else { stepper.style.display = 'none'; unitLbl.style.display = 'none'; }
   editCalcAmount();
 }
-
 function stepEditAddon(btn, delta) {
-  const row   = btn.closest('.edit-addon-row');
+  const row = btn.closest('.edit-addon-row');
   const valEl = row.querySelector('.edit-addon-qty-val');
   let n = parseInt(valEl.textContent, 10) || 1;
   n = Math.max(1, n + delta);
   valEl.textContent = n;
   editCalcAmount();
 }
-
 function updateEditAddonAmounts() {
   document.querySelectorAll('.edit-addon-row').forEach(row => {
-    const cb    = row.querySelector('.edit-addon-cb');
+    const cb = row.querySelector('.edit-addon-cb');
     const amtEl = row.querySelector('.edit-addon-amt');
     if (!cb || !amtEl) return;
-    if (cb.checked) {
-      const n    = parseInt(row.querySelector('.edit-addon-qty-val').textContent, 10) || 1;
-      const rate = parseFloat(cb.dataset.rate) || 0;
-      amtEl.textContent = '₹' + Math.round(rate * n).toLocaleString('en-IN');
-      amtEl.style.color = 'var(--text)';
-    } else {
-      amtEl.textContent = '—';
-      amtEl.style.color = 'var(--muted2)';
-    }
+    if (cb.checked) { const n = parseInt(row.querySelector('.edit-addon-qty-val').textContent, 10) || 1; const rate = parseFloat(cb.dataset.rate) || 0; amtEl.textContent = '₹' + Math.round(rate * n).toLocaleString('en-IN'); amtEl.style.color = 'var(--text)'; }
+    else { amtEl.textContent = '—'; amtEl.style.color = 'var(--muted2)'; }
   });
 }
-
 function editCalcAmountDue() {
-  const amount  = parseFloat(document.getElementById('edit-amount').value) || 0;
+  const amount = parseFloat(document.getElementById('edit-amount').value) || 0;
   const advance = parseFloat(document.getElementById('edit-advancePaid').value) || 0;
   document.getElementById('edit-amountDue').value = Math.max(0, amount - advance);
 }
-
 function editCalcAmount() {
   const useCustom = document.getElementById('edit-customRateEnabled').checked;
   document.getElementById('edit-customRateFields').style.display = useCustom ? 'block' : 'none';
   const from = document.getElementById('edit-fromTime').value;
   const to   = document.getElementById('edit-toTime').value;
   if (!from || !to) return;
-
-  // Update total hours display
   const fMins = timeToMins(from);
-  let   tMins = timeToMins(to);
+  let tMins = timeToMins(to);
   if (tMins <= fMins) tMins += 24 * 60;
-  const diff   = tMins - fMins;
-  const hrs    = Math.floor(diff / 60);
-  const mins   = diff % 60;
-  const billed = Math.ceil(diff / 60);
-  const label  = hrs > 0 && mins > 0 ? `${hrs}hrs ${mins}mins` : hrs > 0 ? `${hrs}hrs` : `${mins}mins`;
-  document.getElementById('edit-totalHours').value = mins > 0 ? `${label} (billed as ${billed}hrs)` : label;
-
+  const diff = tMins - fMins;
+  const hrs = Math.floor(diff / 60), mins = diff % 60, billed = Math.ceil(diff / 60);
+  const label = hrs > 0 && mins > 0 ? hrs + 'hrs ' + mins + 'mins' : hrs > 0 ? hrs + 'hrs' : mins + 'mins';
+  document.getElementById('edit-totalHours').value = mins > 0 ? label + ' (billed as ' + billed + 'hrs)' : label;
   updateEditAddonAmounts();
   const globalRates = getRates();
   let rates = { ...globalRates };
   if (useCustom) {
-    const cDay   = parseFloat(document.getElementById('edit-customDayRate').value);
+    const cDay = parseFloat(document.getElementById('edit-customDayRate').value);
     const cNight = parseFloat(document.getElementById('edit-customNightRate').value);
-    if (cDay   > 0) rates.dayRate   = cDay;
+    if (cDay > 0) rates.dayRate = cDay;
     if (cNight > 0) rates.nightRate = cNight;
   }
   const rehearsalAmt = computeAmount(from, to, rates);
-  const addonsAmt    = getEditSelectedAddons().reduce((s, a) => s + a.amount, 0);
+  const addonsAmt = getEditSelectedAddons().reduce((s, a) => s + a.amount, 0);
   document.getElementById('edit-amount').value = rehearsalAmt + addonsAmt;
   editCalcAmountDue();
 }
-
 function getEditSelectedAddons() {
   const addons = [];
   document.querySelectorAll('.edit-addon-cb:checked').forEach(cb => {
-    const row  = cb.closest('.edit-addon-row');
-    const n    = parseInt(row.querySelector('.edit-addon-qty-val').textContent, 10) || 1;
+    const row = cb.closest('.edit-addon-row');
+    const n = parseInt(row.querySelector('.edit-addon-qty-val').textContent, 10) || 1;
     const rate = parseFloat(cb.dataset.rate) || 0;
     const type = cb.dataset.type || 'hour';
     addons.push({ name: cb.dataset.name, rate, type, qty: n, amount: Math.round(rate * n) });
   });
   return addons;
 }
-
 async function submitEditBooking() {
-  const id          = document.getElementById('edit-editingId').value;
-  const band        = document.getElementById('edit-bandName').value.trim();
-  const mobile      = document.getElementById('edit-bandMobile').value.trim();
-  const date        = document.getElementById('edit-bookDate').value;
-  const from        = document.getElementById('edit-fromTime').value;
-  const to          = document.getElementById('edit-toTime').value;
-  const amount      = document.getElementById('edit-amount').value;
+  const id = document.getElementById('edit-editingId').value;
+  const band = document.getElementById('edit-bandName').value.trim();
+  const mobile = document.getElementById('edit-bandMobile').value.trim();
+  const date = document.getElementById('edit-bookDate').value;
+  const from = document.getElementById('edit-fromTime').value;
+  const to = document.getElementById('edit-toTime').value;
+  const amount = document.getElementById('edit-amount').value;
   const advancePaid = parseFloat(document.getElementById('edit-advancePaid').value) || 0;
-  const amountDue   = parseFloat(document.getElementById('edit-amountDue').value)   || 0;
-  const status      = document.getElementById('edit-status').value;
-  const notes       = document.getElementById('edit-notes').value.trim();
-  const useCustom      = document.getElementById('edit-customRateEnabled').checked;
-  const globalRates    = getRates();
-  const customDayRate   = useCustom ? (parseFloat(document.getElementById('edit-customDayRate').value)   || globalRates.dayRate)   : globalRates.dayRate;
+  const amountDue = parseFloat(document.getElementById('edit-amountDue').value) || 0;
+  const status = document.getElementById('edit-status').value;
+  const notes = document.getElementById('edit-notes').value.trim();
+  const useCustom = document.getElementById('edit-customRateEnabled').checked;
+  const globalRates = getRates();
+  const customDayRate = useCustom ? (parseFloat(document.getElementById('edit-customDayRate').value) || globalRates.dayRate) : globalRates.dayRate;
   const customNightRate = useCustom ? (parseFloat(document.getElementById('edit-customNightRate').value) || globalRates.nightRate) : globalRates.nightRate;
-  const selectedAddons  = getEditSelectedAddons();
+  const selectedAddons = getEditSelectedAddons();
   if (!band || !date || !from || !to || !amount) { showToast('Fill all required fields', 'error'); return; }
   const btn = document.getElementById('edit-submitBtn');
   btn.disabled = true;
   btn.querySelector('.btn-text').style.display = 'none';
   btn.querySelector('.btn-spinner').style.display = 'inline';
   const original = bookings.find(b => b.id === id);
-  const updated  = { ...original, band, mobile, date, from, to,
-    amount: parseFloat(amount), advancePaid, amountDue, status, notes,
-    customDayRate, customNightRate, selectedAddons };
+  const updated = { ...original, band, mobile, date, from, to, amount: parseFloat(amount), advancePaid, amountDue, status, notes, customDayRate, customNightRate, selectedAddons };
   const ok = await updateInSheets(updated);
   if (ok) {
     const idx = bookings.findIndex(b => b.id === id);
@@ -1730,12 +1361,9 @@ async function submitEditBooking() {
     setStatus('ok', '✓ Synced · ' + bookings.length + ' bookings');
     closeEditOverlay();
     renderSchedule();
-  } else {
-    showToast('Update failed — check connection', 'error');
-  }
+  } else { showToast('Update failed — check connection', 'error'); }
   btn.disabled = false; btn.querySelector('.btn-text').style.display = 'inline'; btn.querySelector('.btn-spinner').style.display = 'none';
 }
-
 
 function resetForm() {
   document.getElementById('editingId').value = '';
@@ -1746,52 +1374,44 @@ function resetForm() {
   document.getElementById('fromTimeLabel').className   = 'tp-placeholder';
   document.getElementById('toTimeLabel').textContent   = 'Select time';
   document.getElementById('toTimeLabel').className     = 'tp-placeholder';
-  document.getElementById('customRateEnabled').checked        = false;
-  document.getElementById('customRateFields').style.display   = 'none';
-  document.getElementById('customDayRate').value               = '';
-  document.getElementById('customNightRate').value             = '';
+  document.getElementById('customRateEnabled').checked = false;
+  document.getElementById('customRateFields').style.display = 'none';
+  document.getElementById('customDayRate').value = '';
+  document.getElementById('customNightRate').value = '';
   document.getElementById('totalHours').value = '—';
-  // Uncheck all add-ons, hide steppers, reset amounts
   document.querySelectorAll('.addon-booking-cb').forEach(cb => {
     cb.checked = false;
     const row = cb.closest('.addon-booking-row');
     if (row) {
       const stepper = row.querySelector('.addon-stepper');
       const unitLbl = row.querySelector('.addon-unit-lbl');
-      const lbl     = row.querySelector('.addon-amt-label');
+      const lbl = row.querySelector('.addon-amt-label');
       if (stepper) stepper.style.display = 'none';
       if (unitLbl) unitLbl.style.display = 'none';
       if (lbl) { lbl.textContent = '—'; lbl.style.color = 'var(--muted2)'; }
     }
   });
-  document.getElementById('status').value     = 'Attending';
-  document.getElementById('bookDate').value   = todayStr();
+  document.getElementById('status').value = 'Attending';
+  document.getElementById('bookDate').value = todayStr();
   document.getElementById('clashBox').classList.remove('show');
 }
-
-// ── SAVE BOOKING (handles both add and update) ──
-async function saveBooking() {
-  await addBooking();
-}
-
-// ── ADD BOOKING ──
+async function saveBooking() { await addBooking(); }
 async function addBooking() {
-  const band        = document.getElementById('bandName').value.trim();
-  const mobile      = document.getElementById('bandMobile').value.trim();
-  const date        = document.getElementById('bookDate').value;
-  const from        = document.getElementById('fromTime').value;
-  const to          = document.getElementById('toTime').value;
-  const amount      = document.getElementById('amount').value;
+  const band = document.getElementById('bandName').value.trim();
+  const mobile = document.getElementById('bandMobile').value.trim();
+  const date = document.getElementById('bookDate').value;
+  const from = document.getElementById('fromTime').value;
+  const to = document.getElementById('toTime').value;
+  const amount = document.getElementById('amount').value;
   const advancePaid = parseFloat(document.getElementById('advancePaid').value) || 0;
-  const amountDue   = parseFloat(document.getElementById('amountDue').value)   || 0;
-  const status      = document.getElementById('status').value;
-  const notes       = document.getElementById('notes').value.trim();
-  const useCustom      = document.getElementById('customRateEnabled').checked;
-  const globalRates    = getRates();
-  // Always save the applicable rate — custom if set, otherwise global
-  const customDayRate   = useCustom ? (parseFloat(document.getElementById('customDayRate').value)   || globalRates.dayRate)   : globalRates.dayRate;
+  const amountDue = parseFloat(document.getElementById('amountDue').value) || 0;
+  const status = document.getElementById('status').value;
+  const notes = document.getElementById('notes').value.trim();
+  const useCustom = document.getElementById('customRateEnabled').checked;
+  const globalRates = getRates();
+  const customDayRate = useCustom ? (parseFloat(document.getElementById('customDayRate').value) || globalRates.dayRate) : globalRates.dayRate;
   const customNightRate = useCustom ? (parseFloat(document.getElementById('customNightRate').value) || globalRates.nightRate) : globalRates.nightRate;
-  const selectedAddons  = getSelectedAddons();
+  const selectedAddons = getSelectedAddons();
   if (!band || !date || !from || !to || !amount) { showToast('Fill all required fields', 'error'); return; }
   if (checkClash()) { showToast('Fix the slot clash first', 'error'); return; }
   const btn = document.getElementById('submitBtn');
@@ -1811,9 +1431,6 @@ async function addBooking() {
   resetForm();
   switchTab('schedule');
 }
-
-
-// ── MARK AS PAID ──
 async function markAsPaid(id) {
   const b = bookings.find(b => b.id === id);
   if (!b) return;
@@ -1827,9 +1444,7 @@ async function markAsPaid(id) {
     saveLocal(bookings);
     showToast('✅ Booking updated!', 'success');
     renderSchedule();
-  } else {
-    showToast('Update failed — check connection', 'error');
-  }
+  } else { showToast('Update failed — check connection', 'error'); }
 }
 
 // ── SCHEDULE ──
@@ -1859,34 +1474,29 @@ function renderSchedule() {
   document.getElementById('sumCount').textContent  = ss.length;
   document.getElementById('sumAmount').textContent = '₹' + ss.reduce((s,b) => s+b.amount, 0).toLocaleString('en-IN');
   document.getElementById('sumHours').textContent  = (tm/60).toFixed(1) + 'h';
-  if (!filtered.length) { list.innerHTML = `<div class="empty-state"><div class="empty-icon">🎸</div><p>No bookings here.<br/>Use the Book tab to add one!</p></div>`; return; }
+  if (!filtered.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">🎸</div><p>No bookings here.<br/>Use the Book tab to add one!</p></div>'; return; }
   list.innerHTML = filtered.map((b,i) => {
     const statusColor = b.status === 'Cancelled' ? 'var(--red)' : b.status === 'Attended' ? 'var(--green)' : '#f0a500';
     const isAttended  = (b.status || '') === 'Attended';
     const showPaid    = !isAttended && (parseFloat(b.amountDue) > 0 || parseFloat(b.advancePaid) < parseFloat(b.amount));
-    return `
-    <div class="booking-card ${b.date < today ? 'past' : ''}">
-      <div class="card-icon">${ICONS[i % ICONS.length]}</div>
-      <div class="card-info">
-        <div class="card-band">${b.band}${b._pending ? ' 🔄' : ''}</div>
-        <div class="card-time">${safeTime(b.from)} – ${safeTime(b.to)}${b.notes ? ' · ' + b.notes : ''}</div>
-        <div class="card-date-lbl">${formatDate(b.date)}</div>
-      </div>
-      <div class="card-right">
-        <div class="card-amount">₹${b.amount.toLocaleString('en-IN')}</div>
-        <div style="font-size:0.65rem;font-weight:700;color:${statusColor};text-align:right;">${b.status || 'Attending'}</div>
-        <div style="display:flex;gap:4px;margin-top:2px;">
-          ${showPaid    ? `<button class="card-paid-btn" onclick="markAsPaid('${b.id}')">✓ Paid</button>` : ''}
-          ${!isAttended ? `<button class="card-edit"     onclick="editBooking('${b.id}')">✏️</button>`    : ''}
-        </div>
-      </div>
-    </div>`}).join('');
+    return '<div class="booking-card ' + (b.date < today ? 'past' : '') + '">' +
+      '<div class="card-icon">' + ICONS[i % ICONS.length] + '</div>' +
+      '<div class="card-info"><div class="card-band">' + b.band + (b._pending ? ' 🔄' : '') + '</div>' +
+      '<div class="card-time">' + safeTime(b.from) + ' – ' + safeTime(b.to) + (b.notes ? ' · ' + b.notes : '') + '</div>' +
+      '<div class="card-date-lbl">' + formatDate(b.date) + '</div></div>' +
+      '<div class="card-right"><div class="card-amount">₹' + b.amount.toLocaleString('en-IN') + '</div>' +
+      '<div style="font-size:0.65rem;font-weight:700;color:' + statusColor + ';text-align:right;">' + (b.status || 'Attending') + '</div>' +
+      '<div style="display:flex;gap:4px;margin-top:2px;">' +
+      (showPaid ? '<button class="card-paid-btn" onclick="markAsPaid(\'' + b.id + '\')">✓ Paid</button>' : '') +
+      (!isAttended ? '<button class="card-edit" onclick="editBooking(\'' + b.id + '\')">✏️</button>' : '') +
+      '</div></div></div>';
+  }).join('');
 }
 
 // ── STATS ──
 function renderStats() {
   const el = document.getElementById('statsContent');
-  if (!bookings.length) { el.innerHTML = `<div class="empty-state"><div class="empty-icon">📊</div><p>No data yet.</p></div>`; return; }
+  if (!bookings.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><p>No data yet.</p></div>'; return; }
   const byMonth = {}, byBand = {};
   const grandTotal = bookings.reduce((s,b) => s + b.amount, 0);
   bookings.forEach(b => {
@@ -1899,35 +1509,18 @@ function renderStats() {
   });
   const months   = Object.entries(byMonth).sort((a,b) => b[0].localeCompare(a[0]));
   const topBands = Object.entries(byBand).sort((a,b) => b[1].total - a[1].total).slice(0,5);
-  const card = c => `<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;">${c}</div>`;
-  const sec  = t => `<div style="font-family:var(--font-display);font-size:1rem;letter-spacing:2px;color:var(--muted);margin:18px 0 12px;">${t}</div>`;
+  const card = c => '<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;">' + c + '</div>';
+  const sec  = t => '<div style="font-family:var(--font-display);font-size:1rem;letter-spacing:2px;color:var(--muted);margin:18px 0 12px;">' + t + '</div>';
   el.innerHTML =
-    card(`<div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px;">All-Time Revenue</div>
-      <div style="font-family:var(--font-display);font-size:2.4rem;color:#111;letter-spacing:2px;">₹${grandTotal.toLocaleString('en-IN')}</div>
-      <div style="font-size:0.78rem;color:var(--muted);margin-top:4px;">${bookings.length} total bookings</div>`) +
+    card('<div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px;">All-Time Revenue</div><div style="font-family:var(--font-display);font-size:2.4rem;color:#111;letter-spacing:2px;">₹' + grandTotal.toLocaleString('en-IN') + '</div><div style="font-size:0.78rem;color:var(--muted);margin-top:4px;">' + bookings.length + ' total bookings</div>') +
     sec('MONTHLY') +
     months.map(([key,val]) => {
-      const label = new Date(key+'-01').toLocaleDateString('en-IN',{month:'long',year:'numeric'});
-      const pct   = Math.round((val.total/grandTotal)*100);
-      return card(`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <span style="font-weight:700;font-size:0.88rem;">${label}</span>
-          <span style="font-family:var(--font-display);font-size:1.2rem;color:#111;">₹${val.total.toLocaleString('en-IN')}</span>
-        </div>
-        <div style="background:var(--surface2);border-radius:4px;height:4px;margin-bottom:8px;">
-          <div style="background:#111;height:4px;border-radius:4px;width:${pct}%;"></div>
-        </div>
-        <div style="font-size:0.72rem;color:var(--muted);">${val.count} bookings · ${val.hours.toFixed(1)}h booked</div>`);
+      const lbl = new Date(key+'-01').toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+      const pct = Math.round((val.total/grandTotal)*100);
+      return card('<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><span style="font-weight:700;font-size:0.88rem;">' + lbl + '</span><span style="font-family:var(--font-display);font-size:1.2rem;color:#111;">₹' + val.total.toLocaleString('en-IN') + '</span></div><div style="background:var(--surface2);border-radius:4px;height:4px;margin-bottom:8px;"><div style="background:#111;height:4px;border-radius:4px;width:' + pct + '%;"></div></div><div style="font-size:0.72rem;color:var(--muted);">' + val.count + ' bookings · ' + val.hours.toFixed(1) + 'h booked</div>');
     }).join('') +
     sec('TOP BANDS') +
-    topBands.map(([band,val],i) => card(`
-      <div style="display:flex;align-items:center;gap:12px;">
-        <div style="font-family:var(--font-display);font-size:1.4rem;color:var(--muted2);width:24px;text-align:center;">${i+1}</div>
-        <div style="flex:1;font-weight:700;font-size:0.9rem;">${band}</div>
-        <div style="text-align:right;">
-          <div style="font-family:var(--font-display);font-size:1.1rem;color:#111;">₹${val.total.toLocaleString('en-IN')}</div>
-          <div style="font-size:0.68rem;color:var(--muted);">${val.count} sessions</div>
-        </div>
-      </div>`)).join('');
+    topBands.map(([band,val],i) => card('<div style="display:flex;align-items:center;gap:12px;"><div style="font-family:var(--font-display);font-size:1.4rem;color:var(--muted2);width:24px;text-align:center;">' + (i+1) + '</div><div style="flex:1;font-weight:700;font-size:0.9rem;">' + band + '</div><div style="text-align:right;"><div style="font-family:var(--font-display);font-size:1.1rem;color:#111;">₹' + val.total.toLocaleString('en-IN') + '</div><div style="font-size:0.68rem;color:var(--muted);">' + val.count + ' sessions</div></div></div>')).join('');
 }
 
 // ── TABS ──
@@ -1940,16 +1533,10 @@ function switchTab(tab) {
   if (tab === 'stats')    renderStats();
   if (tab === 'calendar') renderCalendar();
   if (tab === 'settings') initSettingsTab();
-  // Push history entry so back button navigates within app
-  if (history.state?.tab !== tab) {
-    history.pushState({ tab }, '', '#' + tab);
-  }
+  if (!history.state || history.state.tab !== tab) history.pushState({ tab }, '', '#' + tab);
 }
-
-// Handle browser back/forward buttons
 window.addEventListener('popstate', e => {
-  const tab = e.state?.tab || 'book';
-  // If edit overlay is open, just close it (popstate already consumed the history entry)
+  const tab = (e.state && e.state.tab) || 'book';
   if (document.getElementById('editOverlay').classList.contains('open')) {
     document.getElementById('editOverlay').classList.remove('open');
     document.body.style.overflow = '';
@@ -1964,12 +1551,10 @@ window.addEventListener('popstate', e => {
   if (tab === 'calendar') renderCalendar();
   if (tab === 'settings') initSettingsTab();
 });
-
 function currentActiveTab() {
   const active = document.querySelector('.page.active');
   return active ? active.id.replace('page-','') : 'book';
 }
-
 function switchSettingsTab(tab) {
   document.getElementById('sview-rates').style.display  = tab === 'rates'  ? 'block' : 'none';
   document.getElementById('sview-addons').style.display = tab === 'addons' ? 'block' : 'none';
@@ -1978,20 +1563,9 @@ function switchSettingsTab(tab) {
   document.getElementById('stab-addons').style.background = tab === 'addons' ? '#111' : 'transparent';
   document.getElementById('stab-addons').style.color      = tab === 'addons' ? '#fff'  : 'var(--muted)';
 }
-
-function toggleProfileMenu() {
-  const dd = document.getElementById('profileDropdown');
-  dd.classList.toggle('open');
-}
-
-function closeProfileMenu() {
-  document.getElementById('profileDropdown').classList.remove('open');
-}
-
-// Close profile menu when clicking outside
-document.addEventListener('click', e => {
-  if (!e.target.closest('.profile-wrap')) closeProfileMenu();
-});
+function toggleProfileMenu() { document.getElementById('profileDropdown').classList.toggle('open'); }
+function closeProfileMenu() { document.getElementById('profileDropdown').classList.remove('open'); }
+document.addEventListener('click', e => { if (!e.target.closest('.profile-wrap')) closeProfileMenu(); });
 
 // ── CALENDAR ──
 function getWeekDates(offset) {
@@ -2001,9 +1575,7 @@ function getWeekDates(offset) {
   monday.setHours(0,0,0,0);
   return Array.from({length:7}, (_,i) => { const d = new Date(monday); d.setDate(monday.getDate()+i); return d; });
 }
-function dateToStr(d) {
-  return d.getFullYear() + '-' + (d.getMonth()+1).toString().padStart(2,'0') + '-' + d.getDate().toString().padStart(2,'0');
-}
+function dateToStr(d) { return d.getFullYear() + '-' + (d.getMonth()+1).toString().padStart(2,'0') + '-' + d.getDate().toString().padStart(2,'0'); }
 function shiftWeek(delta) { calWeekOffset += delta; renderCalendar(); }
 function jumpToToday() { calWeekOffset = 0; calSelectedDay = todayStr(); renderCalendar(); showDayDetail(todayStr()); }
 
@@ -2023,25 +1595,35 @@ function renderCalendar() {
     const div = document.createElement('div');
     div.className = 'cal-day-header' + (ds === today ? ' today' : '') + (ds === calSelectedDay && ds !== today ? ' selected' : '');
     const dots = (bMap[ds] || []).slice(0,3).map(() => '<span class="booking-dot"></span>').join('');
-    div.innerHTML = `<div class="day-name">${DAY_NAMES[d.getDay()]}</div><div class="day-num">${d.getDate()}</div><div class="dot-row">${dots}</div>`;
+    div.innerHTML = '<div class="day-name">' + DAY_NAMES[d.getDay()] + '</div><div class="day-num">' + d.getDate() + '</div><div class="dot-row">' + dots + '</div>';
     div.onclick = () => { calSelectedDay = ds; renderCalendar(); showDayDetail(ds); };
     strip.appendChild(div);
   });
   const blockMap = {};
+  function placeSegment(colIdx, segFrom, segTo, b, ds) {
+    if (segTo <= startMins || segFrom >= endMins) return;
+    const cFrom  = Math.max(segFrom, startMins);
+    const cTo    = Math.min(segTo, endMins);
+    const startH = Math.floor(cFrom / 60);
+    const topOff = ((cFrom - startH * 60) / 60) * HOUR_PX;
+    const hPx    = Math.max(((cTo - cFrom) / 60) * HOUR_PX, 18);
+    const key    = colIdx + ':' + startH;
+    if (!blockMap[key]) blockMap[key] = [];
+    blockMap[key].push({ b, topOff, hPx, ds });
+  }
   days.forEach((d, colIdx) => {
     const ds = dateToStr(d);
     (bMap[ds] || []).forEach(b => {
       const fMins = timeToMins(safeTime(b.from));
       const tMins = timeToMins(safeTime(b.to));
-      if (tMins <= startMins || fMins >= endMins) return;
-      const cFrom  = Math.max(fMins, startMins);
-      const cTo    = Math.min(tMins, endMins);
-      const startH = Math.floor(cFrom / 60);
-      const topOff = ((cFrom - startH * 60) / 60) * HOUR_PX;
-      const hPx    = Math.max(((cTo - cFrom) / 60) * HOUR_PX, 18);
-      const key    = colIdx + ':' + startH;
-      if (!blockMap[key]) blockMap[key] = [];
-      blockMap[key].push({ b, topOff, hPx, ds });
+      if (tMins <= fMins) {
+        // Overnight booking — first segment: from → midnight on this day
+        placeSegment(colIdx, fMins, 24 * 60, b, ds);
+        // Second segment: midnight → to on the next day (if visible)
+        if (colIdx < 6) placeSegment(colIdx + 1, 0, tMins, b, ds);
+      } else {
+        placeSegment(colIdx, fMins, tMins, b, ds);
+      }
     });
   });
   const wrap    = document.getElementById('calGridWrap');
@@ -2054,7 +1636,8 @@ function renderCalendar() {
     row.className = 'cal-hour-row';
     const lbl = document.createElement('div');
     lbl.className = 'cal-time-label';
-    lbl.textContent = (h === 12 ? 12 : h % 12) + (h < 12 ? 'am' : 'pm');
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    lbl.textContent = h12 + (h < 12 ? 'am' : 'pm');
     row.appendChild(lbl);
     days.forEach((d, colIdx) => {
       const ds  = dateToStr(d);
@@ -2073,7 +1656,7 @@ function renderCalendar() {
         block.className  = 'cal-booking';
         block.style.top  = topOff + 'px';
         block.style.height = hPx + 'px';
-        block.innerHTML  = `<div class="cb-band">${b.band}</div>` + (hPx > 28 ? `<div class="cb-time">${safeTime(b.from)}–${safeTime(b.to)}</div>` : '');
+        block.innerHTML  = '<div class="cb-band">' + b.band + '</div>' + (hPx > 28 ? '<div class="cb-time">' + safeTime(b.from) + '–' + safeTime(b.to) + '</div>' : '');
         block.onclick = e => { e.stopPropagation(); calSelectedDay = bds; renderCalendar(); showDayDetail(bds); };
         col.appendChild(block);
       });
@@ -2088,12 +1671,10 @@ function renderCalendar() {
     });
     wrap.appendChild(row);
   }
-  // Scroll to current time when viewing this week, otherwise default to ~7am
-  // (early-morning bookings remain reachable by scrolling up)
   if (calWeekOffset === 0 && nowMins >= startMins) {
     wrap.scrollTop = Math.max(0, ((nowMins - startMins - 60) / 60) * HOUR_PX);
   } else {
-    wrap.scrollTop = 7 * HOUR_PX; // default view starts around 7am
+    wrap.scrollTop = 7 * HOUR_PX;
   }
   if (calSelectedDay) showDayDetail(calSelectedDay);
 }
@@ -2106,21 +1687,14 @@ function showDayDetail(ds) {
   const dayBs = bookings.filter(b => b.date === ds).sort((a,b) => a.from.localeCompare(b.from));
   body.innerHTML = !dayBs.length
     ? '<div class="cal-free-msg">✅ No bookings — day is fully available</div>'
-    : dayBs.map(b => `
-        <div class="cal-slot">
-          <div class="cal-slot-time">${safeTime(b.from)} – ${safeTime(b.to)}</div>
-          <div class="cal-slot-band">${b.band}${b.notes ? '<br><span style="font-size:0.72rem;color:var(--muted);font-weight:400;">' + b.notes + '</span>' : ''}</div>
-          <div class="cal-slot-amt">₹${b.amount.toLocaleString('en-IN')}</div>
-        </div>`).join('');
+    : dayBs.map(b => '<div class="cal-slot"><div class="cal-slot-time">' + safeTime(b.from) + ' – ' + safeTime(b.to) + '</div><div class="cal-slot-band">' + b.band + (b.notes ? '<br><span style="font-size:0.72rem;color:var(--muted);font-weight:400;">' + b.notes + '</span>' : '') + '</div><div class="cal-slot-amt">₹' + b.amount.toLocaleString('en-IN') + '</div></div>').join('');
   detail.classList.add('show');
 }
 
 // ── PWA: Register service worker ──
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('service-worker.js')
-      .then(reg => console.log('Service worker registered'))
-      .catch(err => console.log('Service worker registration failed:', err));
+    navigator.serviceWorker.register('service-worker.js').then(reg => console.log('Service worker registered')).catch(err => console.log('Service worker registration failed:', err));
   });
 }
 </script>
